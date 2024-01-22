@@ -8,24 +8,18 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
-import com.ctre.phoenix6.*;
-import com.ctre.phoenix6.hardware.TalonFX;
-
 public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
   private RobotContainer m_robotContainer;
-  private TalonFX motorTest;
-
+  
   @Override
   public void robotInit() {
     m_robotContainer = new RobotContainer();
-    motorTest = new TalonFX(0);
   }
 
   @Override
   public void robotPeriodic() {
     CommandScheduler.getInstance().run();
-    motorTest.set(1);
   }
 
   @Override
