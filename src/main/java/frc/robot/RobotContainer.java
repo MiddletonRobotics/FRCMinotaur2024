@@ -4,7 +4,7 @@
 
 package frc.robot;
 
-import frc.robot.subsystems.TankDrive;
+import frc.robot.subsystems.TankSubsystem;
 import frc.robot.utilities.XboxController;
 
 import edu.wpi.first.wpilibj2.command.Command;
@@ -13,7 +13,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
 public class RobotContainer {
 
-  private final TankDrive tankDrive = new TankDrive();
+  private final TankSubsystem tankDrive = new TankSubsystem();
   private final CommandXboxController DriverController = XboxController.getDriverController();
   private final CommandXboxController OperatorController = XboxController.getOperatorController();
 
