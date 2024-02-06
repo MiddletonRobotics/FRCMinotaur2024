@@ -6,7 +6,7 @@ import edu.wpi.first.math.util.Units;
 
 public class Constants {
 
-    // These Constants will varry depending on what Swerve Setup that you run
+    // These Constants will vary depending on what Swerve Setup that you run
 
     public static final class ModuleConstants {
         public static final double WheelDiameterMeters = Units.inchesToMeters(4);
@@ -78,19 +78,53 @@ public class Constants {
     }
 
     public static final class TankConstants {
-        public static final int leftMotorCount = 2;
-        public static final int rightMotorCount = 2;
+        public static final int RightMasterID = 2;
+        public static final int RightSlaveID = 4;
+        public static final int LeftMasterID = 1;
+        public static final int LeftSlaveID = 3;
 
-        public static final int rightMasterID = 1;
-        public static final int rightSlaveID = 2;
-        public static final int leftMasterID = 3;
-        public static final int leftSlaveID = 4;
+        public static final int LeftMotorCount = 2;
+        public static final int RightMotorCount = 2;
 
-        public static final double kDeadband = 0.05;
+        public static double ForwardReductionSpeed = 0;
+        public static double RotationReductionSpeed = 0;
+    }
+
+    public static final class ControllerRawButtons {
+        public static final int LEFT_X_AXIS = 0;
+        public static final int LEFT_Y_AXIS = 1;
+        public static final int LEFT_T_AXIS = 2;
+        public static final int RIGHT_T_AXIS = 3;
+        public static final int RIGHT_X_AXIS = 4;
+        public static final int RIGHT_Y_AXIS = 5;
+
+        public static final int BTN_A = 1;
+        public static final int BTN_B = 2;
+        public static final int BTN_X = 3;
+        public static final int BTN_Y = 4;
+        public static final int BTN_LB = 5;
+        public static final int BTN_RB = 6;
+        public static final int BTN_BACK = 7;
+        public static final int BTN_START = 8;
+        public static final int BTN_LEFT_JOYSTICK = 9;
+        public static final int BTN_RIGHT_JOYSTICK = 10;
+
+        public static final int DPAD_NOT_PRESSED = -1;
+
+        public static final int DPAD_NORTH = 0;
+        public static final int DPAD_NORTHEAST = 45;
+        public static final int DPAD_EAST = 90;
+        public static final int DPAD_SOUTHEAST = 135;
+        public static final int DPAD_SOUTH = 180;
+        public static final int DPAD_SOUTHWEST = 225;
+        public static final int DPAD_WEST = 270;
+        public static final int DPAD_NORTHWEST = 315;
     }
 
     public static final class DriverConstants {
         public static final int driverControllerPort = 0;
         public static final int operatorControllerPort = 1;
+
+        public static final double kDeadband = 0.05;
     }
 }
