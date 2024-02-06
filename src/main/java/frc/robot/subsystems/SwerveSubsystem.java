@@ -5,6 +5,7 @@ import com.kauailabs.navx.frc.AHRS;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.SPI;
@@ -71,7 +72,7 @@ public class SwerveSubsystem extends SubsystemBase {
         return Math.IEEEremainder(gyro.getAngle(), 360);
     }
 
-    public Rotation2d geRotation2d() {
+    public Rotation2d getRotation2d() {
         return Rotation2d.fromDegrees(getHeading());
     }
 
@@ -94,5 +95,9 @@ public class SwerveSubsystem extends SubsystemBase {
         FrontRightSwerveModule.setDesiredState(desiredStates[1]);
         BackLeftSwerveModule.setDesiredState(desiredStates[2]);
         BackRightSwerveModule.setDesiredState(desiredStates[3]);
+    }
+
+    public Command resetHeading() {
+        return run(() -> zeroHeading());
     }
 }

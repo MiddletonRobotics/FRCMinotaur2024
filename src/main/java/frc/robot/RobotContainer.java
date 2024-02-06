@@ -4,26 +4,48 @@
 
 package frc.robot;
 
+import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.subsystems.TankSubsystem;
-import frc.robot.utilities.XboxController;
+import frc.robot.commands.SwerveController;
+import frc.robot.commands.TankController;
+import frc.robot.utilities.Controller;
+import frc.robot.utilities.constants.Constants;
 
+import java.util.function.DoubleSupplier;
+
+import edu.wpi.first.wpilibj.GenericHID;
+import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
 public class RobotContainer {
 
-  private final TankSubsystem tankDrive = new TankSubsystem();
-  private final CommandXboxController DriverController = XboxController.getDriverController();
-  private final CommandXboxController OperatorController = XboxController.getOperatorController();
+  private final Joystick DriverController = new Joystick(Constants.DriverConstants.driverControllerPort);
+  private final Joystick OperatorController = new Joystick(Constants.DriverConstants.operatorControllerPort);
 
-  private void configureBindings() {
-    tankDrive.setDefaultCommand(tankDrive.driveCommand(() -> DriverController.getLeftY(), () -> DriverController.getLeftX()));
+  private final TankSubsystem drivetrain = new TankSubsystem();
+  private DoubleSupplier forwardSpeed = () -> DriverController.getRawAxis(Constants.ControllerRawButtons.LEFT_Y_AXIS);
+  private DoubleSupplier rotationSpeed = () -> DriverController.getRawAxis(Constants.ControllerRawButtons.RIGHT_X_AXIS);
+  private TankController ArcadeDrive = new TankController(drivetrain, forwardSpeed, rotationSpeed);
+  private final SwerveSubsystem swerveSubsystem = new SwerveSubsystem();
+
+  private void configureButtonBindings() {
+    new JoystickButton(DriverController, Constants.ControllerRawButtons.BTN_B).toggleOnTrue(swerveSubsystem.resetHeading());
   }
 
   public RobotContainer() {
-    configureBindings();
-  }
+    drivetrain.setDefaultCommand(ArcadeDrive);
+    swerveSubsystem.setDefaultCommand(new SwerveController(
+      swerveSubsystem,
+      () -> -DriverController.getRawAxis(Constants.ControllerRawButtons.LEFT_Y_AXIS),
+      () -> DriverController.getRawAxis(Constants.ControllerRawButtons.LEFT_X_AXIS),
+      () -> DriverController.getRawAxis(Constants.ControllerRawButtons.RIGHT_X_AXIS),
+      () -> !DriverController.getRawButton(Constants.ControllerRawButtons.BTN_A)));
+
+      configureButtonBindings();
+  };
 
   public Command getAutonomousCommand() {
     return Commands.print("No autonomous command configured");
