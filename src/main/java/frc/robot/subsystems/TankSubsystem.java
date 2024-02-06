@@ -11,11 +11,13 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import frc.robot.utilities.constants.Constants;
-import frc.robot.utilities.XboxController;
+import frc.robot.utilities.Controller;
 
 import java.util.function.DoubleSupplier;
 
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import org.ejml.equation.IntegerSequence.For;
+
+import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -26,8 +28,8 @@ public class TankSubsystem extends SubsystemBase {
     private final TalonFX leftMaster;
     private final TalonFX leftSlave;
 
-    private MotorOutputConfigs leftMotorConfiguration;
     private MotorOutputConfigs rightMotorConfiguration;
+    private MotorOutputConfigs leftMotorConfiguration;
 
     private TalonFXConfigurator rightMasterConfigurator;
     private TalonFXConfigurator rightSlaveConfigurator;
@@ -38,28 +40,25 @@ public class TankSubsystem extends SubsystemBase {
 
     private DifferentialDrive TankDrive;
 
-    private CommandXboxController DriverController;
-    private CommandXboxController OperatorController;
-
     public TankSubsystem() {
-        rightMaster = new TalonFX(Constants.TankConstants.rightMasterID);
-        rightSlave = new TalonFX(Constants.TankConstants.rightSlaveID);
-        leftMaster = new TalonFX(Constants.TankConstants.leftMasterID);
-        leftSlave = new TalonFX(Constants.TankConstants.leftSlaveID);
+        rightMaster = new TalonFX(Constants.TankConstants.RightMasterID);
+        rightSlave = new TalonFX(Constants.TankConstants.RightSlaveID);
+        leftMaster = new TalonFX(Constants.TankConstants.LeftMasterID);
+        leftSlave = new TalonFX(Constants.TankConstants.LeftSlaveID);
 
         rightMasterConfigurator = rightMaster.getConfigurator();
         rightSlaveConfigurator = rightSlave.getConfigurator();
         leftMasterConfigurator = leftMaster.getConfigurator();
         leftSlaveConfigurator = leftSlave.getConfigurator();
 
-        leftMotorConfiguration = new MotorOutputConfigs();
         rightMotorConfiguration = new MotorOutputConfigs();
+        leftMotorConfiguration = new MotorOutputConfigs();
 
-        leftMotorConfiguration.Inverted = InvertedValue.Clockwise_Positive;
-        rightMotorConfiguration.Inverted = InvertedValue.CounterClockwise_Positive;
+        rightMotorConfiguration.Inverted = InvertedValue.Clockwise_Positive;
+        leftMotorConfiguration.Inverted = InvertedValue.CounterClockwise_Positive;
 
-        leftMotorConfiguration.NeutralMode = NeutralModeValue.Brake;
         rightMotorConfiguration.NeutralMode = NeutralModeValue.Brake;
+        leftMotorConfiguration.NeutralMode = NeutralModeValue.Brake;
 
         feedbackConfiguration = new FeedbackConfigs();
         feedbackConfiguration.FeedbackSensorSource = FeedbackSensorSourceValue.RotorSensor;
@@ -72,10 +71,8 @@ public class TankSubsystem extends SubsystemBase {
         leftSlave.setControl(new Follower(leftMaster.getDeviceID(), false));
         rightSlave.setControl(new Follower(rightMaster.getDeviceID(), false));
 
-        leftMaster.setSafetyEnabled(true);
-        leftSlave.setSafetyEnabled(true);
-
-        TankDrive = new DifferentialDrive(leftMaster, rightMaster);
+        TankDrive = new DifferentialDrive(rightMaster, leftMaster);
+        TankDrive.setSafetyEnabled(false);
     }
 
     public void setRightInverted() {
@@ -116,13 +113,16 @@ public class TankSubsystem extends SubsystemBase {
         }
     }
 
-    public Command driveCommand(DoubleSupplier x, DoubleSupplier y) {
-        DriverController = XboxController.getDriverController();
+    public void ArcadeDrive(double y, double x) {
+        TankDrive.feed();
 
-        // x = Math.abs(x.getAsDouble()) > Constants.TankConstants.kDeadband ? x : 0.0;
-        // y = Math.abs(y.getAsDouble()) > Constants.TankConstants.kDeadband ? y : 0.0;
+        double rotationSpeed = Math.abs(x) > Constants.DriverConstants.kDeadband ? x : 0.0;
+        double forwardSpeed = Math.abs(y) > Constants.DriverConstants.kDeadband ? y : 0.0;
 
-        return run(() -> TankDrive.arcadeDrive(x.getAsDouble(), y.getAsDouble())).withName("drive");
+        TankDrive.arcadeDrive(forwardSpeed, rotationSpeed);
     }
     
+    public void stopTankDrive() {
+        TankDrive.stopMotor();
+    }
 }
