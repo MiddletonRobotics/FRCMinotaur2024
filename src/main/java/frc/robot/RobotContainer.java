@@ -12,11 +12,13 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.path.PathPlannerPath;
+import com.pathplanner.lib.path.PathPlannerTrajectory;
 
 import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -32,7 +34,7 @@ import frc.robot.subsystems.ClimberSubsystem;
 import frc.robot.commands.ShooterController;
 import frc.robot.commands.SwerveController;
 import frc.robot.commands.AmpController;
-
+import frc.robot.commands.CycleShooter;
 import frc.robot.commands.IntakeNote;
 import frc.robot.commands.IntakePull;
 import frc.robot.commands.IntakePush;
@@ -66,7 +68,7 @@ public class RobotContainer {
   private final Joystick DriverController;
   private final Joystick OperatorController;
 
-  private final SendableChooser<String> autonomousChooser;
+  private final SendableChooser<Command> autonomousChooser;
 
   private final JoystickButton resetHeading;
   private final JoystickButton robotCentric;
@@ -81,6 +83,7 @@ public class RobotContainer {
   private final JoystickButton leftClimberUp;
   private final JoystickButton rightClimberDown;
   private final JoystickButton leftClimberDown;
+  private final JoystickButton cycleButton;
 
   private final SwerveSubsystem swerveSubsystem;
   private final int translationAxis;
@@ -96,6 +99,7 @@ public class RobotContainer {
   private final IntakePush pushNote;
   private final StopIntake stopIntake;
   private final ScorePositionCircle goScorePosition;
+  private final CycleShooter cyclingShooter;
 
   public RobotContainer() {
     swerveSubsystem = new SwerveSubsystem();
@@ -111,16 +115,18 @@ public class RobotContainer {
     NamedCommands.registerCommand("Store Intake", intakeSubsystem.storeIntake());
     NamedCommands.registerCommand("Intake Note", new IntakeNote(intakeSubsystem));
 
-    autonomousChooser = new SendableChooser<>();
+    autonomousChooser = AutoBuilder.buildAutoChooser();
+    SmartDashboard.putData("Autonomous Chooser", autonomousChooser);
 
     DriverController = Controller.getDriverController();
     OperatorController = Controller.getOperatorController();
 
     resetHeading = new JoystickButton(DriverController, Constants.ControllerRawButtons.XboxController.Button.kY.value);
     robotCentric = new JoystickButton(DriverController, Constants.ControllerRawButtons.XboxController.Button.kX.value);
-    findScorePosition = new JoystickButton(DriverController, Constants.ControllerRawButtons.XboxController.Button.kA.value);
+    findScorePosition = new JoystickButton(DriverController, Constants.ControllerRawButtons.XboxController.Button.kB.value);
     speakerScoring = new JoystickButton(DriverController, Constants.ControllerRawButtons.XboxController.Button.kRightBumper.value);
     ampScoring = new JoystickButton(DriverController, Constants.ControllerRawButtons.XboxController.Button.kLeftBumper.value);
+    cycleButton = new JoystickButton(DriverController, Constants.ControllerRawButtons.XboxController.Button.kA.value);
 
     deployIntake = new JoystickButton(OperatorController, Constants.ControllerRawButtons.XboxController.Button.kA.value);
     storeIntake = new JoystickButton(OperatorController, Constants.ControllerRawButtons.XboxController.Button.kB.value);
@@ -128,8 +134,8 @@ public class RobotContainer {
     outtakeGamePiece = new JoystickButton(OperatorController, Constants.ControllerRawButtons.XboxController.Button.kY.value);
     rightClimberUp = new JoystickButton(OperatorController, Constants.ControllerRawButtons.XboxController.Button.kRightBumper.value);
     leftClimberUp = new JoystickButton(OperatorController, Constants.ControllerRawButtons.XboxController.Button.kLeftBumper.value);
-    rightClimberDown = new JoystickButton(OperatorController, Constants.ControllerRawButtons.XboxController.Axis.kLeftTrigger.value);
-    leftClimberDown = new JoystickButton(OperatorController, Constants.ControllerRawButtons.XboxController.Axis.kRightTrigger.value);
+    rightClimberDown = new JoystickButton(OperatorController, Constants.ControllerRawButtons.XboxController.Button.kRightStick.value);
+    leftClimberDown = new JoystickButton(OperatorController, Constants.ControllerRawButtons.XboxController.Button.kLeftStick.value);
 
     translationAxis = Constants.ControllerRawButtons.XboxController.Axis.kLeftY.value;
     strafeAxis = Constants.ControllerRawButtons.XboxController.Axis.kLeftX.value;
@@ -140,6 +146,7 @@ public class RobotContainer {
     pullNote = new IntakePull(intakeSubsystem);
     pushNote = new IntakePush(intakeSubsystem);
     stopIntake = new StopIntake(intakeSubsystem);
+    cyclingShooter = new CycleShooter(shooterSubsystem, intakeSubsystem);
     goScorePosition = new ScorePositionCircle(swerveSubsystem);
 
     swerveSubsystem.setDefaultCommand(new SwerveController(
@@ -157,6 +164,7 @@ public class RobotContainer {
     resetHeading.whileTrue(new InstantCommand(() -> swerveSubsystem.resetHeading()));
     ampScoring.whileTrue(ampController);
     speakerScoring.whileTrue(shooterController);
+    cycleButton.whileTrue(cyclingShooter);
     deployIntake.whileTrue(intakeSubsystem.deployIntake());
     storeIntake.whileTrue(intakeSubsystem.storeIntake());
     intakeGamePiece.whileTrue(pushNote);
@@ -164,11 +172,14 @@ public class RobotContainer {
     intakeGamePiece.whileFalse(stopIntake);
     outtakeGamePiece.whileFalse(stopIntake);
     findScorePosition.whileTrue(goScorePosition);
-  }
 
+    rightClimberUp.whileTrue(climberSubsystem.rightClimbUp());
+    rightClimberUp.whileFalse(new InstantCommand(() -> climberSubsystem.rightClimberReset()));
+    leftClimberUp.whileTrue(climberSubsystem.leftClimbUp());
+    leftClimberUp.whileFalse(new InstantCommand(() -> climberSubsystem.leftClimberReset()));
+  }
  
   public Command getAutonomousCommand() {
-    return Commands.print("No autonomous command configured");
-
+      return autonomousChooser.getSelected();
   }
 }
