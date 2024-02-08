@@ -1,3 +1,5 @@
+//Import all that jazz you need for swerve drive coding.
+
 package frc.robot.subsystems;
 
 import com.ctre.phoenix6.StatusSignal;
@@ -20,6 +22,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.utilities.constants.Constants;
 import frc.robot.utilities.constants.Constants.ModuleConstants;
 
+//Sets up swerve drive class with encoders. This section can and should be added to.
 public class SwerveModule {
     private final CANSparkMax forwardMotor;
     private final CANSparkMax thetaMotor;
