@@ -1,3 +1,4 @@
+//Import required packages to apply swerve drive to robot.
 package frc.robot.subsystems;
 
 import com.kauailabs.navx.frc.AHRS;
@@ -12,6 +13,9 @@ import edu.wpi.first.wpilibj.SPI;
 
 import frc.robot.utilities.constants.Constants;
 
+/* Sets up class that assigns motors to each swerve module and get swerving.
+* Methods created to handle different actions taken on the controls.
+*/
 public class SwerveSubsystem extends SubsystemBase {
     private final SwerveModule FrontLeftSwerveModule = new SwerveModule(
         Constants.SwerveConstants.FrontLeftForwardMotorID, 
