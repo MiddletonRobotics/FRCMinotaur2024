@@ -22,8 +22,8 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
 public class RobotContainer {
 
-  private final Joystick DriverController = new Joystick(Constants.DriverConstants.driverControllerPort);
-  private final Joystick OperatorController = new Joystick(Constants.DriverConstants.operatorControllerPort);
+  private final Joystick DriverController = Controller.getDriverController();
+  private final Joystick OperatorController = Controller.getOperatorController();
 
   private final TankSubsystem drivetrain = new TankSubsystem();
   private DoubleSupplier forwardSpeed = () -> DriverController.getRawAxis(Constants.ControllerRawButtons.LEFT_Y_AXIS);
@@ -32,7 +32,7 @@ public class RobotContainer {
   private final SwerveSubsystem swerveSubsystem = new SwerveSubsystem();
 
   private void configureButtonBindings() {
-    new JoystickButton(DriverController, Constants.ControllerRawButtons.BTN_B).toggleOnTrue(swerveSubsystem.resetHeading());
+    new JoystickButton(DriverController, Controller.b()).toggleOnTrue(swerveSubsystem.resetHeading());
   }
 
   public RobotContainer() {
