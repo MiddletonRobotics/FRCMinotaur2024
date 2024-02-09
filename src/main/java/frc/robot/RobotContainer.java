@@ -2,6 +2,9 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+/* Imported swerve, tank drive, and controller packages to control robot's movement and have 
+* resources for setup.
+*/
 package frc.robot;
 
 import frc.robot.subsystems.SwerveSubsystem;
@@ -19,6 +22,12 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+
+/* Setup class that handles robot movement operations
+* and assigns movement to joysticks/buttons. Methods allow driver to
+* control robot with swerve drive during teleop.
+* Autonomous is yet to be set up.
+*/
 
 public class RobotContainer {
 
