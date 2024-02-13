@@ -22,8 +22,9 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.utilities.constants.Constants;
 import frc.robot.utilities.constants.Constants.ModuleConstants;
 
-//Sets up swerve drive class with encoders. This section can and should be added to.
+//Behold, swerve modules
 public class SwerveModule {
+    //Set up the encoder and motor variables
     private final CANSparkMax forwardMotor;
     private final CANSparkMax thetaMotor;
 
@@ -37,6 +38,7 @@ public class SwerveModule {
     private final boolean swerveEncoderReversed;
     private final double swerveEncoderOffset;
 
+    //Assign values to swerve module, must identify and check if motors/encoders should be reversed for code to work.
     public SwerveModule(int forwardMotorID, int thetaMotorID, boolean forwardMotorReversed, boolean thetaMotorReversed, int absoluteEncoderID, double encoderOffset, boolean encoderReversed) {
         this.swerveEncoderOffset = encoderOffset;
         this.swerveEncoderReversed = encoderReversed;
@@ -63,6 +65,7 @@ public class SwerveModule {
 
         */
 
+        //Get encoders from motors, base position/movement on rpm
         forwardEncoder = forwardMotor.getEncoder();
         thetaEncoder = thetaMotor.getEncoder();
 
@@ -77,6 +80,7 @@ public class SwerveModule {
         resetMotorEncoders();
     }
 
+    //Get positions!! (the values)
     public double getForwardPosition() {
         return forwardEncoder.getPosition();
     }
@@ -122,6 +126,7 @@ public class SwerveModule {
 
     */
 
+    //Do math to get will finish comment later
     public void setDesiredState(SwerveModuleState desiredState) {
 
         if(Math.abs(desiredState.speedMetersPerSecond) < 0.001) {
@@ -137,6 +142,7 @@ public class SwerveModule {
 
     }
 
+    //Stop the drive
     public void stop() {
         forwardMotor.set(0);
         thetaMotor.set(0);
