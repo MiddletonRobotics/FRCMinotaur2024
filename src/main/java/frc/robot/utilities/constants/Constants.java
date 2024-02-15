@@ -33,15 +33,15 @@ public class Constants {
             new Translation2d(-WheelBase / 2, TrackWidth / 2)
         );
 
-        public static final int FrontLeftForwardMotorID = 8; 
-        public static final int FrontRightForwardMotorID = 6;
-        public static final int BackLeftForwardMotorID = 2;
-        public static final int BackRightForwardMotorID = 4;
+        public static final int FrontLeftForwardMotorID = 1; 
+        public static final int FrontRightForwardMotorID = 3;
+        public static final int BackLeftForwardMotorID = 5;
+        public static final int BackRightForwardMotorID = 7;
 
-        public static final int FrontLeftThetaMotorID = 7;
-        public static final int FrontRightThetaMotorID = 5;
-        public static final int BackLeftThetaMotorID = 1;
-        public static final int BackRightThetaMotorID = 3;
+        public static final int FrontLeftThetaMotorID = 2;
+        public static final int FrontRightThetaMotorID = 4;
+        public static final int BackLeftThetaMotorID = 6;
+        public static final int BackRightThetaMotorID = 8;
 
         public static final boolean FrontLeftThetaEncoderReversed = true;
         public static final boolean BackLeftThetaEncoderReversed = true;
