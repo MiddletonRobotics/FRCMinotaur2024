@@ -53,10 +53,10 @@ public class Constants {
         public static final boolean FrontRightForwardEncoderReversed = false;
         public static final boolean BackRightForwardEncoderReversed = false;
 
-        public static final int FrontLeftCANcoderID = 0;
-        public static final int FrontRightCANcoderID = 2;
-        public static final int BackLeftCANcoderID = 1;
-        public static final int BackRightCANcoderID = 3;
+        public static final int FrontLeftCANcoderID = 9;
+        public static final int FrontRightCANcoderID = 10;
+        public static final int BackLeftCANcoderID = 11;
+        public static final int BackRightCANcoderID = 12;
 
         public static final boolean FrontLeftCANcoderReversed = false;
         public static final boolean BackLeftCANcoderReversed = false;
