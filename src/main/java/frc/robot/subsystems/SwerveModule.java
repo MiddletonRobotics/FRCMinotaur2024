@@ -1,4 +1,4 @@
-//Import all that jazz you need for swerve drive coding.
+//Import various files (encoders, constants, etc.) for swerve drive programming.
 
 package frc.robot.subsystems;
 
@@ -22,7 +22,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.utilities.constants.Constants;
 import frc.robot.utilities.constants.Constants.ModuleConstants;
 
-//Behold, swerve modules
+//Swerve module class for all your swerve-y needs.
 public class SwerveModule {
     //Set up the encoder and motor variables
     private final CANSparkMax forwardMotor;
@@ -38,7 +38,12 @@ public class SwerveModule {
     private final boolean swerveEncoderReversed;
     private final double swerveEncoderOffset;
 
-    //Assign values to swerve module, must identify and check if motors/encoders should be reversed for code to work.
+    /**Swerve module constructor: 
+    * Takes values for motor and encoder identification, whether or 
+    * not motors and encoders are reversed and takes encoder offset value.
+    * Configures encoders and sensors and inverts motors depending on which
+    * motor is being adjusted (some motors are positioned funky and need reversed movement).
+    **/
     public SwerveModule(int forwardMotorID, int thetaMotorID, boolean forwardMotorReversed, boolean thetaMotorReversed, int absoluteEncoderID, double encoderOffset, boolean encoderReversed) {
         this.swerveEncoderOffset = encoderOffset;
         this.swerveEncoderReversed = encoderReversed;
@@ -80,7 +85,7 @@ public class SwerveModule {
         resetMotorEncoders();
     }
 
-    //Get positions!! (the values)
+    //The following methods return the velocities and positions of the forward and theta encoders.
     public double getForwardPosition() {
         return forwardEncoder.getPosition();
     }
@@ -97,6 +102,11 @@ public class SwerveModule {
         return thetaEncoder.getVelocity();
     }
 
+    /** The following method calculates the angle of the CANCoder by dividing
+    * the encoder's current voltage by the total voltage. Unit circle is your friend.
+    * Multiply by 2pi to convert to radians and subtract the offset to get the current position.
+    * Multiply by the reversed amount since the encoder is backwards.
+    */
     public double getCANCoderPosition() {
         double angle = swerveEncoder.getSupplyVoltage().getValueAsDouble() / RobotController.getVoltage5V();
 
@@ -105,11 +115,13 @@ public class SwerveModule {
         return angle * (swerveEncoderReversed ? -1.0 : 1.0);
     }
 
+    //Reset the position of the encoders.
     public void resetMotorEncoders() {
         forwardEncoder.setPosition(0);
         thetaEncoder.setPosition(getCANCoderPosition());
     }
 
+    //Use current velocity and the position of the theta encoder to get results for module.
     public SwerveModuleState getSwerveModuleState() {
         return new SwerveModuleState(getForwardVelocity(), new Rotation2d(getThetaPosition()));
     }
@@ -126,7 +138,12 @@ public class SwerveModule {
 
     */
 
-    //Do math to get will finish comment later
+    /** This method checks if there is substantial change movement in the encoders. 
+    * If motor movement is less than 0.001, stop the motors as there is not enough movement
+    * to start the motors. If there is a large amount of movement set the motors to the 
+    * appropriate power based on the encoder positions and velocity.
+    *
+    **/
     public void setDesiredState(SwerveModuleState desiredState) {
 
         if(Math.abs(desiredState.speedMetersPerSecond) < 0.001) {
@@ -142,7 +159,7 @@ public class SwerveModule {
 
     }
 
-    //Stop the drive
+    //This method stops the motors.
     public void stop() {
         forwardMotor.set(0);
         thetaMotor.set(0);
