@@ -8,8 +8,8 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
-/* This section sets up the Robot class and all methods that will be added to later.
-* 
+/* This section sets up all the commands that will be sent to the robot and all the different states (autonomous, teleop, test).
+* Methods galore!!!!!
 *
 *
 */
