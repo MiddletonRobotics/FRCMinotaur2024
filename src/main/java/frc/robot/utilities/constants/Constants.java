@@ -4,6 +4,8 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.util.Units;
 
+// All of ze constants
+
 public class Constants {
 
     // These Constants will vary depending on what Swerve Setup that you run
@@ -33,6 +35,7 @@ public class Constants {
             new Translation2d(-WheelBase / 2, TrackWidth / 2)
         );
 
+        //Swerve motor ids and base variables
         public static final int FrontLeftForwardMotorID = 1; 
         public static final int FrontRightForwardMotorID = 3;
         public static final int BackLeftForwardMotorID = 5;
@@ -76,7 +79,7 @@ public class Constants {
         public static final double TeleopMaxAccelerationUnitsPerSecond = 3;
         public static final double TeleopMaxAngularAccelerationUnitsPerSecond = 3;
     }
-
+// Tank motor ids and base variables
     public static final class TankConstants {
         public static final int RightMasterID = 2;
         public static final int RightSlaveID = 4;
@@ -90,6 +93,7 @@ public class Constants {
         public static double RotationReductionSpeed = 0;
     }
 
+    // Default controller values
     public static final class ControllerRawButtons {
         public static final int LEFT_X_AXIS = 0;
         public static final int LEFT_Y_AXIS = 1;
