@@ -36,15 +36,15 @@ public class Constants {
         );
 
         //Swerve motor ids and base variables
-        public static final int FrontLeftForwardMotorID = 8; 
-        public static final int FrontRightForwardMotorID = 6;
-        public static final int BackLeftForwardMotorID = 2;
-        public static final int BackRightForwardMotorID = 4;
+        public static final int FrontLeftForwardMotorID = 1; 
+        public static final int FrontRightForwardMotorID = 3;
+        public static final int BackLeftForwardMotorID = 5;
+        public static final int BackRightForwardMotorID = 7;
 
-        public static final int FrontLeftThetaMotorID = 7;
-        public static final int FrontRightThetaMotorID = 5;
-        public static final int BackLeftThetaMotorID = 1;
-        public static final int BackRightThetaMotorID = 3;
+        public static final int FrontLeftThetaMotorID = 2;
+        public static final int FrontRightThetaMotorID = 4;
+        public static final int BackLeftThetaMotorID = 6;
+        public static final int BackRightThetaMotorID = 8;
 
         public static final boolean FrontLeftThetaEncoderReversed = true;
         public static final boolean BackLeftThetaEncoderReversed = true;
@@ -56,10 +56,10 @@ public class Constants {
         public static final boolean FrontRightForwardEncoderReversed = false;
         public static final boolean BackRightForwardEncoderReversed = false;
 
-        public static final int FrontLeftCANcoderID = 0;
-        public static final int FrontRightCANcoderID = 2;
-        public static final int BackLeftCANcoderID = 1;
-        public static final int BackRightCANcoderID = 3;
+        public static final int FrontLeftCANcoderID = 9;
+        public static final int FrontRightCANcoderID = 10;
+        public static final int BackLeftCANcoderID = 11;
+        public static final int BackRightCANcoderID = 12;
 
         public static final boolean FrontLeftCANcoderReversed = false;
         public static final boolean BackLeftCANcoderReversed = false;
