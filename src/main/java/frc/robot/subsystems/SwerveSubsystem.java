@@ -1,108 +1,107 @@
 //Import required packages to apply swerve drive to robot.
 package frc.robot.subsystems;
 
-import com.kauailabs.navx.frc.AHRS;
+import com.revrobotics.CANSparkMax;
 
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
-import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
-import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.wpilibj.SPI;
-import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.utilities.constants.Constants;
 
-/* Sets up class that assigns motors to each swerve module and get swerving.
-* Methods created to handle different actions taken on the controls.
-*/
+class SwerveModule {
+
+    private CANSparkMax driveMotor;
+    private CANSparkMax steeringMotor;
+    private SwerveModuleState currentState;
+
+    public SwerveModule(int driveMotorPort, int steeringMotorPort) {
+        driveMotor = new CANSparkMax(driveMotorPort, CANSparkMax.MotorType.kBrushless);
+        steeringMotor = new CANSparkMax(steeringMotorPort, CANSparkMax.MotorType.kBrushless);
+        currentState = new SwerveModuleState(1, new Rotation2d(Units.degreesToRadians(30)));
+    }
+
+    public SwerveModuleState getSwerveModuleState() {
+        return currentState;
+    }
+
+    public void setDesiredState(SwerveModuleState desiredState) {
+        currentState = desiredState;
+    }
+}
+
 public class SwerveSubsystem extends SubsystemBase {
-    private final AHRS gyro;
 
-    private SwerveDriveOdometry swerveOdometry;
-    private SwerveModule[] swerveModules;
+    // We have four swerve modules on our robot, so create a "list" of them
+    SwerveModule frontLeftModule = new SwerveModule(1, 2);
+    SwerveModule frontRightModule = new SwerveModule(3, 4);
+    SwerveModule backLeftModule = new SwerveModule(5, 6);
+    SwerveModule backRightModule = new SwerveModule(7, 8);
 
-    private Field2d field;
+    double chassisWidth = Units.inchesToMeters(28);
+    double chassisLength = Units.inchesToMeters(28);
 
-    public SwerveSubsystem() {
-        gyro = new AHRS(SPI.Port.kMXP);
+    // Defining the location of each module on the robot realtive to the center of the robot
+    Translation2d frontLeftLocation = new Translation2d(chassisLength / 2, chassisWidth / 2);
+    Translation2d frontRightLocation = new Translation2d(chassisLength / 2, -chassisWidth / 2);
+    Translation2d backLeftLocation = new Translation2d(-chassisLength / 2, chassisWidth / 2);
+    Translation2d backRightLocation = new Translation2d(-chassisLength / 2, -chassisWidth / 2);
 
-        // swerveOdometry = new SwerveDriveOdometry(Constants.SwerveConstants.SwerveKinematics, getYaw(), getSwerveModulePositions());
-        
-        swerveModules = new SwerveModule[] {
-            new SwerveModule(0, Constants.ModuleConstants.FrontLeftModule.constants),
-            new SwerveModule(1,Constants.ModuleConstants.FrontRightModule.constants),
-            new SwerveModule(2,Constants.ModuleConstants.BackLeftModule.constants),
-            new SwerveModule(3,Constants.ModuleConstants.BackRightModule.constants)
-        };
+    // Define a kinematics object. (Takes ChassisSpeeds and returns SwerveModuleStates)
+    SwerveDriveKinematics kinematics = new SwerveDriveKinematics(
+        frontLeftLocation,
+        frontRightLocation,
+        backLeftLocation,
+        backRightLocation
+    );
 
-        field = new Field2d();
-        SmartDashboard.putData("Field", field);
+    CommandXboxController controller;
+    public SwerveSubsystem(CommandXboxController io) {
+        controller = io;
     }
 
-    public void drive(Translation2d translation, double rotation, boolean fieldRelative, boolean isOpenLoop) {
-        SwerveModuleState[] swerveModuleStates = Constants.SwerveConstants.SwerveKinematics.toSwerveModuleStates(fieldRelative 
-            ? ChassisSpeeds.fromFieldRelativeSpeeds(translation.getX(), translation.getY(), rotation, getYaw())
-            : new ChassisSpeeds(translation.getX(), translation.getY(), rotation)
-        );
+    public void setChassisSpeed(ChassisSpeeds desired) {
 
-        SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, Constants.SwerveConstants.PhysicalMaxSpeedMetersPerSecond);
+        // Get the desired states for each module. Uses fancy math
+        SwerveModuleState[] newStates = kinematics.toSwerveModuleStates(desired);
 
-        for(SwerveModule module : swerveModules) {
-            module.setDesiredState(swerveModuleStates[module.moduleNumber], false);
-        }
-    }
-
-    public void setModuleStates(SwerveModuleState[] desiredStates) {
-        SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, Constants.SwerveConstants.PhysicalMaxSpeedMetersPerSecond);
-
-        for(SwerveModule module : swerveModules) {
-            module.setDesiredState(desiredStates[module.moduleNumber], false);
-        }
-    }
-
-    /*
-
-    public Pose2d getPose() {
-        return swerveOdometry.getPoseMeters();
-    }
-
-    public void resetSwerveOdometry(Pose2d pose) {
-        swerveOdometry.resetPosition(getYaw(), getSwerveModulePositions(), pose);
-    }
-
-    */
-
-    public SwerveModuleState[] getSwerveModuleStates() {
-        SwerveModuleState[] states = new SwerveModuleState[4];
-        for(SwerveModule module : swerveModules) {
-            states[module.moduleNumber] = module.getSwerveModuleState();
-        }
-
-        return states;
-    }
-
-    public void resetHeading() {
-        gyro.zeroYaw();
-    }
-
-    public Rotation2d getYaw() {
-        return (Constants.SwerveConstants.swerveEncoderInverted)? Rotation2d.fromDegrees(360 - gyro.getYaw()) : Rotation2d.fromDegrees(gyro.getYaw());
+        // Set the desired states for each module (speed/direction)
+        frontLeftModule.setDesiredState(newStates[0]);
+        frontRightModule.setDesiredState(newStates[1]);
+        backLeftModule.setDesiredState(newStates[2]);
+        backRightModule.setDesiredState(newStates[3]);
     }
 
     @Override
     public void periodic() {
-        // field.setRobotPose(getPose());
 
-        for (SwerveModule module : swerveModules) {
-            SmartDashboard.putNumber("Module " + module.moduleNumber + " Cancoder", module.getSwerveEncoder().getDegrees());
-            SmartDashboard.putNumber("Module " + module.moduleNumber + " Integrated", module.getSwerveModuleState().angle.getDegrees());
-            SmartDashboard.putNumber("Module " + module.moduleNumber + " Velocity", module.getSwerveModuleState().speedMetersPerSecond);
+        ChassisSpeeds newDesiredSpeeds = new ChassisSpeeds(
+            -controller.getLeftY() * 4,
+            -controller.getLeftX() * 4,
+            controller.getRightX() * 4
+        );
+
+        System.out.println(newDesiredSpeeds);
+
+        setChassisSpeed(newDesiredSpeeds);
+
+        double loggingState[] = {
+            frontLeftModule.getSwerveModuleState().angle.getDegrees(),
+            frontLeftModule.getSwerveModuleState().speedMetersPerSecond,
+            frontRightModule.getSwerveModuleState().angle.getDegrees(),
+            frontRightModule.getSwerveModuleState().speedMetersPerSecond,
+            backLeftModule.getSwerveModuleState().angle.getDegrees(),
+            backLeftModule.getSwerveModuleState().speedMetersPerSecond,
+            backRightModule.getSwerveModuleState().angle.getDegrees(),
+            backRightModule.getSwerveModuleState().speedMetersPerSecond,
+        };
+
+        SmartDashboard.putNumberArray("SwerveModuleStates", loggingState);
     }
-  }
 }

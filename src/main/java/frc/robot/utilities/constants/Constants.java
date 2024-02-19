@@ -12,6 +12,8 @@ import edu.wpi.first.math.util.Units;
 public class Constants {
     public static final class ModuleConstants {
 
+        public static final boolean invertGyro = false;
+
         /* Swerve Voltage Compensation */
         public static final double voltageCompensation = 12.0;
 
@@ -111,7 +113,7 @@ public class Constants {
 
         /* Motor Inverts */
         public static final boolean driveInvert = false;
-        public static final boolean angleInvert = false;
+        public static final boolean angleInvert = true;
 
         /* Angle Encoder Invert */
         public static final boolean swerveEncoderInverted = false;
