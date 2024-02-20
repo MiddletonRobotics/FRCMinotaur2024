@@ -148,7 +148,7 @@ public class SwerveModule {
 
     private void setAngle(SwerveModuleState desiredState) {
         Rotation2d angle = (Math.abs(desiredState.speedMetersPerSecond) <= (Constants.SwerveConstants.PhysicalMaxSpeedMetersPerSecond * 0.01)) ? lastAngle : desiredState.angle;
-        anglePIDController.setReference(angle.getDegrees(), CANSparkMax.ControlType.kVelocity);
+        anglePIDController.setReference(angle.getDegrees(), CANSparkMax.ControlType.kPosition);
         lastAngle = angle;
     }
 }
