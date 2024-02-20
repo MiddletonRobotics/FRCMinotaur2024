@@ -17,6 +17,10 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import frc.robot.utilities.constants.Constants;
+import frc.robot.utilities.constants.Constants.ModuleConstants.BackLeftModule;
+import frc.robot.utilities.constants.Constants.ModuleConstants.BackRightModule;
+import frc.robot.utilities.constants.Constants.ModuleConstants.FrontLeftModule;
+import frc.robot.utilities.constants.Constants.ModuleConstants.FrontRightModule;
 
 /* Sets up class that assigns motors to each swerve module and get swerving.
 * Methods created to handle different actions taken on the controls.
@@ -97,12 +101,25 @@ public class SwerveSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
-        // field.setRobotPose(getPose());
+        double loggingState[] = {
+            swerveModules[0].getSwerveModuleState().angle.getDegrees(),
+            swerveModules[0].getSwerveModuleState().speedMetersPerSecond,
+            swerveModules[1].getSwerveModuleState().angle.getDegrees(),
+            swerveModules[1].getSwerveModuleState().speedMetersPerSecond,
+            swerveModules[2].getSwerveModuleState().angle.getDegrees(),
+            swerveModules[2].getSwerveModuleState().speedMetersPerSecond,
+            swerveModules[3].getSwerveModuleState().angle.getDegrees(),
+            swerveModules[3].getSwerveModuleState().speedMetersPerSecond,
+        };
 
-        for (SwerveModule module : swerveModules) {
-            SmartDashboard.putNumber("Module " + module.moduleNumber + " Cancoder", module.getSwerveEncoder().getDegrees());
-            SmartDashboard.putNumber("Module " + module.moduleNumber + " Integrated", module.getSwerveModuleState().angle.getDegrees());
-            SmartDashboard.putNumber("Module " + module.moduleNumber + " Velocity", module.getSwerveModuleState().speedMetersPerSecond);
-    }
+        double loggingEncoders[] = {
+            swerveModules[0].getSwerveEncoder().getDegrees(),
+            swerveModules[1].getSwerveEncoder().getDegrees(),
+            swerveModules[2].getSwerveEncoder().getDegrees(),
+            swerveModules[3].getSwerveEncoder().getDegrees(),
+        };
+
+        SmartDashboard.putNumberArray("SwerveModuleStates", loggingState);
+        SmartDashboard.putNumberArray("Encoder Positions", loggingEncoders);
   }
 }

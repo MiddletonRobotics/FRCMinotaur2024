@@ -69,7 +69,9 @@ public class SwerveModule {
     }
 
     public Rotation2d getSwerveEncoder() {
-        return Rotation2d.fromRotations(swerveEncoder.getAbsolutePosition().getValueAsDouble());
+        Rotation2d angle = Rotation2d.fromRotations(swerveEncoder.getAbsolutePosition().getValueAsDouble());
+        double corrected = angle.getDegrees() - angleOffset.getDegrees();
+        return Rotation2d.fromDegrees(corrected);
     }
 
     public Rotation2d getAngle() {

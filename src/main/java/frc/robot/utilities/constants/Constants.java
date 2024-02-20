@@ -116,10 +116,10 @@ public class Constants {
         /* Angle Encoder Invert */
         public static final boolean swerveEncoderInverted = false;
 
-        public static final double FrontLeftCANcoderOffsetDegrees = 92.944;
-        public static final double BackLeftCANcoderOffsetDegrees = 257.5635;
-        public static final double FrontRightCANcoderOffsetDegrees = 181.9725;
-        public static final double BackRightCANcoderOffsetDegrees = 235.239;
+        public static final double FrontLeftCANcoderOffsetDegrees = 0;
+        public static final double BackLeftCANcoderOffsetDegrees = 0;
+        public static final double FrontRightCANcoderOffsetDegrees = 0;
+        public static final double BackRightCANcoderOffsetDegrees = 0;
 
         public static final double PhysicalMaxSpeedMetersPerSecond = 4.5;
         public static final double AngularMaxVelocity = 11.5;
