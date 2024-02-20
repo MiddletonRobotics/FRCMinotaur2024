@@ -101,7 +101,7 @@ public class SwerveSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
-        double loggingState[] = {
+        double measuredStates[] = {
             swerveModules[0].getSwerveModuleState().angle.getDegrees(),
             swerveModules[0].getSwerveModuleState().speedMetersPerSecond,
             swerveModules[1].getSwerveModuleState().angle.getDegrees(),
@@ -112,6 +112,17 @@ public class SwerveSubsystem extends SubsystemBase {
             swerveModules[3].getSwerveModuleState().speedMetersPerSecond,
         };
 
+        double desiredStates[] = {
+            swerveModules[0].getDesiredState().angle.getDegrees(),
+            swerveModules[0].getDesiredState().speedMetersPerSecond,
+            swerveModules[1].getDesiredState().angle.getDegrees(),
+            swerveModules[1].getDesiredState().speedMetersPerSecond,
+            swerveModules[2].getDesiredState().angle.getDegrees(),
+            swerveModules[2].getDesiredState().speedMetersPerSecond,
+            swerveModules[3].getDesiredState().angle.getDegrees(),
+            swerveModules[3].getDesiredState().speedMetersPerSecond,
+        };
+
         double loggingEncoders[] = {
             swerveModules[0].getSwerveEncoder().getDegrees(),
             swerveModules[1].getSwerveEncoder().getDegrees(),
@@ -119,7 +130,12 @@ public class SwerveSubsystem extends SubsystemBase {
             swerveModules[3].getSwerveEncoder().getDegrees(),
         };
 
-        SmartDashboard.putNumberArray("SwerveModuleStates", loggingState);
-        SmartDashboard.putNumberArray("Encoder Positions", loggingEncoders);
+        SmartDashboard.putNumberArray("MeasuredSwerveStates", measuredStates);
+        SmartDashboard.putNumberArray("DesiredSwerveStates", desiredStates);
+
+        SmartDashboard.putNumber("Front-Left Encoder Position", loggingEncoders[0]);
+        SmartDashboard.putNumber("Front-Right Encoder Position", loggingEncoders[1]);
+        SmartDashboard.putNumber("Back-Left Encoder Position", loggingEncoders[2]);
+        SmartDashboard.putNumber("Back-Right Encoder Position", loggingEncoders[3]);
   }
 }

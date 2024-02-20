@@ -35,6 +35,8 @@ public class SwerveModule {
     private Rotation2d lastAngle;
     private Rotation2d angleOffset;
 
+    private SwerveModuleState expectedState = new SwerveModuleState();
+
     private CANSparkMax driveMotor;
     private CANSparkMax angleMotor;
 
@@ -97,8 +99,14 @@ public class SwerveModule {
         swerveEncoderConfigurator.apply(new CANcoderConfiguration().withMagnetSensor(magnetSensorConfiguration));
     }
 
+    public SwerveModuleState getDesiredState() {
+        return expectedState;
+    }
+
     public void setDesiredState(SwerveModuleState desiredState, boolean isOpenLoop) {
         desiredState = OnboardModuleState.optimize(desiredState, getSwerveModuleState().angle);
+
+        this.expectedState = desiredState;
 
         setAngle(desiredState);
         setSpeed(desiredState, isOpenLoop);
