@@ -21,7 +21,6 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
-import frc.robot.Robot;
 import frc.robot.utilities.CANSparkMaxUtil;
 import frc.robot.utilities.OnboardModuleState;
 import frc.robot.utilities.CANSparkMaxUtil.Usage;
@@ -33,7 +32,7 @@ import frc.robot.utilities.constants.Constants.ModuleConstants;
 public class SwerveModule {
     public int moduleNumber;
     private Rotation2d lastAngle;
-    private Rotation2d angleOffset;
+    private double angleOffset;
 
     private SwerveModuleState expectedState = new SwerveModuleState();
 
@@ -52,7 +51,7 @@ public class SwerveModule {
 
     public SwerveModule(int moduleNumber, SwerveModuleConstants moduleConstants) {
         this.moduleNumber = moduleNumber;
-        angleOffset = moduleConstants.angleOffset;
+        this.angleOffset = moduleConstants.angleOffset;
 
         swerveEncoder = new CANcoder(moduleConstants.swerveEncoderID);
         configureSwerveEncoder();
@@ -71,9 +70,7 @@ public class SwerveModule {
     }
 
     public Rotation2d getSwerveEncoder() {
-        Rotation2d angle = Rotation2d.fromRotations(swerveEncoder.getAbsolutePosition().getValueAsDouble());
-        double corrected = angle.getDegrees() - angleOffset.getDegrees();
-        return Rotation2d.fromDegrees(corrected);
+        return Rotation2d.fromRotations(swerveEncoder.getAbsolutePosition().getValueAsDouble());
     }
 
     public Rotation2d getAngle() {
@@ -82,20 +79,24 @@ public class SwerveModule {
 
     public SwerveModuleState getSwerveModuleState() {
         return new SwerveModuleState(driveEncocder.getVelocity(), getAngle());
-      }
+    }
+
+    public double convertToDegrees(double rotations) {
+        return rotations * 360;
+    }
 
     private void resetToAbsolute() {
-        double absolutePosition = getSwerveEncoder().getDegrees() - angleOffset.getDegrees();
+        double absolutePosition = getSwerveEncoder().getRotations() - convertToDegrees(angleOffset);
         angleEncoder.setPosition(absolutePosition);
     }
 
     private void configureSwerveEncoder() {
-        swerveEncoder.clearStickyFaults();
-
         swerveEncoderConfigurator = swerveEncoder.getConfigurator();
         MagnetSensorConfigs magnetSensorConfiguration = new MagnetSensorConfigs();
 
-        magnetSensorConfiguration.AbsoluteSensorRange = AbsoluteSensorRangeValue.Signed_PlusMinusHalf;
+        magnetSensorConfiguration.AbsoluteSensorRange = AbsoluteSensorRangeValue.Unsigned_0To1;
+        magnetSensorConfiguration.SensorDirection = SensorDirectionValue.CounterClockwise_Positive;
+        magnetSensorConfiguration.MagnetOffset = angleOffset;
         swerveEncoderConfigurator.apply(new CANcoderConfiguration().withMagnetSensor(magnetSensorConfiguration));
     }
 

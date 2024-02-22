@@ -17,10 +17,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import frc.robot.utilities.constants.Constants;
-import frc.robot.utilities.constants.Constants.ModuleConstants.BackLeftModule;
-import frc.robot.utilities.constants.Constants.ModuleConstants.BackRightModule;
-import frc.robot.utilities.constants.Constants.ModuleConstants.FrontLeftModule;
-import frc.robot.utilities.constants.Constants.ModuleConstants.FrontRightModule;
 
 /* Sets up class that assigns motors to each swerve module and get swerving.
 * Methods created to handle different actions taken on the controls.
@@ -44,9 +40,6 @@ public class SwerveSubsystem extends SubsystemBase {
             new SwerveModule(2,Constants.ModuleConstants.BackLeftModule.constants),
             new SwerveModule(3,Constants.ModuleConstants.BackRightModule.constants)
         };
-
-        field = new Field2d();
-        SmartDashboard.putData("Field", field);
     }
 
     public void drive(Translation2d translation, double rotation, boolean fieldRelative, boolean isOpenLoop) {
