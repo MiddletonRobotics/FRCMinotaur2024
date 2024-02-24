@@ -31,8 +31,7 @@ public class SwerveSubsystem extends SubsystemBase {
 
     public SwerveSubsystem() {
         gyro = new AHRS(SPI.Port.kMXP);
-
-        // swerveOdometry = new SwerveDriveOdometry(Constants.SwerveConstants.SwerveKinematics, getYaw(), getSwerveModulePositions());
+        swerveOdometry = new SwerveDriveOdometry(Constants.SwerveConstants.SwerveKinematics, getYaw(), getSwerveModulePositions());
         
         swerveModules = new SwerveModule[] {
             new SwerveModule(0, Constants.ModuleConstants.FrontLeftModule.constants),
@@ -40,6 +39,9 @@ public class SwerveSubsystem extends SubsystemBase {
             new SwerveModule(2,Constants.ModuleConstants.BackLeftModule.constants),
             new SwerveModule(3,Constants.ModuleConstants.BackRightModule.constants)
         };
+
+        field = new Field2d();
+        SmartDashboard.putData("Field", field);
     }
 
     public void drive(Translation2d translation, double rotation, boolean fieldRelative, boolean isOpenLoop) {
@@ -63,8 +65,6 @@ public class SwerveSubsystem extends SubsystemBase {
         }
     }
 
-    /*
-
     public Pose2d getPose() {
         return swerveOdometry.getPoseMeters();
     }
@@ -73,8 +73,6 @@ public class SwerveSubsystem extends SubsystemBase {
         swerveOdometry.resetPosition(getYaw(), getSwerveModulePositions(), pose);
     }
 
-    */
-
     public SwerveModuleState[] getSwerveModuleStates() {
         SwerveModuleState[] states = new SwerveModuleState[4];
         for(SwerveModule module : swerveModules) {
@@ -82,6 +80,15 @@ public class SwerveSubsystem extends SubsystemBase {
         }
 
         return states;
+    }
+
+    public SwerveModulePosition[] getSwerveModulePositions() {
+        SwerveModulePosition[] positions = new SwerveModulePosition[4];
+        for(SwerveModule module : swerveModules) {
+            positions[module.moduleNumber] = module.getSwerveModulePosition();
+        }
+
+        return positions;
     }
 
     public void resetHeading() {

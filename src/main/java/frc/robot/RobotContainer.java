@@ -7,7 +7,7 @@
 */
 package frc.robot;
 
-import edu.wpi.first.wpilibj.GenericHID;
+// import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -16,9 +16,9 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
 import frc.robot.commands.SwerveController;
-import frc.robot.commands.TankController;
+// import frc.robot.commands.TankController;
 import frc.robot.subsystems.SwerveSubsystem;
-import frc.robot.subsystems.TankSubsystem;
+// import frc.robot.subsystems.TankSubsystem;
 import frc.robot.utilities.Controller;
 
 /* Setup class that handles robot movement operations
@@ -30,7 +30,7 @@ import frc.robot.utilities.Controller;
 public class RobotContainer {
 
   private final Joystick DriverController = Controller.getDriverController();
-  private final Joystick OperatorController = Controller.getOperatorController();
+  // private final Joystick OperatorController = Controller.getOperatorController();
 
   private final int translationAxis = XboxController.Axis.kLeftY.value;
   private final int strafeAxis = XboxController.Axis.kLeftX.value;
@@ -48,7 +48,7 @@ public class RobotContainer {
 
   // If button is pressed, swerve drive is oriented to field or other
   private void configureButtonBindings() {
-    robotCentric.whileTrue(new InstantCommand(() -> swerveSubsystem.resetHeading()));
+    resetHeading.whileTrue(new InstantCommand(() -> swerveSubsystem.resetHeading()));
   }
 
   //Set up the arcade drive and swerve drive with all the kooky things like getting speed/movement from joystick values and switching heading style from button

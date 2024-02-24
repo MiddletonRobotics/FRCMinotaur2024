@@ -109,6 +109,9 @@ public class Constants {
         public static final IdleMode angleNeutralMode = IdleMode.kBrake; // What the steering motor should do when not applied with any power (should always be brake while running to prevent overshooting target)
         public static final IdleMode driveNeutralMode = IdleMode.kBrake; // What the drive motor should do when not applied with any power (should always be brake while running to prevent overshooting target)
 
+        public static final IdleMode driveIdleMode = IdleMode.kCoast; // What the drive motor should so when the robot hasn't been initialized
+        public static final IdleMode angleIdleMode = IdleMode.kCoast; // What the steering motor should so when the robot hasn't been initialized
+
         /* Motor and Encoder Inversions, they should all br running in CCW+ (either apply positive power when turned counterclockwise or returning postive values when spun counterclockwise) */
         public static final boolean driveInvert = false;
         public static final boolean angleInvert = false; 

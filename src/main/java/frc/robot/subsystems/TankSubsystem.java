@@ -11,16 +11,9 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import frc.robot.utilities.constants.Constants;
-import frc.robot.utilities.Controller;
 
-import java.util.function.DoubleSupplier;
-
-import org.ejml.equation.IntegerSequence.For;
-
-import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpilibj2.command.Command;
 
 public class TankSubsystem extends SubsystemBase {
     private final TalonFX rightMaster;
