@@ -32,7 +32,7 @@ import frc.robot.utilities.constants.Constants.ModuleConstants;
 public class SwerveModule {
     public int moduleNumber;
     private Rotation2d lastAngle;
-    private double angleOffset;
+    private Rotation2d angleOffset;
 
     private SwerveModuleState expectedState = new SwerveModuleState();
 
@@ -81,12 +81,8 @@ public class SwerveModule {
         return new SwerveModuleState(driveEncocder.getVelocity(), getAngle());
     }
 
-    public double convertToDegrees(double rotations) {
-        return rotations * 360;
-    }
-
     private void resetToAbsolute() {
-        double absolutePosition = getSwerveEncoder().getRotations() - convertToDegrees(angleOffset);
+        double absolutePosition = getSwerveEncoder().getDegrees();
         angleEncoder.setPosition(absolutePosition);
     }
 
@@ -96,7 +92,7 @@ public class SwerveModule {
 
         magnetSensorConfiguration.AbsoluteSensorRange = AbsoluteSensorRangeValue.Unsigned_0To1;
         magnetSensorConfiguration.SensorDirection = SensorDirectionValue.CounterClockwise_Positive;
-        magnetSensorConfiguration.MagnetOffset = angleOffset;
+        magnetSensorConfiguration.MagnetOffset = angleOffset.getRotations();
         swerveEncoderConfigurator.apply(new CANcoderConfiguration().withMagnetSensor(magnetSensorConfiguration));
     }
 
@@ -120,6 +116,7 @@ public class SwerveModule {
         angleMotor.setInverted(Constants.SwerveConstants.angleInvert);
         angleMotor.setIdleMode(Constants.SwerveConstants.angleNeutralMode);
         angleEncoder.setPositionConversionFactor(Constants.ModuleConstants.angleConversionFactor);
+        anglePIDController.setFeedbackDevice(angleEncoder); // Setting the encoder to be the feedback device (EXPERIMENTAL)
         anglePIDController.setP(Constants.ModuleConstants.angleKP);
         anglePIDController.setI(Constants.ModuleConstants.angleKI);
         anglePIDController.setD(Constants.ModuleConstants.angleKD);
@@ -137,6 +134,7 @@ public class SwerveModule {
         driveMotor.setIdleMode(Constants.SwerveConstants.driveNeutralMode);
         driveEncocder.setVelocityConversionFactor(Constants.ModuleConstants.driveConversionVelocityFactor);
         driveEncocder.setPositionConversionFactor(Constants.ModuleConstants.driveConversionPositionFactor);
+        drivePIDController.setFeedbackDevice(driveEncocder); // Setting the encoder to be the feedback device (EXPERIMENTAL)
         drivePIDController.setP(Constants.ModuleConstants.angleKP);
         drivePIDController.setI(Constants.ModuleConstants.angleKI);
         drivePIDController.setD(Constants.ModuleConstants.angleKD);
