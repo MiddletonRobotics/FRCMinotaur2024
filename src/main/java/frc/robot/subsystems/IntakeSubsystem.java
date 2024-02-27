@@ -2,29 +2,24 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix.motorcontrol.NeutralMode;
-import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
-import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
-import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.command.Subsystem;
 import frc.robot.Utilities.Constants.Constants;
-import frc.robot.Utilities.Drivers.MinoDoubleSol;
 import frc.robot.Utilities.Drivers.MinoGamepad;
 import frc.robot.Utilities.Section;
+import com.revrobotics.CANSparkMax;
 
 
 public class Intake extends Subsystem implements Section, Constants {
 
-    private WPI_TalonSRX rightIntakeMaster;
-    private WPI_VictorSPX leftIntakeSlave;
-    public MinoDoubleSol intakeSolenoid;
+    private CANSparkMax topIntake;
+    private CANSparkMax bottomIntake;
 
 
     private static Intake instance = null;
 
     private Intake() {
-        rightIntakeMaster = new WPI_TalonSRX(intakeMasterRightID);
-        leftIntakeSlave = new WPI_VictorSPX(intakeSlaveLeftID);
-        intakeSolenoid = new MinoDoubleSol(intakeSolenoidForwardChannel, intakeSolenoidReverseChannel);
+        topIntake = new CANSparkMax​(intakeTopID, intakeTopMotorType);
+        bottomIntake = new CANSparkMax(intakeBottomID, intakeBottomMotorType);
 
         configTalons();
 
@@ -40,12 +35,12 @@ public class Intake extends Subsystem implements Section, Constants {
     }
 
     private void configTalons() {
-        rightIntakeMaster.set(0);
-        leftIntakeSlave.set(0);
-        rightIntakeMaster.configOpenloopRamp(0, 0);
-        leftIntakeSlave.configOpenloopRamp(0, 0);
-        leftIntakeSlave.setNeutralMode(NeutralMode.Brake);
-        rightIntakeMaster.setNeutralMode(NeutralMode.Brake);
+        topIntake.set(0.0);
+        bottomIntake.set(0.0);
+        topIntake.configOpenloopRamp(0, 0);
+        bottomIntake.configOpenloopRamp(0, 0);
+        bottomIntake.setNeutralMode(NeutralMode.Brake);
+        topIntake.setNeutralMode(NeutralMode.Brake);
 
     }
 
@@ -58,54 +53,56 @@ public class Intake extends Subsystem implements Section, Constants {
     @Override
     public void teleop(MinoGamepad gamepad) {
 
-
-        if(gamepad.leftTriggerPressed()) {
+/*
+        if(gamepad.bottomTriggerPressed()) {
             intaking = false;
-            rightIntakeMaster.configOpenloopRamp(0, kTimeoutMs);
-            leftIntakeSlave.configOpenloopRamp(0, kTimeoutMs);
-            setPercentSpeed(intakeSolenoid.getValue() == DoubleSolenoid.Value.kForward ? -1 : 1); //OUT
-        } else if (gamepad.rightTriggerPressed()){
+            topIntake.configOpenloopRamp(0, kTimeoutMs);
+            bottomIntake.configOpenloopRamp(0, kTimeoutMs);
+        } else if (gamepad.topTriggerPressed()){
             intaking = true;
-            rightIntakeMaster.configOpenloopRamp(0.25, kTimeoutMs);
-            leftIntakeSlave.configOpenloopRamp(0.25, kTimeoutMs);
+            topIntake.configOpenloopRamp(0.25, kTimeoutMs);
+            bottomIntake.configOpenloopRamp(0.25, kTimeoutMs);
             setPercentSpeed(intakeSolenoid.getValue() == DoubleSolenoid.Value.kForward ? 1 : -1); //IN
         } else {
             if (intaking) {
                 setPercentSpeed(intakeSolenoid.getValue() == DoubleSolenoid.Value.kForward ? 0.05 : -0.05); //IN
             } else {
-                setPercentSpeed(0);
+                topIntake.set(0);
+                bottomIntake.set(0);
             }
 
         }
-
+*/
         if (gamepad.getRawButton(BTN_X)) {
             toggleIntake();
         }
 
     }
 
-
-    public void openIntake() {
-        intakeSolenoid.set(DoubleSolenoid.Value.kReverse);
+//we felt a little silly with the names
+    public void intakeConsume() {
+        topIntake.set(0.5); //whatever makes motor take thingy
+        bottomIntake.set(0.5); //make it match top intake(reverse probably if motors are backwards)
     }
 
-    public void closeIntake() {
-        intakeSolenoid.set(DoubleSolenoid.Value.kForward);
+    public void intakeRegurgitate() {
+        topIntake.set(-0.5); //whatever makes motor release thingy
+        bottomIntake.set(-0.5); //make it match bottom
     }
 
     public void toggleIntake() {
-        intakeSolenoid.toggle();
+        
     }
 
     @Override
     public void reset() {
-        rightIntakeMaster.set(0);
-        leftIntakeSlave.set(0);
+        topIntake.set(0);
+        bottomIntake.set(0);
         closeIntake();
     }
 
     public void setPercentSpeed(double speed) {
-        rightIntakeMaster.set(-speed);
-        leftIntakeSlave.set(speed);
+        topIntake.set(-speed);
+        bottomIntake.set(speed);
     }
 }
