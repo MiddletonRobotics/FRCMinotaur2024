@@ -24,14 +24,14 @@ import frc.robot.utilities.constants.Constants;
 public class SwerveSubsystem extends SubsystemBase {
     private final AHRS gyro;
 
-    private SwerveDriveOdometry swerveOdometry;
+    //private SwerveDriveOdometry swerveOdometry;
     private SwerveModule[] swerveModules;
 
-    private Field2d field;
+   // private Field2d field;
 
     public SwerveSubsystem() {
         gyro = new AHRS(SPI.Port.kMXP);
-        swerveOdometry = new SwerveDriveOdometry(Constants.SwerveConstants.SwerveKinematics, getYaw(), getSwerveModulePositions());
+        //swerveOdometry = new SwerveDriveOdometry(Constants.SwerveConstants.SwerveKinematics, getYaw(), getSwerveModulePositions());
         
         swerveModules = new SwerveModule[] {
             new SwerveModule(0, Constants.ModuleConstants.FrontLeftModule.constants),
@@ -40,8 +40,8 @@ public class SwerveSubsystem extends SubsystemBase {
             new SwerveModule(3,Constants.ModuleConstants.BackRightModule.constants)
         };
 
-        field = new Field2d();
-        SmartDashboard.putData("Field", field);
+        //field = new Field2d();
+        //SmartDashboard.putData("Field", field);
     }
 
     public void drive(Translation2d translation, double rotation, boolean fieldRelative, boolean isOpenLoop) {
@@ -65,12 +65,12 @@ public class SwerveSubsystem extends SubsystemBase {
         }
     }
 
-    public Pose2d getPose() {
-        return swerveOdometry.getPoseMeters();
-    }
+    //public Pose2d getPose() {
+       // return swerveOdometry.getPoseMeters();
+    //}
 
     public void resetSwerveOdometry(Pose2d pose) {
-        swerveOdometry.resetPosition(getYaw(), getSwerveModulePositions(), pose);
+        //swerveOdometry.resetPosition(getYaw(), getSwerveModulePositions(), pose);
     }
 
     public SwerveModuleState[] getSwerveModuleStates() {

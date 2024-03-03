@@ -55,8 +55,8 @@ public class RobotContainer {
   public RobotContainer() {
     swerveSubsystem.setDefaultCommand(new SwerveController(
       swerveSubsystem, 
-      () -> -DriverController.getRawAxis(translationAxis), 
-      () -> -DriverController.getRawAxis(strafeAxis), 
+      () -> DriverController.getRawAxis(translationAxis),
+      () -> DriverController.getRawAxis(strafeAxis), 
       () -> -DriverController.getRawAxis(rotationAxis), 
       () -> robotCentric.getAsBoolean()));
       
