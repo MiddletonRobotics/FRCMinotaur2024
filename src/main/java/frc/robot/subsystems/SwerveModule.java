@@ -59,6 +59,7 @@ public class SwerveModule {
         configureAngleMotor();
 
         driveMotor = new CANSparkMax(moduleConstants.driveMotorID, MotorType.kBrushless);
+        driveMotor.setInverted(Constants.SwerveConstants.driveInvert);
         driveEncocder = driveMotor.getEncoder();
         drivePIDController = driveMotor.getPIDController();
         configureDriveMotor();
