@@ -3,16 +3,14 @@ package frc.robot.subsystems;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 
-import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+
 import frc.robot.utilities.constants.Constants;
 
 public class IntakeSubsystem extends SubsystemBase {
 
     public CANSparkMax rollerMotor;
     public CANSparkMax pivotMotor;
-
-    public static IntakeSubsystem instance = null;
 
     public IntakeSubsystem() {
         rollerMotor = new CANSparkMax(Constants.IntakeConstants.rollerMotorID, MotorType.kBrushless);
@@ -30,6 +28,6 @@ public class IntakeSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
-        
+
     }
 }
