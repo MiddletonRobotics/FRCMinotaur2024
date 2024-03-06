@@ -36,7 +36,7 @@ public class ClimberSubsystem extends SubsystemBase {
 
     private void configureRightClimbMotor() {
         rightClimbMotor.restoreFactoryDefaults();
-        CANSparkMaxUtil.setCANSparkMaxBusUsage(rightClimbMotor, Usage.kAll);
+        CANSparkMaxUtil.setCANSparkMaxBusUsage(rightClimbMotor, Usage.kPositionOnly);
         rightClimbMotor.setSmartCurrentLimit(ClimberConstants.rightClimbContinuousCurrentLimit);
         rightClimbMotor.setInverted(ClimberConstants.rightClimbInvert);
         rightClimbMotor.setIdleMode(ClimberConstants.rightClimbNeutralMode);
@@ -70,34 +70,18 @@ public class ClimberSubsystem extends SubsystemBase {
         leftClimbEncoder.setPosition(0.0);
     }
 
-    /*private void configureClimbMotor() {
-        climbMotor.restoreFactoryDefaults();
-        CANSparkMaxUtil.setCANSparkMaxBusUsage(climbMotor, Usage.kAll);
-        climbMotor.setSmartCurrentLimit(ClimberConstants.climbContinuousCurrentLimit);
-        climbMotor.setInverted(ClimberConstants.climbInvert);
-        climbMotor.setIdleMode(ClimberConstants.climbNeutralMode);
-        climbEncoder.setVelocityConversionFactor(ClimberConstants.climbConversionVelocityFactor);
-        climbEncoder.setPositionConversionFactor(ClimberConstants.climbConversionPositionFactor);
-        climbPID.setFeedbackDevice(climbEncoder); // Setting the encoder to be the feedback device (EXPERIMENTAL)
-        climbPID.setP(ClimberConstants.climbKP);
-        climbPID.setI(ClimberConstants.climbKI);
-        climbPID.setD(ClimberConstants.climbKD);
-        climbPID.setFF(ClimberConstants.climbKFF);
-        climbMotor.enableVoltageCompensation(ClimberConstants.voltageCompensation);
-        climbMotor.burnFlash();
-        climbEncoder.setPosition(0.0);
-    }
-    */
-
-
     public void climb() {
         rightClimbMotor.set(0.5);
         leftClimbMotor.set(0.5);
-        
     }
 
     public void reset() {
         rightClimbMotor.set(0.0);
         leftClimbMotor.set(0.0);
+    }
+
+    @Override
+    public void periodic() {
+
     }
 }

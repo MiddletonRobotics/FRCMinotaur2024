@@ -183,8 +183,8 @@ public class Constants {
         public static final int LeftClimbMotorID = 1;
         public static final int RightClimbMotorID = 2;
 
-        public static final int rightClimbContinuousCurrentLimit = 80; //AGG I will change it but here is what rohan put: Drive motors should be at the maximum reccomended amperes to get the most power and speed from it
-        public static final int leftClimbContinuousCurrentLimit = 80; // Same here buddy: Drive motors should be at the maximum reccomended amperes to get the most power and speed from it
+        public static final int rightClimbContinuousCurrentLimit = 60; //AGG I will change it but here is what rohan put: Drive motors should be at the maximum reccomended amperes to get the most power and speed from it
+        public static final int leftClimbContinuousCurrentLimit = 60; // Same here buddy: Drive motors should be at the maximum reccomended amperes to get the most power and speed from it
 
         public static final double voltageCompensation = 12.0; // For PID tuning, the max voltage that the PID will compensate for this value (for example at 12V your PID will tune for receiving for 12V, or the max battery output)
         public static final boolean leftClimbInvert = false;
