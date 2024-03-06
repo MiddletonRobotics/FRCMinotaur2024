@@ -1,4 +1,3 @@
-//just a test to make sure this all commits properly
 package frc.robot.subsystems;
 
 import com.ctre.phoenix.motorcontrol.NeutralMode;
@@ -11,28 +10,24 @@ import com.revrobotics.CANSparkMax;
 
 public class Intake extends Subsystem {
 
-    private CANSparkMax topIntake;
-    private CANSparkMax bottomIntake;
+    private CANSparkMax gripIntake;
     private CANSparkMax rotateIntake;
 
 
     private static Intake instance = null;
 
     private Intake() {
-        topIntake = new CANSparkMax​(62 intakeTopID, CANSparkLowLevel.MotorType.kBrushless);
-        bottomIntake = new CANSparkMax(7 intakeBottomID, CANSparkLowLevel.MotorType.kBrushless);
-        rotateIntake = new CANSparkMax(48 intakeRotateID, CANSparkLowLevel.MotorType.kBrushless); //ints are just there as placeholders till we get actual ones, same with ids
+        gripIntake = new CANSparkMax​(Constants.IntakeConstants.gripIntakeID, CANSparkLowLevel.MotorType.kBrushless);
+        rotateIntake = new CANSparkMax(Constants.IntakeConstants.rotateIntakeID, CANSparkLowLevel.MotorType.kBrushless); //ints are just there as placeholders till we get actual ones, same with ids
     }
 
 //we felt a little silly with the names
     public void intakeConsume() {
-        topIntake.set(0.5); //whatever makes motor take thingy
-        bottomIntake.set(0.5); //make it match top intake(reverse probably if motors are backwards)
+        gripIntake.set(0.5); //whatever makes motor take thingy
     }
 
     public void intakeRegurgitate() {
-        topIntake.set(-0.5); //whatever makes motor release thingy
-        bottomIntake.set(-0.5); //make it match bottom
+        gripIntake.set(-0.5); //whatever makes motor release thingy
     }
 
     public void intakeForward() {
@@ -45,8 +40,7 @@ public class Intake extends Subsystem {
 
     @Override
     public void reset() {
-        topIntake.set(0);
-        bottomIntake.set(0);
+        gripIntake.set(0);
     }
 
 }
