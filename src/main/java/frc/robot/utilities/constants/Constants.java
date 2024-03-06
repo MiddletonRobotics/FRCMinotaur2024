@@ -130,6 +130,26 @@ public class Constants {
     public static final class IntakeConstants {
         public static final int rollerMotorID = 13;
         public static final int pivotMotorID = 14;
+        public static boolean rollerMotorInvert = false;
+        public static IdleMode rollerMotorNeutralMode = IdleMode.kBrake;
+        public static double voltageCompensation;
+        public static boolean pivotMotorInvert = false;
+        public static IdleMode pivotMotorNeutralMode = IdleMode.kBrake;
+        public static IdleMode rollerMotorIdleMode = IdleMode.kCoast;
+        public static IdleMode pivotMotorIdleMode = IdleMode.kCoast;
+        public static final int pivotEncoderID = 17;
+    }
+
+    public static final class ShooterConstants {
+        public static int leftShooterMotorID = 15;
+        public static int rightShooterMotorID = 16;
+        public static IdleMode rightShooterMotorNeutralMode = IdleMode.kBrake;
+        public static IdleMode leftShooterMotorNeutralMode = IdleMode.kBrake;
+        public static IdleMode rightShooterMotorIdleMode = IdleMode.kCoast;
+        public static IdleMode leftShooterMotorIdleMode = IdleMode.kCoast;
+        public static boolean rightShooterMotorInvert = false;
+        public static boolean leftShooterMotorInvert = false;
+        public static final double voltageCompensation = 12.0;
     }
 
     // Tank motor ids and base variables
@@ -183,11 +203,5 @@ public class Constants {
         public static final int operatorControllerPort = 1;
 
         public static final double kDeadband = 0.1;
-    }
-
-    public static final class IntakeConstants {
-        public static final int Constants.IntakeConstants.intakeTopID;
-        public static final int Constants.IntakeConstants.intakeBottomID;
-        public static final int Constants.IntakeConstants.intakeRotateID;
     }
 }
