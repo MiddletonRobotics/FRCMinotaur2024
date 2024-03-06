@@ -178,4 +178,32 @@ public class Constants {
 
         public static final double kDeadband = 0.1;
     }
+
+    public static final class ClimberConstants {
+        public static final int LeftClimbMotorID = 1;
+        public static final int RightClimbMotorID = 2;
+
+        public static final int rightClimbContinuousCurrentLimit = 80; //AGG I will change it but here is what rohan put: Drive motors should be at the maximum reccomended amperes to get the most power and speed from it
+        public static final int leftClimbContinuousCurrentLimit = 80; // Same here buddy: Drive motors should be at the maximum reccomended amperes to get the most power and speed from it
+
+        public static final double voltageCompensation = 12.0; // For PID tuning, the max voltage that the PID will compensate for this value (for example at 12V your PID will tune for receiving for 12V, or the max battery output)
+        public static final boolean leftClimbInvert = false;
+        public static final boolean rightClimbInvert = false;
+        public static final IdleMode leftClimbNeutralMode = IdleMode.kBrake;
+        public static final IdleMode rightClimbNeutralMode = IdleMode.kBrake;
+        //public static final double rightClimbConversionPositionFactor = (WheelDiameter * Math.PI) / DriveGearRatio;
+        //public static final double rightClimbConversionVelocityFactor = rightClimbConversionPositionFactor / 60.0;
+        //public static final double leftClimbConversionPositionFactor = (WheelDiameter * Math.PI) / DriveGearRatio;
+        //public static final double leftClimbConversionVelocityFactor = leftClimbConversionPositionFactor / 60.0;
+
+        public static final double rClimbKP = 0.1; // Propotional: If there is error, move the motor propotional to the error
+        public static final double rClimbKI = 0.0; // Intergral: If the error is taking too long to correct, move the motor faster
+        public static final double rClimbKD = 0.0; // Derivative: If the motor is getting close to reaching the target, slow it down
+        public static final double rClimbKFF = 0.0; // Force: Additional gain for creating offsets
+
+        public static final double lClimbKP = 0.1; // Propotional: If there is error, move the motor propotional to the error
+        public static final double lClimbKI = 0.0; // Intergral: If the error is taking too long to correct, move the motor faster
+        public static final double lClimbKD = 0.0; // Derivative: If the motor is getting close to reaching the target, slow it down
+        public static final double lClimbKFF = 0.0; // Force: Additional gain for creating offsets
+    }
 }
