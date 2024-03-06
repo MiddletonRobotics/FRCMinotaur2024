@@ -231,5 +231,7 @@ public class Constants {
         public static final double lClimbKI = 0.0; // Intergral: If the error is taking too long to correct, move the motor faster
         public static final double lClimbKD = 0.0; // Derivative: If the motor is getting close to reaching the target, slow it down
         public static final double lClimbKFF = 0.0; // Force: Additional gain for creating offsets
+
+        public static final double climbSpeed = 0.5;
     }
 }

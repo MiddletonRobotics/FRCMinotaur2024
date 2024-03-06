@@ -70,9 +70,14 @@ public class ClimberSubsystem extends SubsystemBase {
         leftClimbEncoder.setPosition(0.0);
     }
 
-    public void climb() {
-        rightClimbMotor.set(0.5);
-        leftClimbMotor.set(0.5);
+    public void climbUp() {
+        rightClimbMotor.set(ClimberConstants.climbSpeed);
+        leftClimbMotor.set(ClimberConstants.climbSpeed);
+    }
+
+    public void climbDown() {
+        rightClimbMotor.set(-ClimberConstants.climbSpeed);
+        leftClimbMotor.set(-ClimberConstants.climbSpeed);
     }
 
     public void reset() {
