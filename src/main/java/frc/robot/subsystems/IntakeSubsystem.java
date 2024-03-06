@@ -11,34 +11,34 @@ import com.revrobotics.CANSparkLowLevel.MotorType;
 
 public class Intake extends SubsystemBase {
 
-    public CANSparkMax gripIntake;
-    public CANSparkMax rotateIntake;
+    public CANSparkMax rollerMotor;
+    public CANSparkMax pivotMotor;
 
     public Intake() {
-        gripIntake = new CANSparkMax(Constants.IntakeConstants.gripIntakeID, CANSparkLowLevel.MotorType.kBrushless);
-        rotateIntake = new CANSparkMax(Constants.IntakeConstants.rotateIntakeID, CANSparkLowLevel.MotorType.kBrushless); //ints are just there as placeholders till we get actual ones, same with ids
+        rollerMotor = new CANSparkMax(Constants.IntakeConstants.rollerMotorID, CANSparkLowLevel.MotorType.kBrushless);
+        pivotMotor = new CANSparkMax(Constants.IntakeConstants.pivotMotorID, CANSparkLowLevel.MotorType.kBrushless); //ints are just there as placeholders till we get actual ones, same with ids
     }
 
 //we felt a little silly with the names
     public void intakeConsume() {
-        gripIntake.set(0.5); //whatever makes motor take thingy
+        rollerMotor.set(0.5); //whatever makes motor take thingy
     }
 
     public void intakeRegurgitate() {
-        gripIntake.set(-0.5); //whatever makes motor release thingy
+        rollerMotor.set(-0.5); //whatever makes motor release thingy
     }
 
     public void intakeForward() {
-        rotateIntake.set(0.5); //placeholder values for rn
+        pivotMotor.set(0.5); //placeholder values for rn
     }
 
     public void intakeBackward() {
-        rotateIntake.set(-0.5); //same comment as intakeForward
+        pivotMotor.set(-0.5); //same comment as intakeForward
     }
 
     @Override
     public void reset() {
-        gripIntake.set(0);
+        rollerMotor.set(0);
     }
   
     public void configureRollerMotor() {
