@@ -126,7 +126,13 @@ public class Constants {
         public static final double PhysicalMaxSpeedMetersPerSecond = 2.75;
         public static final double AngularMaxVelocity = 5;
     }
-// Tank motor ids and base variables
+
+    public static final class IntakeConstants {
+        public static final int rollerMotorID = 13;
+        public static final int pivotMotorID = 14;
+    }
+
+    // Tank motor ids and base variables
     public static final class TankConstants {
         public static final int RightMasterID = 2;
         public static final int RightSlaveID = 4;
