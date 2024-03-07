@@ -46,7 +46,7 @@ public class Geometry {
         return radians;
     }
 
-    public double  rotationWrapper(double rotations) {
+    public double rotationWrapper(double rotations) {
         while (rotations < 0) {
             rotations += 1;
         }

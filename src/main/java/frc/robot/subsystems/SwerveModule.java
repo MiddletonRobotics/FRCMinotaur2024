@@ -18,6 +18,7 @@ import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+
 import frc.robot.Robot;
 import frc.robot.utilities.CANSparkMaxUtil;
 import frc.robot.utilities.OnboardModuleState;
@@ -83,8 +84,8 @@ public class SwerveModule {
         angleMotor.setSmartCurrentLimit(Constants.ModuleConstants.angleContinuousCurrentLimit);
         angleMotor.setInverted(Constants.SwerveConstants.angleInvert);
         angleMotor.setIdleMode(Constants.SwerveConstants.angleNeutralMode);
-        angleEncoder.setPositionConversionFactor(Constants.ModuleConstants.angleConversionFactor);
-        anglePIDController.setFeedbackDevice(angleEncoder); // Setting the encoder to be the feedback device (EXPERIMENTAL)
+        angleEncoder.setPositionConversionFactor(Constants.SwerveConstants.AngleConversionFactor);
+        anglePIDController.setFeedbackDevice(angleEncoder);
         anglePIDController.setP(Constants.ModuleConstants.angleKP);
         anglePIDController.setI(Constants.ModuleConstants.angleKI);
         anglePIDController.setD(Constants.ModuleConstants.angleKD);
@@ -100,9 +101,9 @@ public class SwerveModule {
         driveMotor.setSmartCurrentLimit(Constants.ModuleConstants.driveContinuousCurrentLimit);
         driveMotor.setInverted(Constants.SwerveConstants.driveInvert);
         driveMotor.setIdleMode(Constants.SwerveConstants.driveNeutralMode);
-        driveEncocder.setVelocityConversionFactor(Constants.ModuleConstants.driveConversionVelocityFactor);
-        driveEncocder.setPositionConversionFactor(Constants.ModuleConstants.driveConversionPositionFactor);
-        drivePIDController.setFeedbackDevice(driveEncocder); // Setting the encoder to be the feedback device (EXPERIMENTAL)
+        driveEncocder.setVelocityConversionFactor(Constants.SwerveConstants.DriveConversionPositionFactor);
+        driveEncocder.setPositionConversionFactor(Constants.SwerveConstants.DriveConversionVelocityFactor);
+        drivePIDController.setFeedbackDevice(driveEncocder);
         drivePIDController.setP(Constants.ModuleConstants.angleKP);
         drivePIDController.setI(Constants.ModuleConstants.angleKI);
         drivePIDController.setD(Constants.ModuleConstants.angleKD);

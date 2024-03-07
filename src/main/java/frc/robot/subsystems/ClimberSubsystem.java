@@ -1,6 +1,7 @@
 package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkPIDController;
@@ -43,10 +44,10 @@ public class ClimberSubsystem extends SubsystemBase {
         //rightClimbEncoder.setVelocityConversionFactor(ClimberConstants.rightClimbConversionVelocityFactor);
         //rightClimbEncoder.setPositionConversionFactor(ClimberConstants.rightClimbConversionPositionFactor);
         rightPID.setFeedbackDevice(rightClimbEncoder); // Setting the encoder to be the feedback device (EXPERIMENTAL)
-        rightPID.setP(ClimberConstants.rClimbKP);
-        rightPID.setI(ClimberConstants.rClimbKI);
-        rightPID.setD(ClimberConstants.rClimbKD);
-        rightPID.setFF(ClimberConstants.rClimbKFF);
+        rightPID.setP(ClimberConstants.climbKP);
+        rightPID.setI(ClimberConstants.climbKI);
+        rightPID.setD(ClimberConstants.climbKD);
+        rightPID.setFF(ClimberConstants.climbKFF);
         rightClimbMotor.enableVoltageCompensation(ClimberConstants.voltageCompensation);
         rightClimbMotor.burnFlash();
         rightClimbEncoder.setPosition(0.0);
@@ -61,10 +62,10 @@ public class ClimberSubsystem extends SubsystemBase {
         //leftClimbEncoder.setVelocityConversionFactor(ClimberConstants.leftClimbConversionVelocityFactor);
         //leftClimbEncoder.setPositionConversionFactor(ClimberConstants.leftClimbConversionPositionFactor);
         leftPID.setFeedbackDevice(leftClimbEncoder); // Setting the encoder to be the feedback device (EXPERIMENTAL)
-        leftPID.setP(ClimberConstants.lClimbKP);
-        leftPID.setI(ClimberConstants.lClimbKI);
-        leftPID.setD(ClimberConstants.lClimbKD);
-        leftPID.setFF(ClimberConstants.lClimbKFF);
+        leftPID.setP(ClimberConstants.climbKP);
+        leftPID.setI(ClimberConstants.climbKI);
+        leftPID.setD(ClimberConstants.climbKD);
+        leftPID.setFF(ClimberConstants.climbKFF);
         leftClimbMotor.enableVoltageCompensation(ClimberConstants.voltageCompensation);
         leftClimbMotor.burnFlash();
         leftClimbEncoder.setPosition(0.0);

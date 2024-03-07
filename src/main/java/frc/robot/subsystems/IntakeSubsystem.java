@@ -1,13 +1,11 @@
 package frc.robot.subsystems;
 
-import com.ctre.phoenix.motorcontrol.NeutralMode;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.utilities.CANSparkMaxUtil;
-import frc.robot.utilities.CANSparkMaxUtil.Usage;
-import frc.robot.utilities.constants.Constants;
+
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkLowLevel.MotorType;
+
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.signals.AbsoluteSensorRangeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
@@ -15,6 +13,9 @@ import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.CANcoderConfigurator;
 import com.ctre.phoenix6.configs.MagnetSensorConfigs;
 
+import frc.robot.utilities.CANSparkMaxUtil;
+import frc.robot.utilities.CANSparkMaxUtil.Usage;
+import frc.robot.utilities.constants.Constants;
 
 public class IntakeSubsystem extends SubsystemBase {
 
@@ -33,23 +34,6 @@ public class IntakeSubsystem extends SubsystemBase {
         configurePivotEncoder();
     }
 
-//we felt a little silly with the names
-    public void intakeConsume() {
-        rollerMotor.set(0.5); //whatever makes motor take thingy
-    }
-
-    public void intakeRegurgitate() {
-        rollerMotor.set(-0.5); //whatever makes motor release thingy
-    }
-
-    public void intakeForward() {
-        pivotMotor.set(0.5); //placeholder values for rn
-    }
-
-    public void intakeBackward() {
-        pivotMotor.set(-0.5); //same comment as intakeForward
-    }
-  
     public void configureRollerMotor() {
         rollerMotor.restoreFactoryDefaults();
         CANSparkMaxUtil.setCANSparkMaxBusUsage(rollerMotor, Usage.kAll);
@@ -76,6 +60,23 @@ public class IntakeSubsystem extends SubsystemBase {
         magnetSensorConfiguration.SensorDirection = SensorDirectionValue.CounterClockwise_Positive;
         magnetSensorConfiguration.MagnetOffset = angleOffset.getRotations();
         pivotEncoderConfigurator.apply(new CANcoderConfiguration().withMagnetSensor(magnetSensorConfiguration));
+    }
+
+    //we felt a little silly with the names
+    public void intakeConsume() {
+        rollerMotor.set(0.5); //whatever makes motor take thingy
+    }
+
+    public void intakeRegurgitate() {
+        rollerMotor.set(-0.5); //whatever makes motor release thingy
+    }
+
+    public void intakeForward() {
+        pivotMotor.set(0.5); //placeholder values for rn
+    }
+
+    public void intakeBackward() {
+        pivotMotor.set(-0.5); //same comment as intakeForward
     }
 
     public void reset() {

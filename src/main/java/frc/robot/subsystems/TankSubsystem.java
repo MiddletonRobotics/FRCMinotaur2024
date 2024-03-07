@@ -16,33 +16,33 @@ import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class TankSubsystem extends SubsystemBase {
-    private final TalonFX rightMaster;
-    private final TalonFX rightSlave;
-    private final TalonFX leftMaster;
-    private final TalonFX leftSlave;
+    private final TalonFX frontRight;
+    private final TalonFX backRight;
+    private final TalonFX frontLeft;
+    private final TalonFX backLeft;
 
     private MotorOutputConfigs rightMotorConfiguration;
     private MotorOutputConfigs leftMotorConfiguration;
 
-    private TalonFXConfigurator rightMasterConfigurator;
-    private TalonFXConfigurator rightSlaveConfigurator;
-    private TalonFXConfigurator leftMasterConfigurator;
-    private TalonFXConfigurator leftSlaveConfigurator;
+    private TalonFXConfigurator frontRightConfigurator;
+    private TalonFXConfigurator backRightConfigurator;
+    private TalonFXConfigurator frontLeftConfigurator;
+    private TalonFXConfigurator backLeftConfigurator;
 
     private FeedbackConfigs feedbackConfiguration;
 
     private DifferentialDrive TankDrive;
 
     public TankSubsystem() {
-        rightMaster = new TalonFX(Constants.TankConstants.RightMasterID);
-        rightSlave = new TalonFX(Constants.TankConstants.RightSlaveID);
-        leftMaster = new TalonFX(Constants.TankConstants.LeftMasterID);
-        leftSlave = new TalonFX(Constants.TankConstants.LeftSlaveID);
+        frontRight = new TalonFX(Constants.TankConstants.FrontRightID);
+        backRight = new TalonFX(Constants.TankConstants.BackRightID);
+        frontLeft = new TalonFX(Constants.TankConstants.FrontLeftID);
+        backLeft = new TalonFX(Constants.TankConstants.BackLeftID);
 
-        rightMasterConfigurator = rightMaster.getConfigurator();
-        rightSlaveConfigurator = rightSlave.getConfigurator();
-        leftMasterConfigurator = leftMaster.getConfigurator();
-        leftSlaveConfigurator = leftSlave.getConfigurator();
+        frontRightConfigurator = frontRight.getConfigurator();
+        backRightConfigurator = backRight.getConfigurator();
+        frontLeftConfigurator = frontLeft.getConfigurator();
+        backLeftConfigurator = backLeft.getConfigurator();
 
         rightMotorConfiguration = new MotorOutputConfigs();
         leftMotorConfiguration = new MotorOutputConfigs();
@@ -56,53 +56,53 @@ public class TankSubsystem extends SubsystemBase {
         feedbackConfiguration = new FeedbackConfigs();
         feedbackConfiguration.FeedbackSensorSource = FeedbackSensorSourceValue.RotorSensor;
 
-        rightMasterConfigurator.apply(new TalonFXConfiguration().withMotorOutput(rightMotorConfiguration).withFeedback(feedbackConfiguration));
-        rightSlaveConfigurator.apply(new TalonFXConfiguration().withMotorOutput(rightMotorConfiguration).withFeedback(feedbackConfiguration));
-        leftMasterConfigurator.apply(new TalonFXConfiguration().withMotorOutput(leftMotorConfiguration).withFeedback(feedbackConfiguration));
-        leftSlaveConfigurator.apply(new TalonFXConfiguration().withMotorOutput(leftMotorConfiguration).withFeedback(feedbackConfiguration));
+        frontRightConfigurator.apply(new TalonFXConfiguration().withMotorOutput(rightMotorConfiguration).withFeedback(feedbackConfiguration));
+        backRightConfigurator.apply(new TalonFXConfiguration().withMotorOutput(rightMotorConfiguration).withFeedback(feedbackConfiguration));
+        frontLeftConfigurator.apply(new TalonFXConfiguration().withMotorOutput(leftMotorConfiguration).withFeedback(feedbackConfiguration));
+        backLeftConfigurator.apply(new TalonFXConfiguration().withMotorOutput(leftMotorConfiguration).withFeedback(feedbackConfiguration));
 
-        leftSlave.setControl(new Follower(leftMaster.getDeviceID(), false));
-        rightSlave.setControl(new Follower(rightMaster.getDeviceID(), false));
+        backLeft.setControl(new Follower(frontLeft.getDeviceID(), false));
+        backRight.setControl(new Follower(frontRight.getDeviceID(), false));
 
-        TankDrive = new DifferentialDrive(rightMaster, leftMaster);
+        TankDrive = new DifferentialDrive(frontRight, frontLeft);
         TankDrive.setSafetyEnabled(false);
     }
 
     public void setRightInverted() {
-        boolean invertedState = rightMaster.getInverted();
+        boolean invertedState = frontRight.getInverted();
 
         if(invertedState) {
-            rightMasterConfigurator.apply(new MotorOutputConfigs().withInverted(InvertedValue.CounterClockwise_Positive));
-            rightSlaveConfigurator.apply(new MotorOutputConfigs().withInverted(InvertedValue.CounterClockwise_Positive));
+            frontRightConfigurator.apply(new MotorOutputConfigs().withInverted(InvertedValue.CounterClockwise_Positive));
+            backRightConfigurator.apply(new MotorOutputConfigs().withInverted(InvertedValue.CounterClockwise_Positive));
         } else {
-            rightMasterConfigurator.apply(new MotorOutputConfigs().withInverted(InvertedValue.Clockwise_Positive));
-            rightSlaveConfigurator.apply(new MotorOutputConfigs().withInverted(InvertedValue.Clockwise_Positive));
+            frontRightConfigurator.apply(new MotorOutputConfigs().withInverted(InvertedValue.Clockwise_Positive));
+            backRightConfigurator.apply(new MotorOutputConfigs().withInverted(InvertedValue.Clockwise_Positive));
         }
     }
 
     public void setLeftInverted() {
-        boolean invertedState = leftMaster.getInverted();
+        boolean invertedState = frontLeft.getInverted();
 
         if(invertedState) {
-            leftMasterConfigurator.apply(new MotorOutputConfigs().withInverted(InvertedValue.CounterClockwise_Positive));
-            leftSlaveConfigurator.apply(new MotorOutputConfigs().withInverted(InvertedValue.CounterClockwise_Positive));
+            frontLeftConfigurator.apply(new MotorOutputConfigs().withInverted(InvertedValue.CounterClockwise_Positive));
+            backLeftConfigurator.apply(new MotorOutputConfigs().withInverted(InvertedValue.CounterClockwise_Positive));
         } else {
-            leftMasterConfigurator.apply(new MotorOutputConfigs().withInverted(InvertedValue.Clockwise_Positive));
-            leftSlaveConfigurator.apply(new MotorOutputConfigs().withInverted(InvertedValue.Clockwise_Positive));
+            frontLeftConfigurator.apply(new MotorOutputConfigs().withInverted(InvertedValue.Clockwise_Positive));
+            backLeftConfigurator.apply(new MotorOutputConfigs().withInverted(InvertedValue.Clockwise_Positive));
         }
     }
 
     public void setIdleMode(String mode) {
         if(mode == "Coast") {
-            rightMasterConfigurator.apply(new MotorOutputConfigs().withNeutralMode(NeutralModeValue.Coast));
-            rightSlaveConfigurator.apply(new MotorOutputConfigs().withNeutralMode(NeutralModeValue.Coast));
-            leftMasterConfigurator.apply(new MotorOutputConfigs().withNeutralMode(NeutralModeValue.Coast));
-            leftSlaveConfigurator.apply(new MotorOutputConfigs().withNeutralMode(NeutralModeValue.Coast));
+            frontRightConfigurator.apply(new MotorOutputConfigs().withNeutralMode(NeutralModeValue.Coast));
+            backRightConfigurator.apply(new MotorOutputConfigs().withNeutralMode(NeutralModeValue.Coast));
+            frontLeftConfigurator.apply(new MotorOutputConfigs().withNeutralMode(NeutralModeValue.Coast));
+            backLeftConfigurator.apply(new MotorOutputConfigs().withNeutralMode(NeutralModeValue.Coast));
         } else if(mode == "Brake") {
-            rightMasterConfigurator.apply(new MotorOutputConfigs().withNeutralMode(NeutralModeValue.Brake));
-            rightSlaveConfigurator.apply(new MotorOutputConfigs().withNeutralMode(NeutralModeValue.Brake));
-            leftMasterConfigurator.apply(new MotorOutputConfigs().withNeutralMode(NeutralModeValue.Brake));
-            leftSlaveConfigurator.apply(new MotorOutputConfigs().withNeutralMode(NeutralModeValue.Brake));
+            frontRightConfigurator.apply(new MotorOutputConfigs().withNeutralMode(NeutralModeValue.Brake));
+            backRightConfigurator.apply(new MotorOutputConfigs().withNeutralMode(NeutralModeValue.Brake));
+            frontLeftConfigurator.apply(new MotorOutputConfigs().withNeutralMode(NeutralModeValue.Brake));
+            backLeftConfigurator.apply(new MotorOutputConfigs().withNeutralMode(NeutralModeValue.Brake));
         }
     }
 
