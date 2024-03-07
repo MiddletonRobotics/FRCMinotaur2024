@@ -7,6 +7,7 @@ import com.kauailabs.navx.frc.AHRS;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
+import com.pathplanner.lib.util.PathPlannerLogging;
 import com.pathplanner.lib.util.ReplanningConfig;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -50,6 +51,7 @@ public class SwerveSubsystem extends SubsystemBase {
         };
 
         swerveOdometry = new SwerveDriveOdometry(Constants.SwerveConstants.SwerveKinematics, getYaw(), getSwerveModulePositions());
+        field = new Field2d();
 
         AutoBuilder.configureHolonomic(
             this::getPose, 
@@ -69,7 +71,7 @@ public class SwerveSubsystem extends SubsystemBase {
             this
         );
 
-        field = new Field2d();
+        PathPlannerLogging.setLogActivePathCallback((poses) -> field.getObject("path").setPoses(poses));
         SmartDashboard.putData("Field", field);
     }
 

@@ -7,6 +7,8 @@
 */
 package frc.robot;
 
+import com.pathplanner.lib.commands.PathPlannerAuto;
+
 // import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
@@ -64,6 +66,6 @@ public class RobotContainer {
   };
 
   public Command getAutonomousCommand() {
-    return Commands.print("No autonomous command configured");
+    return new PathPlannerAuto("Exmaple Auto");
   }
 }
