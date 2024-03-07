@@ -133,7 +133,7 @@ public class SwerveModule {
         return new SwerveModulePosition(driveEncocder.getPosition(), getAngle());
     }
 
-    private void resetToAbsolute() {
+    public void resetToAbsolute() {
         double absolutePosition = getSwerveEncoder().getDegrees();
         angleEncoder.setPosition(absolutePosition);
     }

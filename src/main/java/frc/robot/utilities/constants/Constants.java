@@ -1,10 +1,12 @@
 package frc.robot.utilities.constants;
 
+import com.pathplanner.lib.util.PIDConstants;
 import com.revrobotics.CANSparkBase.IdleMode;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 
 // All of the constants that are accessed by other files, to prevent repetition and allows easy changing
@@ -118,6 +120,22 @@ public class Constants {
         public static final double BackLeftCANcoderOffsetRotations = 0;
         public static final double FrontRightCANcoderOffsetRotations = 0;
         public static final double BackRightCANcoderOffsetRotations = 0;
+    }
+
+    public static final class AutonomousConstants {
+        public static final double PhysicalMaxSpeedMetersPerSecond = 2.0;
+        public static final double MaxAccelerationMetersPerSecondSquared = 2;
+        public static final double MaxAngularSpeedRadiansPerSecond = Math.PI;
+        public static final double MaxAngularSpeedRadiansPerSecondSquared = Math.PI;
+
+        public static final double kPXController = 1.3;
+        public static final double kPYController = 1.3;
+        public static final double kPThetaController = 2;
+
+        public static final TrapezoidProfile.Constraints kThetaControllerConstraints = new TrapezoidProfile.Constraints(MaxAngularSpeedRadiansPerSecond, MaxAngularSpeedRadiansPerSecondSquared);
+
+        public static final PIDConstants TranslationPID = new PIDConstants(0.1, 0.0, 0.0);
+        public static final PIDConstants RotationalPID = new PIDConstants(0.01, 0.0, 0.0);
     }
 
     public static final class IntakeConstants {
