@@ -237,24 +237,56 @@ public class Constants {
     public static final class ControllerRawButtons {
 
         /* Axis Constants for Xbox Controllers */
-        public static final int LEFT_X_AXIS = 0;
-        public static final int LEFT_Y_AXIS = 1;
-        public static final int LEFT_T_AXIS = 2;
-        public static final int RIGHT_T_AXIS = 3;
-        public static final int RIGHT_X_AXIS = 4;
-        public static final int RIGHT_Y_AXIS = 5;
+        public enum Axis {
+            kLeftX(0),
+            kLeftY(1),
+            kLeftTrigger(2),
+            kRightTrigger(3),
+            kRightX(4),
+            kRightY(5);
+        
+            public final int value;
+        
+            Axis(int value) {
+              this.value = value;
+            }
+        
+            public String toString() {
+              var name = this.name().substring(1); // Remove leading `k`
+              if (name.endsWith("Trigger")) {
+                return name + "Axis";
+              }
+              return name;
+            }
+        }
 
         /* Button Constants for Xbox Controllers */
-        public static final int BTN_A = 1;
-        public static final int BTN_B = 2;
-        public static final int BTN_X = 3;
-        public static final int BTN_Y = 4;
-        public static final int BTN_LB = 5;
-        public static final int BTN_RB = 6;
-        public static final int BTN_BACK = 7;
-        public static final int BTN_START = 8;
-        public static final int BTN_LEFT_JOYSTICK = 9;
-        public static final int BTN_RIGHT_JOYSTICK = 10;
+        public enum Button {
+            kA(1),
+            kB(2),
+            kX(3),
+            kY(4),
+            kLeftBumper(5),
+            kRightBumper(6),
+            kBack(7),
+            kStart(8),
+            kLeftStick(9),
+            kRightStick(10);
+
+            public final int value;
+        
+            Button(int value) {
+              this.value = value;
+            }
+
+            public String toString() {
+                var name = this.name().substring(1); // Remove leading `k`
+                if (name.endsWith("Bumper")) {
+                  return name;
+                }
+                return name + "Button";
+            }
+        }
 
         /* DPAD Angular Constants for Xbox Controllers */
         public static final int DPAD_NORTH = 0;
