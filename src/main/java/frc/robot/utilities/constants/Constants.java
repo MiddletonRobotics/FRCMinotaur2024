@@ -114,6 +114,7 @@ public class Constants {
         public static final boolean driveInvert = false;
         public static final boolean angleInvert = false; 
         public static final boolean swerveEncoderInverted = false;
+        public static final boolean gyroInverted = false;
 
         /* The Swerve modules have the encoders and magnets all installed in different orientations, so these values will be the average returned by the CANCoders */
         public static final double FrontLeftCANcoderOffsetRotations = 0;
@@ -123,8 +124,8 @@ public class Constants {
     }
 
     public static final class AutonomousConstants {
-        public static final double PhysicalMaxSpeedMetersPerSecond = 2.0;
-        public static final double MaxAccelerationMetersPerSecondSquared = 2;
+        public static final double PhysicalMaxSpeedMetersPerSecond = 4.4;
+        public static final double MaxAccelerationMetersPerSecondSquared = 4.4;
         public static final double MaxAngularSpeedRadiansPerSecond = Math.PI;
         public static final double MaxAngularSpeedRadiansPerSecondSquared = Math.PI;
 
@@ -134,7 +135,7 @@ public class Constants {
 
         public static final TrapezoidProfile.Constraints kThetaControllerConstraints = new TrapezoidProfile.Constraints(MaxAngularSpeedRadiansPerSecond, MaxAngularSpeedRadiansPerSecondSquared);
 
-        public static final PIDConstants TranslationPID = new PIDConstants(0.1, 0.0, 0.0);
+        public static final PIDConstants TranslationPID = new PIDConstants(0.5, 0.0, 0.0);
         public static final PIDConstants RotationalPID = new PIDConstants(0.01, 0.0, 0.0);
     }
 
@@ -189,6 +190,7 @@ public class Constants {
     public static final class ClimberConstants {
 
         /* Hardware ID from CAN */
+
         public static final int LeftClimbMotorID = 1; // Motor ID of the motor thats attched on the left climber of the robot
         public static final int RightClimbMotorID = 2; // Motor ID of the motor thats attached on the right climber of the robot
 

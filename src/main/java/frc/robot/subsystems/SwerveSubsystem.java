@@ -138,7 +138,7 @@ public class SwerveSubsystem extends SubsystemBase {
     }
 
     public double getHeading() {
-        return Math.IEEEremainder(gyro.getAngle(),360)*(Constants.SwerveConstants.swerveEncoderInverted ? -1.0 : 1.0);
+        return Math.IEEEremainder(gyro.getAngle(),360)*(Constants.SwerveConstants.gyroInverted ? -1.0 : 1.0);
     }
 
     public Rotation2d getYaw() {

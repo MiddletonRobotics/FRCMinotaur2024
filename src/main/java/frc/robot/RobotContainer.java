@@ -57,8 +57,8 @@ public class RobotContainer {
   public RobotContainer() {
     swerveSubsystem.setDefaultCommand(new SwerveController(
       swerveSubsystem, 
-      () -> DriverController.getRawAxis(translationAxis),
-      () -> DriverController.getRawAxis(strafeAxis), 
+      () -> -DriverController.getRawAxis(translationAxis),
+      () -> -DriverController.getRawAxis(strafeAxis), 
       () -> -DriverController.getRawAxis(rotationAxis), 
       () -> robotCentric.getAsBoolean()));
       
@@ -66,6 +66,6 @@ public class RobotContainer {
   };
 
   public Command getAutonomousCommand() {
-    return new PathPlannerAuto("Exmaple Auto");
+    return new PathPlannerAuto("Line");
   }
 }
