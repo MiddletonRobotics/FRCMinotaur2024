@@ -3,6 +3,7 @@ package frc.robot.subsystems;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import frc.robot.utilities.CANSparkMaxUtil;
@@ -40,17 +41,17 @@ public class ShooterSubsystem extends SubsystemBase {
         upperShooterMotor.burnFlash();
     }
 
-    public void shooterSlowSpin() {
+    public void shooterAmpScoring() {
         lowerShooterMotor.set(Constants.ShooterConstants.ampScorerSpeed);
         upperShooterMotor.set(Constants.ShooterConstants.ampScorerSpeed);
     }
 
-    public void shooterFastSpin() {
+    public void shooterSpeakerScoring() {
         lowerShooterMotor.set(Constants.ShooterConstants.shooterScorerSpeed);
         upperShooterMotor.set(Constants.ShooterConstants.shooterScorerSpeed);
     }
 
-    public void shooterStop() {
+    public void stopShooter() {
         lowerShooterMotor.set(0.0);
         upperShooterMotor.set(0.0);
     }

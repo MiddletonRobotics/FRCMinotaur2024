@@ -61,11 +61,15 @@ public class SwerveSubsystem extends SubsystemBase {
             new HolonomicPathFollowerConfig(
                 Constants.AutonomousConstants.TranslationPID, 
                 Constants.AutonomousConstants.RotationalPID, 
-                Constants.SwerveConstants.PhysicalMaxSpeedMetersPerSecond, 
-                Constants.SwerveConstants.TrackWidth / 2, 
+                Constants.AutonomousConstants.PhysicalMaxSpeedMetersPerSecond, 
+                Constants.AutonomousConstants.DriveBaseRadius, 
                 new ReplanningConfig()
             ), 
             () -> {
+                var alliance = DriverStation.getAlliance();
+                if (alliance.isPresent()) {
+                    return alliance.get() == DriverStation.Alliance.Red;
+                }
                 return false;
             },
             this

@@ -101,7 +101,7 @@ public class Constants {
 
         /* Swerve Profiling Values */
         public static final double PhysicalMaxSpeedMetersPerSecond = 4.4031408; // Maximum speed in meters per second that the Swerve Modules allow you to go
-        public static final double AngularMaxVelocity = 11.5; // Maxiumum speed in radians per seconr that the swerve module is able to rotate (6.28 radians per full rotation)
+        public static final double AngularMaxVelocity = 12.5; // Maxiumum speed in radians per seconr that the swerve module is able to rotate (6.28 radians per full rotation)
 
         /* Neutral Modes */
         public static final IdleMode angleNeutralMode = IdleMode.kBrake; // What the steering motor should do when not applied with any power (should always be brake while running to prevent overshooting target)
@@ -124,14 +124,12 @@ public class Constants {
     }
 
     public static final class AutonomousConstants {
-        public static final double PhysicalMaxSpeedMetersPerSecond = 4.4;
-        public static final double MaxAccelerationMetersPerSecondSquared = 4.4;
-        public static final double MaxAngularSpeedRadiansPerSecond = Math.PI;
-        public static final double MaxAngularSpeedRadiansPerSecondSquared = Math.PI;
+        public static final double PhysicalMaxSpeedMetersPerSecond = 4.4031408;
+        public static final double MaxAccelerationMetersPerSecondSquared = 3;
+        public static final double MaxAngularSpeedRadiansPerSecond = 2 * Math.PI;
+        public static final double MaxAngularSpeedRadiansPerSecondSquared = Math.PI / 4;
 
-        public static final double kPXController = 1.3;
-        public static final double kPYController = 1.3;
-        public static final double kPThetaController = 2;
+        public static final double DriveBaseRadius = Math.hypot(SwerveConstants.TrackWidth / 2, SwerveConstants.WheelBase / 2);
 
         public static final TrapezoidProfile.Constraints kThetaControllerConstraints = new TrapezoidProfile.Constraints(MaxAngularSpeedRadiansPerSecond, MaxAngularSpeedRadiansPerSecondSquared);
 
@@ -165,8 +163,8 @@ public class Constants {
     public static final class ShooterConstants {
 
         /* Hardware ID from CAN */
-        public static final int lowerShooterMotorID = 16; // Motor ID of the motor thats rolls the lower wheels on the shooter
-        public static final int upperShooterMotorID = 15; // Motor ID of the motor thats rolls the upper wheels on the shooter
+        public static final int lowerShooterMotorID = 9; // Motor ID of the motor thats rolls the lower wheels on the shooter
+        public static final int upperShooterMotorID = 10; // Motor ID of the motor thats rolls the upper wheels on the shooter
 
         /* Motor Inversions (to where postive values shooter a game piece out, or CW+) */
         public static final boolean rightShooterMotorInvert = false; 

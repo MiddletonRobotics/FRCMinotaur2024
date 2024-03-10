@@ -41,8 +41,6 @@ public class ClimberSubsystem extends SubsystemBase {
         rightClimbMotor.setSmartCurrentLimit(ClimberConstants.rightClimbContinuousCurrentLimit);
         rightClimbMotor.setInverted(ClimberConstants.rightClimbInvert);
         rightClimbMotor.setIdleMode(ClimberConstants.rightClimbNeutralMode);
-        //rightClimbEncoder.setVelocityConversionFactor(ClimberConstants.rightClimbConversionVelocityFactor);
-        //rightClimbEncoder.setPositionConversionFactor(ClimberConstants.rightClimbConversionPositionFactor);
         rightPID.setFeedbackDevice(rightClimbEncoder); // Setting the encoder to be the feedback device (EXPERIMENTAL)
         rightPID.setP(ClimberConstants.climbKP);
         rightPID.setI(ClimberConstants.climbKI);
@@ -59,8 +57,6 @@ public class ClimberSubsystem extends SubsystemBase {
         leftClimbMotor.setSmartCurrentLimit(ClimberConstants.leftClimbContinuousCurrentLimit);
         leftClimbMotor.setInverted(ClimberConstants.leftClimbInvert);
         leftClimbMotor.setIdleMode(ClimberConstants.leftClimbNeutralMode);
-        //leftClimbEncoder.setVelocityConversionFactor(ClimberConstants.leftClimbConversionVelocityFactor);
-        //leftClimbEncoder.setPositionConversionFactor(ClimberConstants.leftClimbConversionPositionFactor);
         leftPID.setFeedbackDevice(leftClimbEncoder); // Setting the encoder to be the feedback device (EXPERIMENTAL)
         leftPID.setP(ClimberConstants.climbKP);
         leftPID.setI(ClimberConstants.climbKI);
