@@ -9,9 +9,9 @@ package frc.robot;
 
 import com.pathplanner.lib.commands.PathPlannerAuto;
 
+import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -59,9 +59,12 @@ public class RobotContainer {
       () -> -DriverController.getRawAxis(translationAxis),
       () -> -DriverController.getRawAxis(strafeAxis), 
       () -> -DriverController.getRawAxis(rotationAxis), 
-      () -> robotCentric.getAsBoolean()));
+      () -> robotCentric.getAsBoolean()
+    ));
+
+    CameraServer.startAutomaticCapture();
       
-      configureButtonBindings();
+    configureButtonBindings();
   };
 
   public Command getAutonomousCommand() {
