@@ -22,8 +22,8 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.commands.SwerveController;
 import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
-import frc.robot.commands.AmpScorer;
 import frc.robot.commands.ShooterController;
+import frc.robot.commands.AmpController;
 import frc.robot.utilities.Controller;
 import frc.robot.utilities.constants.Constants;
 
@@ -34,7 +34,8 @@ public class RobotContainer {
 
   private final JoystickButton resetHeading = new JoystickButton(DriverController, Constants.ControllerRawButtons.Button.kY.value);
   private final JoystickButton robotCentric = new JoystickButton(DriverController, Constants.ControllerRawButtons.Button.kLeftBumper.value);
-  private final JoystickButton ampScoring = new JoystickButton(DriverController, Constants.ControllerRawButtons.Button.kRightBumper.value);
+  private final JoystickButton speakerScoring = new JoystickButton(DriverController, Constants.ControllerRawButtons.Button.kRightBumper.value);
+  private final JoystickButton ampScoring = new JoystickButton(DriverController, Constants.ControllerRawButtons.Button.kLeftBumper.value);
 
   private final SwerveSubsystem swerveSubsystem = new SwerveSubsystem();
   private final int translationAxis = Constants.ControllerRawButtons.Axis.kLeftY.value;
@@ -43,11 +44,13 @@ public class RobotContainer {
 
   private final ShooterSubsystem shooterSubsystem = new ShooterSubsystem();
   private final ShooterController shooterController = new ShooterController(shooterSubsystem);
+  private final AmpController ampController = new AmpController(shooterSubsystem);
 
 
   private void configureButtonBindings() {
     resetHeading.whileTrue(new InstantCommand(() -> swerveSubsystem.resetHeading()));
-    ampScoring.whileTrue(new InstantCommand(() -> shooterController.execute()));
+    ampScoring.whileTrue(new InstantCommand(() -> ampController.execute()));
+    speakerScoring.whileTrue(new InstantCommand(() -> shooterController.execute()));
   }
 
   public RobotContainer() {

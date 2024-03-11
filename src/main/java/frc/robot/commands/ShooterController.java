@@ -15,7 +15,7 @@ public class ShooterController extends Command {
 
     @Override
     public void execute() {
-        shooterSubsystem.shooterAmpScoring();
+        shooterSubsystem.shooterSpeakerScoring();
         Timer.delay(3);
         shooterSubsystem.stopShooter();
     }
