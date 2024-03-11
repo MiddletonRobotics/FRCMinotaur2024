@@ -47,7 +47,7 @@ public class RobotContainer {
 
   private void configureButtonBindings() {
     resetHeading.whileTrue(new InstantCommand(() -> swerveSubsystem.resetHeading()));
-    ampScoring.onTrue(new InstantCommand(() -> shooterController.execute()));
+    ampScoring.whileTrue(new InstantCommand(() -> shooterController.execute()));
   }
 
   public RobotContainer() {
