@@ -2,8 +2,9 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-/* Imported swerve, tank drive, and controller packages to control robot's movement and have 
-* resources for setup.
+/* Imported subsystem/controller classes to control parts of robot.
+* Also imported camera, constants file, command files, and information 
+* related to controls so robot can do thing when button pressed.
 */
 package frc.robot;
 
@@ -26,6 +27,24 @@ import frc.robot.commands.ShooterController;
 import frc.robot.commands.AmpController;
 import frc.robot.utilities.Controller;
 import frc.robot.utilities.constants.Constants;
+
+/*Below class holds all info related to controlling robot.
+
+ * DriverController is created to drive robot.
+ * Buttons are assigned so robot can change movement style related to
+ * heading or score speaker or amp when told to. Swerve drive is 
+ * connected to left joystick with values to help movement.
+ * Shooter subsystem/controller is also created.
+ * 
+ * Commands are used to tell each system what to do when buttons
+ * are pressed in ConfigureButtonBindings.
+ * 
+ * In constructor, swerve drive is told to take values from
+ * joystick and robotCentric button to determine movement.
+ * Camera begins taking in information, and buttons are configured.
+ * 
+ * Autonomous command is called (currently to move in straight line).
+ */
 
 public class RobotContainer {
 

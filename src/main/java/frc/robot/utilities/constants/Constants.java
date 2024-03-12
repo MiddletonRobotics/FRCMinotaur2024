@@ -142,7 +142,7 @@ public class Constants {
         /* Hardware ID from CAN */
         public static final int rollerMotorID = 13; // Motor ID of the motor thats rolls the intake
         public static final int pivotMotorID = 14; // Motor ID of the motor that pivots or rotates the intake to its storage / idle position
-        public static final int pivotEncoderID = 17; // Encoder ID of the encoder that has been mounted to the HEX shaft on the pivot plate
+        public static final int pivotEncoderID = 15; // Encoder ID of the encoder that has been mounted to the HEX shaft on the pivot plate
 
         /* Motor and Encoder Inversions */
         public static final boolean rollerMotorInvert = false;
@@ -163,8 +163,8 @@ public class Constants {
     public static final class ShooterConstants {
 
         /* Hardware ID from CAN */
-        public static final int lowerShooterMotorID = 9; // Motor ID of the motor thats rolls the lower wheels on the shooter
-        public static final int upperShooterMotorID = 10; // Motor ID of the motor thats rolls the upper wheels on the shooter
+        public static final int lowerShooterMotorID = 16; // Motor ID of the motor thats rolls the lower wheels on the shooter
+        public static final int upperShooterMotorID = 17; // Motor ID of the motor thats rolls the upper wheels on the shooter
 
         /* Motor Inversions (to where postive values shooter a game piece out, or CW+) */
         public static final boolean rightShooterMotorInvert = false; 
@@ -189,8 +189,8 @@ public class Constants {
 
         /* Hardware ID from CAN */
 
-        public static final int LeftClimbMotorID = 1; // Motor ID of the motor thats attched on the left climber of the robot
-        public static final int RightClimbMotorID = 2; // Motor ID of the motor thats attached on the right climber of the robot
+        public static final int LeftClimbMotorID = 18; // Motor ID of the motor thats attched on the left climber of the robot
+        public static final int RightClimbMotorID = 19; // Motor ID of the motor thats attached on the right climber of the robot
 
         /* Climber Current Limiting */
         public static final int rightClimbContinuousCurrentLimit = 60; // Climbers don't need to be running at maximum amperes due to the extension limit / extension length. Runs at 75%.

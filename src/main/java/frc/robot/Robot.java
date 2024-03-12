@@ -8,10 +8,12 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
-/* This section sets up all the commands that will be sent to the robot and all the different states (autonomous, teleop, test).
-* Methods galore!!!!!
-*
-*
+/* This section pulls from autonomous code and the
+* robotContainer to tell robot to follow basic commands
+* including: initialize robotContainer, get information
+* periodically, run autonomous command when initialized,
+* cancel autonomous command when teleop begins, and cancel
+* other commands in test.
 */
 
 public class Robot extends TimedRobot {
