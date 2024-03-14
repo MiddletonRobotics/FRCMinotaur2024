@@ -29,6 +29,9 @@ public class IntakeSubsystem extends SubsystemBase {
         rollerMotor = new CANSparkMax(Constants.IntakeConstants.rollerMotorID, MotorType.kBrushless);
         pivotMotor = new CANSparkMax(Constants.IntakeConstants.pivotMotorID, MotorType.kBrushless); //ints are just there as placeholders till we get actual ones, same with ids
         pivotEncoder = new CANcoder(Constants.IntakeConstants.pivotEncoderID);
+
+        angleOffset = Constants.IntakeConstants.angleOffset;
+
         configureRollerMotor();
         configurePivotMotor();
         configurePivotEncoder();
@@ -62,6 +65,10 @@ public class IntakeSubsystem extends SubsystemBase {
         pivotEncoderConfigurator.apply(new CANcoderConfiguration().withMagnetSensor(magnetSensorConfiguration));
     }
 
+    public double getPivotEncoder() {
+        return pivotEncoder.getAbsolutePosition().getValueAsDouble(); // Getting
+    }
+
     //we felt a little silly with the names
     public void intakeConsume() {
         rollerMotor.set(0.5); //whatever makes motor take thingy
@@ -71,16 +78,25 @@ public class IntakeSubsystem extends SubsystemBase {
         rollerMotor.set(-0.5); //whatever makes motor release thingy
     }
 
-    public void intakeForward() {
-        pivotMotor.set(0.5); //placeholder values for rn
+    public void storePosition() {
+        if(getPivotEncoder() > Constants.IntakeConstants.deployPosition) {
+            pivotMotor.set(-0.5);
+        } else {
+            pivotMotor.set(0);
+        }
     }
 
-    public void intakeBackward() {
-        pivotMotor.set(-0.5); //same comment as intakeForward
+    public void deployPosition() {
+        if(getPivotEncoder() < Constants.IntakeConstants.deployPosition) {
+            pivotMotor.set(0.5);
+        } else {
+            pivotMotor.set(0);
+        }
     }
 
     public void reset() {
         rollerMotor.set(0);
+        pivotMotor.set(0);
     }
 
     @Override

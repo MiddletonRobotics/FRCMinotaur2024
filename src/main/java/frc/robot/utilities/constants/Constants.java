@@ -1,6 +1,7 @@
 package frc.robot.utilities.constants;
 
 import com.pathplanner.lib.util.PIDConstants;
+
 import com.revrobotics.CANSparkBase.IdleMode;
 
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -133,16 +134,21 @@ public class Constants {
 
         public static final TrapezoidProfile.Constraints kThetaControllerConstraints = new TrapezoidProfile.Constraints(MaxAngularSpeedRadiansPerSecond, MaxAngularSpeedRadiansPerSecondSquared);
 
-        public static final PIDConstants TranslationPID = new PIDConstants(0.3, 0.0, 0.0);
-        public static final PIDConstants RotationalPID = new PIDConstants(0.01, 0.0, 0.0);
+        public static final PIDConstants TranslationPID = new PIDConstants(5.0, 0.0, 0.0);
+        public static final PIDConstants RotationalPID = new PIDConstants(4.0, 0.0, 0.0);
     }
 
     public static final class IntakeConstants {
 
-        /* Hardware ID from CAN */
-        public static final int rollerMotorID = 13; // Motor ID of the motor thats rolls the intake
-        public static final int pivotMotorID = 14; // Motor ID of the motor that pivots or rotates the intake to its storage / idle position
-        public static final int pivotEncoderID = 15; // Encoder ID of the encoder that has been mounted to the HEX shaft on the pivot plate
+        /* Hardware ID of CAN */
+        public static final int rollerMotorID = 16;
+        public static final int pivotMotorID = 17;
+        public static final int pivotEncoderID = 15;
+
+        /* Encoder Offsets and positions */
+        public static final Rotation2d angleOffset = Rotation2d.fromRotations(0);
+        public static final double storePosition = 0.0;
+        public static final double deployPosition = 0.0;
 
         /* Motor and Encoder Inversions */
         public static final boolean rollerMotorInvert = false;

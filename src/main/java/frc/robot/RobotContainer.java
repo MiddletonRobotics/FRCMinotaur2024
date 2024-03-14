@@ -8,7 +8,10 @@
 */
 package frc.robot;
 
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
+import com.pathplanner.lib.path.PathPlannerPath;
 
 import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.wpilibj.GenericHID;
@@ -73,6 +76,10 @@ public class RobotContainer {
   }
 
   public RobotContainer() {
+
+    NamedCommands.registerCommand("Speaker Shooter", new InstantCommand(() -> shooterController.execute()));
+    NamedCommands.registerCommand("Amp Shooter", new InstantCommand(() -> ampController.execute()));
+
     swerveSubsystem.setDefaultCommand(new SwerveController(
       swerveSubsystem, 
       () -> -DriverController.getRawAxis(translationAxis),
@@ -87,6 +94,7 @@ public class RobotContainer {
   };
 
   public Command getAutonomousCommand() {
-    return new PathPlannerAuto("Line");
+    PathPlannerPath path = PathPlannerPath.fromPathFile("Line");
+    return AutoBuilder.followPath(path);
   }
 }
