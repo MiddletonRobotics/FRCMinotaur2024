@@ -75,8 +75,8 @@ public class Constants {
     }
 
     public static final class SwerveConstants {
-        public static final double TrackWidth = Units.inchesToMeters(21.05); // Distance from center from the right wheels to the left wheels (must be converted to meters)
-        public static final double WheelBase = Units.inchesToMeters(21.05); // Distance from center from the front wheels to the back wheels (must be converted to meters)
+        public static final double TrackWidth = Units.inchesToMeters(28); // Distance from center from the right wheels to the left wheels (must be converted to meters)
+        public static final double WheelBase = Units.inchesToMeters(28); // Distance from center from the front wheels to the back wheels (must be converted to meters)
         public static final double WheelDiameter = Units.inchesToMeters(4.0); // Diameter of the wheel attached to the swerve modules (must be converted to meters)
         public static final double WheelCircumference = WheelDiameter * Math.PI; // To get the circumference multiply the diameter by PI
 
@@ -100,7 +100,7 @@ public class Constants {
         public static final double AngleConversionFactor = 360.0 / AngleGearRatio;
 
         /* Swerve Profiling Values */
-        public static final double PhysicalMaxSpeedMetersPerSecond = 4.4031408; // Maximum speed in meters per second that the Swerve Modules allow you to go
+        public static final double PhysicalMaxSpeedMetersPerSecond = 4.4; // Maximum speed in meters per second that the Swerve Modules allow you to go
         public static final double AngularMaxVelocity = 12.5; // Maxiumum speed in radians per seconr that the swerve module is able to rotate (6.28 radians per full rotation)
 
         /* Neutral Modes */
@@ -124,16 +124,16 @@ public class Constants {
     }
 
     public static final class AutonomousConstants {
-        public static final double PhysicalMaxSpeedMetersPerSecond = 4.4031408;
+        public static final double PhysicalMaxSpeedMetersPerSecond = 4.4;
         public static final double MaxAccelerationMetersPerSecondSquared = 3;
         public static final double MaxAngularSpeedRadiansPerSecond = 2 * Math.PI;
-        public static final double MaxAngularSpeedRadiansPerSecondSquared = Math.PI / 4;
+        public static final double MaxAngularSpeedRadiansPerSecondSquared = Math.PI;
 
-        public static final double DriveBaseRadius = Math.hypot(SwerveConstants.TrackWidth / 2, SwerveConstants.WheelBase / 2);
+        public static final double DriveBaseRadius = Math.hypot(SwerveConstants.TrackWidth / 2, SwerveConstants.WheelBase / 2); // 0.503
 
         public static final TrapezoidProfile.Constraints kThetaControllerConstraints = new TrapezoidProfile.Constraints(MaxAngularSpeedRadiansPerSecond, MaxAngularSpeedRadiansPerSecondSquared);
 
-        public static final PIDConstants TranslationPID = new PIDConstants(0.5, 0.0, 0.0);
+        public static final PIDConstants TranslationPID = new PIDConstants(0.3, 0.0, 0.0);
         public static final PIDConstants RotationalPID = new PIDConstants(0.01, 0.0, 0.0);
     }
 
@@ -167,15 +167,15 @@ public class Constants {
         public static final int upperShooterMotorID = 17; // Motor ID of the motor thats rolls the upper wheels on the shooter
 
         /* Motor Inversions (to where postive values shooter a game piece out, or CW+) */
-        public static final boolean rightShooterMotorInvert = false; 
-        public static final boolean leftShooterMotorInvert = false;
+        public static final boolean lowerShooterMotorInvert = true; 
+        public static final boolean upperShooterMotorInvert = false;
 
         /* Neutral Modes */ 
-        public static final IdleMode rightShooterMotorNeutralMode = IdleMode.kBrake; // What the lower shooter motor should do when not applied with any power (should always be brake while running to prevent overshooting target)
-        public static final IdleMode leftShooterMotorNeutralMode = IdleMode.kBrake; // What the upper shooter motor should do when not applied with any power (should always be brake while running to prevent overshooting target)
+        public static final IdleMode lowerShooterMotorNeutralMode = IdleMode.kBrake; // What the lower shooter motor should do when not applied with any power (should always be brake while running to prevent overshooting target)
+        public static final IdleMode upperShooterMotorNeutralMode = IdleMode.kBrake; // What the upper shooter motor should do when not applied with any power (should always be brake while running to prevent overshooting target)
 
-        public static final IdleMode rightShooterMotorIdleMode = IdleMode.kCoast; // What the lower shooter motor should so when the robot hasn't been initialized
-        public static final IdleMode leftShooterMotorIdleMode = IdleMode.kCoast; // What the upper shooter motor should so when the robot hasn't been initialized
+        public static final IdleMode lowerShooterMotorIdleMode = IdleMode.kCoast; // What the lower shooter motor should so when the robot hasn't been initialized
+        public static final IdleMode upperShooterMotorIdleMode = IdleMode.kCoast; // What the upper shooter motor should so when the robot hasn't been initialized
 
         /* Spped Profiling */
         public static final double ampScorerSpeed = 0.45;

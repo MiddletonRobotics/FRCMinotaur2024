@@ -26,8 +26,8 @@ public class ShooterSubsystem extends SubsystemBase {
     public void configureLowerShooterMotor() {
         lowerShooterMotor.restoreFactoryDefaults();
         CANSparkMaxUtil.setCANSparkMaxBusUsage(lowerShooterMotor, Usage.kAll);
-        lowerShooterMotor.setInverted(Constants.ShooterConstants.rightShooterMotorInvert);
-        lowerShooterMotor.setIdleMode(Constants.ShooterConstants.rightShooterMotorNeutralMode);
+        lowerShooterMotor.setInverted(Constants.ShooterConstants.lowerShooterMotorInvert);
+        lowerShooterMotor.setIdleMode(Constants.ShooterConstants.lowerShooterMotorNeutralMode);
         lowerShooterMotor.enableVoltageCompensation(Constants.ShooterConstants.voltageCompensation);
         lowerShooterMotor.burnFlash();
     }
@@ -35,8 +35,8 @@ public class ShooterSubsystem extends SubsystemBase {
     public void configureUpperShooterMotor() {
         upperShooterMotor.restoreFactoryDefaults();
         CANSparkMaxUtil.setCANSparkMaxBusUsage(upperShooterMotor, Usage.kAll);
-        upperShooterMotor.setInverted(Constants.ShooterConstants.leftShooterMotorInvert);
-        upperShooterMotor.setIdleMode(Constants.ShooterConstants.leftShooterMotorNeutralMode);
+        upperShooterMotor.setInverted(Constants.ShooterConstants.upperShooterMotorInvert);
+        upperShooterMotor.setIdleMode(Constants.ShooterConstants.upperShooterMotorNeutralMode);
         upperShooterMotor.enableVoltageCompensation(Constants.ShooterConstants.voltageCompensation);
         upperShooterMotor.burnFlash();
     }
