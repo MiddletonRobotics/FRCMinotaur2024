@@ -25,9 +25,12 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 // import frc.robot.commands.TankController;
 import frc.robot.commands.SwerveController;
 import frc.robot.subsystems.SwerveSubsystem;
+import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.commands.ShooterController;
 import frc.robot.commands.AmpController;
+import frc.robot.commands.DeployIntake;
+import frc.robot.commands.StoreIntake;
 import frc.robot.utilities.Controller;
 import frc.robot.utilities.constants.Constants;
 
@@ -58,6 +61,9 @@ public class RobotContainer {
   private final JoystickButton robotCentric;
   private final JoystickButton speakerScoring;
   private final JoystickButton ampScoring;
+  private final JoystickButton deployIntake;
+  private final JoystickButton storeIntake;
+  private final JoystickButton intakeGamePiece;
 
   private final SwerveSubsystem swerveSubsystem;
   private final int translationAxis;
@@ -67,10 +73,14 @@ public class RobotContainer {
   private final ShooterSubsystem shooterSubsystem;
   private final ShooterController shooterController;
   private final AmpController ampController;
+  private final IntakeSubsystem intakeSubsystem;
+  private final DeployIntake deployIntakeCommand;
+  private final StoreIntake storeIntakeCommand;
 
   public RobotContainer() {
     swerveSubsystem = new SwerveSubsystem();
     shooterSubsystem = new ShooterSubsystem();
+    intakeSubsystem = new IntakeSubsystem();
 
     NamedCommands.registerCommand("Speaker Shooter",  new ShooterController(shooterSubsystem));
     NamedCommands.registerCommand("Amp Shooter",  new AmpController(shooterSubsystem));
@@ -82,6 +92,9 @@ public class RobotContainer {
     robotCentric = new JoystickButton(DriverController, Constants.ControllerRawButtons.Button.kLeftBumper.value);
     speakerScoring = new JoystickButton(DriverController, Constants.ControllerRawButtons.Button.kRightBumper.value);
     ampScoring = new JoystickButton(DriverController, Constants.ControllerRawButtons.Button.kLeftBumper.value);
+    deployIntake = new JoystickButton(OperatorController, Constants.ControllerRawButtons.Button.kA.value);
+    storeIntake = new JoystickButton(OperatorController, Constants.ControllerRawButtons.Button.kB.value);
+    intakeGamePiece = new JoystickButton(OperatorController, Constants.ControllerRawButtons.Button.kX.value);
 
     translationAxis = Constants.ControllerRawButtons.Axis.kLeftY.value;
     strafeAxis = Constants.ControllerRawButtons.Axis.kLeftX.value;
@@ -89,6 +102,8 @@ public class RobotContainer {
 
     shooterController = new ShooterController(shooterSubsystem);
     ampController = new AmpController(shooterSubsystem);
+    deployIntakeCommand = new DeployIntake(intakeSubsystem);
+    storeIntakeCommand = new StoreIntake(intakeSubsystem);
 
     swerveSubsystem.setDefaultCommand(new SwerveController(
       swerveSubsystem, 
@@ -105,6 +120,8 @@ public class RobotContainer {
     resetHeading.whileTrue(new InstantCommand(() -> swerveSubsystem.resetHeading()));
     ampScoring.whileTrue(new InstantCommand(() -> ampController.execute()));
     speakerScoring.whileTrue(new InstantCommand(() -> shooterController.execute()));
+    deployIntake.whileTrue(new InstantCommand(() -> deployIntakeCommand.execute()));
+    storeIntake.whileTrue(new InstantCommand(() -> storeIntakeCommand.execute()));
   }
 
  

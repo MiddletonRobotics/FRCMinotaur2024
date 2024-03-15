@@ -26,7 +26,7 @@ public class Constants {
         public static final double angleKP = 0.01; // Propotional: If there is error, move the motor propotional to the error
         public static final double angleKI = 0.0; // Intergral: If the error is taking too long to correct, move the motor faster
         public static final double angleKD = 0.0; // Derivative: If the motor is getting close to reaching the target, slow it down
-        public static final double angleKFF = 0.0;
+        public static final double angleKFF = 0.0; // Force: Additional gain for creating offsts
 
         public static final double driveKP = 0.1; // Propotional: If there is error, move the motor propotional to the error
         public static final double driveKI = 0.0; // Intergral: If the error is taking too long to correct, move the motor faster
@@ -145,6 +145,10 @@ public class Constants {
         public static final int pivotMotorID = 17;
         public static final int pivotEncoderID = 15;
 
+        /* Climber Current Limiting */
+        public static final int pivotContinuousCurrentLimit = 60; 
+        public static final int rollerContinuousCurrentLimit = 80; 
+
         /* Encoder Offsets and positions */
         public static final Rotation2d angleOffset = Rotation2d.fromRotations(0);
         public static final double storePosition = 0.0;
@@ -154,6 +158,19 @@ public class Constants {
         public static final boolean rollerMotorInvert = false;
         public static final boolean pivotMotorInvert = false;
         public static final boolean pivotEnocderInverted = false;
+
+        /* Gear Ratios */
+        public static final double pivotGearRatio = (20 / 1.0);
+        public static final double rollerGearRatio = (1 / 1.0);
+
+        /* Motor Conversion Factors */
+        public static final double AngleConversionFactor = 360.0 / pivotGearRatio;
+
+        /* PID Values for the Motors. Used to correct the error when trying to move the motors to a desired location */
+        public static final double pivotKP = 0.00; // Propotional: If there is error, move the motor propotional to the error
+        public static final double pivotKI = 0.0; // Intergral: If the error is taking too long to correct, move the motor faster
+        public static final double pivotKD = 0.0; // Derivative: If the motor is getting close to reaching the target, slow it down
+        public static final double pivotKFF = 0.0; // Force: Additional gain for creating offsts
 
        /* Neutral Modes */ 
         public static final IdleMode rollerMotorNeutralMode = IdleMode.kBrake; // What the roller motor should do when not applied with any power (should always be brake while running to prevent overshooting target)
