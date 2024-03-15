@@ -51,23 +51,55 @@ import frc.robot.utilities.constants.Constants;
 
 public class RobotContainer {
 
-  private final Joystick DriverController = Controller.getDriverController();
-  // private final Joystick OperatorController = Controller.getOperatorController();
+  private final Joystick DriverController;
+  private final Joystick OperatorController;
 
-  private final JoystickButton resetHeading = new JoystickButton(DriverController, Constants.ControllerRawButtons.Button.kY.value);
-  private final JoystickButton robotCentric = new JoystickButton(DriverController, Constants.ControllerRawButtons.Button.kLeftBumper.value);
-  private final JoystickButton speakerScoring = new JoystickButton(DriverController, Constants.ControllerRawButtons.Button.kRightBumper.value);
-  private final JoystickButton ampScoring = new JoystickButton(DriverController, Constants.ControllerRawButtons.Button.kLeftBumper.value);
+  private final JoystickButton resetHeading;
+  private final JoystickButton robotCentric;
+  private final JoystickButton speakerScoring;
+  private final JoystickButton ampScoring;
 
-  private final SwerveSubsystem swerveSubsystem = new SwerveSubsystem();
-  private final int translationAxis = Constants.ControllerRawButtons.Axis.kLeftY.value;
-  private final int strafeAxis = Constants.ControllerRawButtons.Axis.kLeftX.value;
-  private final int rotationAxis = Constants.ControllerRawButtons.Axis.kRightX.value;
+  private final SwerveSubsystem swerveSubsystem;
+  private final int translationAxis;
+  private final int strafeAxis;
+  private final int rotationAxis;
 
-  private final ShooterSubsystem shooterSubsystem = new ShooterSubsystem();
-  private final ShooterController shooterController = new ShooterController(shooterSubsystem);
-  private final AmpController ampController = new AmpController(shooterSubsystem);
+  private final ShooterSubsystem shooterSubsystem;
+  private final ShooterController shooterController;
+  private final AmpController ampController;
 
+  public RobotContainer() {
+    swerveSubsystem = new SwerveSubsystem();
+    shooterSubsystem = new ShooterSubsystem();
+
+    NamedCommands.registerCommand("Speaker Shooter",  new ShooterController(shooterSubsystem));
+    NamedCommands.registerCommand("Amp Shooter",  new AmpController(shooterSubsystem));
+
+    DriverController = Controller.getDriverController();
+    OperatorController = Controller.getOperatorController();
+
+    resetHeading = new JoystickButton(DriverController, Constants.ControllerRawButtons.Button.kY.value);
+    robotCentric = new JoystickButton(DriverController, Constants.ControllerRawButtons.Button.kLeftBumper.value);
+    speakerScoring = new JoystickButton(DriverController, Constants.ControllerRawButtons.Button.kRightBumper.value);
+    ampScoring = new JoystickButton(DriverController, Constants.ControllerRawButtons.Button.kLeftBumper.value);
+
+    translationAxis = Constants.ControllerRawButtons.Axis.kLeftY.value;
+    strafeAxis = Constants.ControllerRawButtons.Axis.kLeftX.value;
+    rotationAxis = Constants.ControllerRawButtons.Axis.kRightX.value;
+
+    shooterController = new ShooterController(shooterSubsystem);
+    ampController = new AmpController(shooterSubsystem);
+
+    swerveSubsystem.setDefaultCommand(new SwerveController(
+      swerveSubsystem, 
+      () -> -DriverController.getRawAxis(translationAxis),
+      () -> -DriverController.getRawAxis(strafeAxis), 
+      () -> -DriverController.getRawAxis(rotationAxis), 
+      () -> robotCentric.getAsBoolean())
+    );
+      
+    configureButtonBindings();
+  }
 
   private void configureButtonBindings() {
     resetHeading.whileTrue(new InstantCommand(() -> swerveSubsystem.resetHeading()));
@@ -75,24 +107,7 @@ public class RobotContainer {
     speakerScoring.whileTrue(new InstantCommand(() -> shooterController.execute()));
   }
 
-  public RobotContainer() {
-
-    NamedCommands.registerCommand("Speaker Shooter", new InstantCommand(() -> shooterController.execute()));
-    NamedCommands.registerCommand("Amp Shooter", new InstantCommand(() -> ampController.execute()));
-
-    swerveSubsystem.setDefaultCommand(new SwerveController(
-      swerveSubsystem, 
-      () -> -DriverController.getRawAxis(translationAxis),
-      () -> -DriverController.getRawAxis(strafeAxis), 
-      () -> -DriverController.getRawAxis(rotationAxis), 
-      () -> robotCentric.getAsBoolean()
-    ));
-
-    CameraServer.startAutomaticCapture();
-      
-    configureButtonBindings();
-  };
-
+ 
   public Command getAutonomousCommand() {
     PathPlannerPath path = PathPlannerPath.fromPathFile("Line");
     return AutoBuilder.followPath(path);
