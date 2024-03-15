@@ -23,12 +23,12 @@ public class Constants {
         public static final int driveContinuousCurrentLimit = 80; // Drive motors should be at the maximum reccomended amperes to get the most power and speed from it
 
         /* PID Values for the Motors. Used to correct the error when trying to move the motors to a desired location */
-        public static final double angleKP = 0.01; // Propotional: If there is error, move the motor propotional to the error
+        public static final double angleKP = 0.3; // Propotional: If there is error, move the motor propotional to the error
         public static final double angleKI = 0.0; // Intergral: If the error is taking too long to correct, move the motor faster
         public static final double angleKD = 0.0; // Derivative: If the motor is getting close to reaching the target, slow it down
         public static final double angleKFF = 0.0; // Force: Additional gain for creating offsts
 
-        public static final double driveKP = 0.1; // Propotional: If there is error, move the motor propotional to the error
+        public static final double driveKP = 0.3; // Propotional: If there is error, move the motor propotional to the error
         public static final double driveKI = 0.0; // Intergral: If the error is taking too long to correct, move the motor faster
         public static final double driveKD = 0.0; // Derivative: If the motor is getting close to reaching the target, slow it down
         public static final double driveKFF = 0.0; // Force: Additional gain for creating offsts
