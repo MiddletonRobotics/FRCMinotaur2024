@@ -23,12 +23,12 @@ public class Constants {
         public static final int driveContinuousCurrentLimit = 80; // Drive motors should be at the maximum reccomended amperes to get the most power and speed from it
 
         /* PID Values for the Motors. Used to correct the error when trying to move the motors to a desired location */
-        public static final double angleKP = 0.3; // Propotional: If there is error, move the motor propotional to the error
+        public static final double angleKP = 0.01; // Propotional: If there is error, move the motor propotional to the error
         public static final double angleKI = 0.0; // Intergral: If the error is taking too long to correct, move the motor faster
         public static final double angleKD = 0.0; // Derivative: If the motor is getting close to reaching the target, slow it down
         public static final double angleKFF = 0.0; // Force: Additional gain for creating offsts
 
-        public static final double driveKP = 0.3; // Propotional: If there is error, move the motor propotional to the error
+        public static final double driveKP = 0.2; // Propotional: If there is error, move the motor propotional to the error
         public static final double driveKI = 0.0; // Intergral: If the error is taking too long to correct, move the motor faster
         public static final double driveKD = 0.0; // Derivative: If the motor is getting close to reaching the target, slow it down
         public static final double driveKFF = 0.0; // Force: Additional gain for creating offsts
@@ -142,8 +142,8 @@ public class Constants {
 
         /* Hardware ID of CAN */
         public static final int rollerMotorID = 16;
-        public static final int pivotMotorID = 17;
-        public static final int pivotEncoderID = 15;
+        public static final int pivotMotorID = 15;
+        public static final int pivotEncoderID = 19;
 
         /* Climber Current Limiting */
         public static final int pivotContinuousCurrentLimit = 60; 
@@ -186,8 +186,8 @@ public class Constants {
     public static final class ShooterConstants {
 
         /* Hardware ID from CAN */
-        public static final int lowerShooterMotorID = 16; // Motor ID of the motor thats rolls the lower wheels on the shooter
-        public static final int upperShooterMotorID = 17; // Motor ID of the motor thats rolls the upper wheels on the shooter
+        public static final int lowerShooterMotorID = 13; // Motor ID of the motor thats rolls the lower wheels on the shooter
+        public static final int upperShooterMotorID = 14; // Motor ID of the motor thats rolls the upper wheels on the shooter
 
         /* Motor Inversions (to where postive values shooter a game piece out, or CW+) */
         public static final boolean lowerShooterMotorInvert = true; 
@@ -212,8 +212,8 @@ public class Constants {
 
         /* Hardware ID from CAN */
 
-        public static final int LeftClimbMotorID = 18; // Motor ID of the motor thats attched on the left climber of the robot
-        public static final int RightClimbMotorID = 19; // Motor ID of the motor thats attached on the right climber of the robot
+        public static final int LeftClimbMotorID = 17; // Motor ID of the motor thats attched on the left climber of the robot
+        public static final int RightClimbMotorID = 18; // Motor ID of the motor thats attached on the right climber of the robot
 
         /* Climber Current Limiting */
         public static final int rightClimbContinuousCurrentLimit = 60; // Climbers don't need to be running at maximum amperes due to the extension limit / extension length. Runs at 75%.
