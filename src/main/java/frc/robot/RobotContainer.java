@@ -65,7 +65,8 @@ public class RobotContainer {
   private final JoystickButton deployIntake;
   private final JoystickButton storeIntake;
   private final JoystickButton intakeGamePiece;
-  private final JoystickButton robotClimb;
+  private final JoystickButton robotClimbUp;
+  private final JoystickButton robotClimbDown;
 
   private final SwerveSubsystem swerveSubsystem;
   private final int translationAxis;
@@ -100,7 +101,8 @@ public class RobotContainer {
     deployIntake = new JoystickButton(OperatorController, Constants.ControllerRawButtons.Button.kA.value);
     storeIntake = new JoystickButton(OperatorController, Constants.ControllerRawButtons.Button.kB.value);
     intakeGamePiece = new JoystickButton(OperatorController, Constants.ControllerRawButtons.Button.kX.value);
-    robotClimb = new JoystickButton(OperatorController, Constants.ControllerRawButtons.Button.kLeftTrigger.value);
+    robotClimbUp = new JoystickButton(OperatorController, Constants.ControllerRawButtons.Button.kLeftTrigger.value);
+    robotClimbDown = new JoystickButton(OperatorController, Constants.ControllerRawButtons.Button.kRightTrigger.value);
 
     translationAxis = Constants.ControllerRawButtons.Axis.kLeftY.value;
     strafeAxis = Constants.ControllerRawButtons.Axis.kLeftX.value;
@@ -130,7 +132,8 @@ public class RobotContainer {
     deployIntake.whileTrue(new InstantCommand(() -> deployIntakeCommand.execute()));
     storeIntake.whileTrue(new InstantCommand(() -> storeIntakeCommand.execute()));
     intakeGamePiece.whileTrue(new InstantCommand(() -> intakeSubsystem.intakeConsume()));
-    robotClimb.whileTrue(new InstantCommand(() -> climberController.execute()));
+    robotClimbUp.whileTrue(new InstantCommand(() -> climberSubsystem.climbUp()));
+    robotClimbDown.whileTrue(new InstantCommand(() -> climberSubsystem.climbDown()));
   }
 
  
