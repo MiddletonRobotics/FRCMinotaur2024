@@ -29,6 +29,7 @@ import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.commands.ShooterController;
 import frc.robot.commands.AmpController;
+import frc.robot.commands.ClimberController;
 import frc.robot.commands.DeployIntake;
 import frc.robot.commands.StoreIntake;
 import frc.robot.utilities.Controller;
@@ -64,6 +65,8 @@ public class RobotContainer {
   private final JoystickButton deployIntake;
   private final JoystickButton storeIntake;
   private final JoystickButton intakeGamePiece;
+  private final JoystickButton robotClimbUp;
+  private final JoystickButton robotClimbDown;
 
   private final SwerveSubsystem swerveSubsystem;
   private final int translationAxis;
@@ -73,6 +76,8 @@ public class RobotContainer {
   private final ShooterSubsystem shooterSubsystem;
   private final ShooterController shooterController;
   private final AmpController ampController;
+  private final ClimberSubsystem climberSubsystem;
+  private final ClimberController climberController;
   private final IntakeSubsystem intakeSubsystem;
   private final DeployIntake deployIntakeCommand;
   private final StoreIntake storeIntakeCommand;
@@ -80,6 +85,7 @@ public class RobotContainer {
   public RobotContainer() {
     swerveSubsystem = new SwerveSubsystem();
     shooterSubsystem = new ShooterSubsystem();
+    climberSubsystem = new ClimberSubsystem();
     intakeSubsystem = new IntakeSubsystem();
 
     NamedCommands.registerCommand("Speaker Shooter",  new ShooterController(shooterSubsystem));
@@ -95,6 +101,8 @@ public class RobotContainer {
     deployIntake = new JoystickButton(OperatorController, Constants.ControllerRawButtons.Button.kA.value);
     storeIntake = new JoystickButton(OperatorController, Constants.ControllerRawButtons.Button.kB.value);
     intakeGamePiece = new JoystickButton(OperatorController, Constants.ControllerRawButtons.Button.kX.value);
+    robotClimbUp = new JoystickButton(OperatorController, Constants.ControllerRawButtons.Button.kLeftTrigger.value);
+    robotClimbDown = new JoystickButton(OperatorController, Constants.ControllerRawButtons.Button.kRightTrigger.value);
 
     translationAxis = Constants.ControllerRawButtons.Axis.kLeftY.value;
     strafeAxis = Constants.ControllerRawButtons.Axis.kLeftX.value;
@@ -102,6 +110,7 @@ public class RobotContainer {
 
     shooterController = new ShooterController(shooterSubsystem);
     ampController = new AmpController(shooterSubsystem);
+    climberController = new ClimberController(climberSubsystem);
     deployIntakeCommand = new DeployIntake(intakeSubsystem);
     storeIntakeCommand = new StoreIntake(intakeSubsystem);
 
@@ -122,6 +131,9 @@ public class RobotContainer {
     speakerScoring.whileTrue(new InstantCommand(() -> shooterController.execute()));
     deployIntake.whileTrue(new InstantCommand(() -> deployIntakeCommand.execute()));
     storeIntake.whileTrue(new InstantCommand(() -> storeIntakeCommand.execute()));
+    intakeGamePiece.whileTrue(new InstantCommand(() -> intakeSubsystem.intakeConsume()));
+    robotClimbUp.whileTrue(new InstantCommand(() -> climberSubsystem.climbUp()));
+    robotClimbDown.whileTrue(new InstantCommand(() -> climberSubsystem.climbDown()));
   }
 
  

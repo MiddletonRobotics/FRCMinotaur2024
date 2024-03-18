@@ -1,6 +1,7 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj.Timer;
 
 import frc.robot.subsystems.ClimberSubsystem;
 import frc.robot.utilities.constants.Constants;
@@ -18,7 +19,7 @@ public class ClimberController extends Command {
     @Override
     public void execute() {
         climberSubsystem.climbUp();
-        //thingy
+        wait(10);
         climberSubsystem.climbDown();
     }
 
