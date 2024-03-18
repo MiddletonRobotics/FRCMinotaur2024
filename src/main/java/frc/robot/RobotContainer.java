@@ -100,7 +100,7 @@ public class RobotContainer {
     OperatorController = Controller.getOperatorController();
 
     resetHeading = new JoystickButton(DriverController, Constants.ControllerRawButtons.Button.kY.value);
-    robotCentric = new JoystickButton(DriverController, Constants.ControllerRawButtons.Button.kLeftBumper.value);
+    robotCentric = new JoystickButton(DriverController, Constants.ControllerRawButtons.Button.kX.value);
     speakerScoring = new JoystickButton(DriverController, Constants.ControllerRawButtons.Button.kRightBumper.value);
     ampScoring = new JoystickButton(DriverController, Constants.ControllerRawButtons.Button.kLeftBumper.value);
 
@@ -109,8 +109,8 @@ public class RobotContainer {
     intakeGamePiece = new JoystickButton(OperatorController, Constants.ControllerRawButtons.Button.kX.value);
     outtakeGamePiece = new JoystickButton(OperatorController, Constants.ControllerRawButtons.Button.kY.value);
     
-    robotClimbUp = new JoystickButton(OperatorController, Constants.ControllerRawButtons.Button.kStart.value);
-    robotClimbDown = new JoystickButton(OperatorController, Constants.ControllerRawButtons.Button.kBack.value);
+    robotClimbUp = new JoystickButton(OperatorController, Constants.ControllerRawButtons.Button.kLeftBumper.value);
+    robotClimbDown = new JoystickButton(OperatorController, Constants.ControllerRawButtons.Button.kRightBumper.value);
 
     translationAxis = Constants.ControllerRawButtons.Axis.kLeftY.value;
     strafeAxis = Constants.ControllerRawButtons.Axis.kLeftX.value;
