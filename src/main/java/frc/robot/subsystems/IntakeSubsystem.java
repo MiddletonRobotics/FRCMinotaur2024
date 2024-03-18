@@ -88,10 +88,15 @@ public class IntakeSubsystem extends SubsystemBase {
     }
 
     public void storePosition() {
-        if(getIntakeEncoder() > Constants.IntakeConstants.deployPosition) {
-            pivotMotor.set(-0.5);
-        } else if(getIntakeEncoder() < Constants.IntakeConstants.deployPosition) {
-            pivotMotor.set(0.5);
+        // if limit switch is touched then keep wheels at 0 to hold, else the rest
+        // while (switchTouch = true){
+        //    pivotMotor.set(0);
+
+        //} else (switchTouch = false) 
+        if(getIntakeEncoder() > Constants.IntakeConstants.storePosition) {
+            pivotMotor.set(-0.1);
+        } else if(getIntakeEncoder() < Constants.IntakeConstants.storePosition) {
+            pivotMotor.set(0.1);
         } else {
             pivotMotor.set(0);
             deployPosition = false;
@@ -99,10 +104,14 @@ public class IntakeSubsystem extends SubsystemBase {
     }
 
     public void deployPosition() {
+        // while (switchTouch = true){
+        //    pivotMotor.set(0);
+
+        //} else (switchTouch = false) 
         if(getIntakeEncoder() < Constants.IntakeConstants.deployPosition) {
-            pivotMotor.set(0.5);
+            pivotMotor.set(0.1);
         } else if(getIntakeEncoder() > Constants.IntakeConstants.deployPosition) {
-            pivotMotor.set(-0.5);
+            pivotMotor.set(-0.1);
         } else {
             pivotMotor.set(0);
             deployPosition = true;
