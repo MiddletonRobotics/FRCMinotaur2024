@@ -111,11 +111,11 @@ public class IntakeSubsystem extends SubsystemBase {
 
     //we felt a little silly with the names
     public void intakeConsume() {
-        rollerMotor.set(0.5); //whatever makes motor take thingy
+        rollerMotor.set(-0.5); //whatever makes motor take thingy
     }
 
     public void intakeRegurgitate() {
-        rollerMotor.set(-0.5); //whatever makes motor release thingy
+        rollerMotor.set(0.5); //whatever makes motor release thingy
     }
 
     public void reset() {
