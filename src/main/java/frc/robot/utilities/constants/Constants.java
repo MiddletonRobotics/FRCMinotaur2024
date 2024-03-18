@@ -294,9 +294,7 @@ public class Constants {
             kBack(7),
             kStart(8),
             kLeftStick(9),
-            kRightStick(10),
-            kLeftTrigger(11),
-            kRightTrigger(12);
+            kRightStick(10);
 
             public final int value;
         

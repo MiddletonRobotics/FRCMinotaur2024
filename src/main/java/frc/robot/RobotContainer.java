@@ -108,8 +108,9 @@ public class RobotContainer {
     storeIntake = new JoystickButton(OperatorController, Constants.ControllerRawButtons.Button.kB.value);
     intakeGamePiece = new JoystickButton(OperatorController, Constants.ControllerRawButtons.Button.kX.value);
     outtakeGamePiece = new JoystickButton(OperatorController, Constants.ControllerRawButtons.Button.kY.value);
-    robotClimbUp = new JoystickButton(OperatorController, Constants.ControllerRawButtons.Button.kLeftTrigger.value);
-    robotClimbDown = new JoystickButton(OperatorController, Constants.ControllerRawButtons.Button.kRightTrigger.value);
+    
+    robotClimbUp = new JoystickButton(OperatorController, Constants.ControllerRawButtons.Button.kStart.value);
+    robotClimbDown = new JoystickButton(OperatorController, Constants.ControllerRawButtons.Button.kBack.value);
 
     translationAxis = Constants.ControllerRawButtons.Axis.kLeftY.value;
     strafeAxis = Constants.ControllerRawButtons.Axis.kLeftX.value;
