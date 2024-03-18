@@ -101,7 +101,7 @@ public class Constants {
         public static final double AngleConversionFactor = 360.0 / AngleGearRatio;
 
         /* Swerve Profiling Values */
-        public static final double PhysicalMaxSpeedMetersPerSecond = 4.4; // Maximum speed in meters per second that the Swerve Modules allow you to go
+        public static final double PhysicalMaxSpeedMetersPerSecond = 9.0; // Maximum speed in meters per second that the Swerve Modules allow you to go
         public static final double AngularMaxVelocity = 12.5; // Maxiumum speed in radians per seconr that the swerve module is able to rotate (6.28 radians per full rotation)
 
         /* Neutral Modes */
@@ -151,8 +151,8 @@ public class Constants {
 
         /* Encoder Offsets and positions */
         public static final Rotation2d angleOffset = Rotation2d.fromRotations(0);
-        public static final double storePosition = 0.0;
-        public static final double deployPosition = 0.0;
+        public static final double storePosition = 0.761;
+        public static final double deployPosition = 0.198;
 
         /* Motor and Encoder Inversions */
         public static final boolean rollerMotorInvert = false;
