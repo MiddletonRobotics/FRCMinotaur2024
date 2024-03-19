@@ -56,12 +56,4 @@ public class Controller {
     public static double rightX(Joystick Controller) {
         return Controller.getRawAxis(Constants.ControllerRawButtons.Axis.kRightX.value);
     }
-
-    public static boolean start(Joystick Controller) {
-        return Controller.getRawButton(Constants.ControllerRawButtons.Button.kStart.value);
-    }
-    
-    public static boolean back(Joystick Controller) {
-        return Controller.getRawButton(Constants.ControllerRawButtons.Button.kBack.value);
-    }
 }
