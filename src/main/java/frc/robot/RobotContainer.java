@@ -27,15 +27,18 @@ import frc.robot.commands.SwerveController;
 import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
+import frc.robot.subsystems.ClimberSubsystem;
 import frc.robot.commands.ShooterController;
 import frc.robot.commands.AmpController;
 import frc.robot.commands.DeployIntake;
 import frc.robot.commands.StoreIntake;
 import frc.robot.commands.IntakePull;
 import frc.robot.commands.IntakePush;
+import frc.robot.commands.ClimberUp;
+import frc.robot.commands.ClimberDown;
 import frc.robot.utilities.Controller;
 import frc.robot.utilities.constants.Constants;
-import frc.robot.subsystems.ClimberSubsystem;
+
 
 
 /*Below class holds all info related to controlling robot.
@@ -86,6 +89,8 @@ public class RobotContainer {
   private final StoreIntake storeIntakeCommand;
   private final IntakePull pullNote;
   private final IntakePush pushNote;
+  private final ClimberUp climberUpCommand;
+  private final ClimberDown climberDownCommand;
 
   public RobotContainer() {
     swerveSubsystem = new SwerveSubsystem();
@@ -122,6 +127,8 @@ public class RobotContainer {
     storeIntakeCommand = new StoreIntake(intakeSubsystem);
     pullNote = new IntakePull(intakeSubsystem);
     pushNote = new IntakePush(intakeSubsystem);
+    climberUpCommand = new ClimberUp(climberSubsystem);
+    climberDownCommand = new ClimberDown(climberSubsystem);
 
 
     swerveSubsystem.setDefaultCommand(new SwerveController(
@@ -143,8 +150,8 @@ public class RobotContainer {
     storeIntake.whileTrue(new InstantCommand(() -> storeIntakeCommand.execute()));
     intakeGamePiece.whileTrue(new InstantCommand(() -> pullNote.execute()));
     outtakeGamePiece.whileTrue(new InstantCommand(() -> pushNote.execute()));
-    robotClimbUp.whileTrue(new InstantCommand(() -> climberSubsystem.climbUp()));
-    robotClimbDown.whileTrue(new InstantCommand(() -> climberSubsystem.climbDown()));
+    robotClimbUp.whileTrue(new InstantCommand(() -> climberUpCommand.execute()));
+    robotClimbDown.whileTrue(new InstantCommand(() -> climberDownCommand.execute()));
   }
 
  
