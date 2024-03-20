@@ -38,6 +38,7 @@ import frc.robot.commands.IntakePush;
 import frc.robot.commands.ClimberUp;
 import frc.robot.commands.ClimberDown;
 import frc.robot.commands.StopIntake;
+import frc.robot.commands.ScorePositionCircle;
 
 import frc.robot.utilities.Controller;
 import frc.robot.utilities.constants.Constants;
@@ -93,6 +94,7 @@ public class RobotContainer {
   private final StopIntake stopIntake;
   private final ClimberUp climbingUp;
   private final ClimberDown climbingDown;
+  private final ScorePositionCircle goScorePosition;
 
   public RobotContainer() {
     swerveSubsystem = new SwerveSubsystem();
@@ -133,6 +135,7 @@ public class RobotContainer {
     stopIntake = new StopIntake(intakeSubsystem);
     climbingUp = new ClimberUp(climberSubsystem);
     climbingDown = new ClimberDown(climberSubsystem);
+    goScorePosition = new ScorePositionCircle(swerveSubsystem);
 
     swerveSubsystem.setDefaultCommand(new SwerveController(
       swerveSubsystem, 
@@ -157,6 +160,7 @@ public class RobotContainer {
     outtakeGamePiece.whileFalse(stopIntake);
     robotClimbUp.whileTrue(climbingUp);
     robotClimbDown.whileTrue(climbingDown);
+    findScorePosition.whileTrue(goScorePosition);
   }
 
  
