@@ -1,6 +1,7 @@
 package frc.robot.subsystems;
 
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import com.revrobotics.CANSparkMax;
@@ -87,35 +88,30 @@ public class IntakeSubsystem extends SubsystemBase {
         return intakeEncoder.getAbsolutePosition().getValueAsDouble(); // Getting
     }
 
-    public void storePosition() {
-        // if limit switch is touched then keep wheels at 0 to hold, else the rest
-        // while (switchTouch = true){
-        //    pivotMotor.set(0);
-
-        //} else (switchTouch = false) 
-        if(getIntakeEncoder() > Constants.IntakeConstants.storePosition) {
-            pivotMotor.set(-0.2);
-        } else if(getIntakeEncoder() < Constants.IntakeConstants.storePosition) {
-            pivotMotor.set(0.2);
-        } else {
-            pivotMotor.set(0);
-            deployPosition = false;
-        }
+    public Command deployIntake() {
+        return run(() -> {
+            if(getIntakeEncoder() < Constants.IntakeConstants.deployPosition) {
+                pivotMotor.set(0.2);
+            } else if(getIntakeEncoder() > Constants.IntakeConstants.deployPosition) {
+                pivotMotor.set(-0.2);
+            } else {
+                pivotMotor.set(0);
+                deployPosition = true;
+            }
+        }).withName("Deploy Intake");
     }
 
-    public void deployPosition() {
-        // while (switchTouch = true){
-        //    pivotMotor.set(0);
-
-        //} else (switchTouch = false) 
-        if(getIntakeEncoder() < Constants.IntakeConstants.deployPosition) {
-            pivotMotor.set(0.2);
-        } else if(getIntakeEncoder() > Constants.IntakeConstants.deployPosition) {
-            pivotMotor.set(-0.2);
-        } else {
-            pivotMotor.set(0);
-            deployPosition = true;
-        }
+    public Command storeIntake() {
+        return run(() -> {
+            if(getIntakeEncoder() > Constants.IntakeConstants.storePosition) {
+                pivotMotor.set(-0.2);
+            } else if(getIntakeEncoder() < Constants.IntakeConstants.storePosition) {
+                pivotMotor.set(0.2);
+            } else {
+                pivotMotor.set(0);
+                deployPosition = false;
+            }
+        }).withName("Deploy Intake");
     }
 
     //we felt a little silly with the names

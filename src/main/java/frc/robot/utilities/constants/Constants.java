@@ -20,7 +20,7 @@ public class Constants {
 
         /* Swerve Current Limiting */
         public static final int angleContinuousCurrentLimit = 20; // Steering the swerve modules requires less power, and doesn't have a lot of movement, therefore we can reduce the amperes we are feeding it
-        public static final int driveContinuousCurrentLimit = 80; // Drive motors should be at the maximum reccomended amperes to get the most power and speed from it
+        public static final int driveContinuousCurrentLimit = 60; // Drive motors should be at the maximum reccomended amperes to get the most power and speed from it
 
         /* PID Values for the Motors. Used to correct the error when trying to move the motors to a desired location */
         public static final double angleKP = 0.01; // Propotional: If there is error, move the motor propotional to the error
@@ -167,7 +167,7 @@ public class Constants {
         public static final double AngleConversionFactor = 360.0 / pivotGearRatio;
 
         /* PID Values for the Motors. Used to correct the error when trying to move the motors to a desired location */
-        public static final double pivotKP = 0.00; // Propotional: If there is error, move the motor propotional to the error
+        public static final double pivotKP = 0.05; // Propotional: If there is error, move the motor propotional to the error
         public static final double pivotKI = 0.0; // Intergral: If the error is taking too long to correct, move the motor faster
         public static final double pivotKD = 0.0; // Derivative: If the motor is getting close to reaching the target, slow it down
         public static final double pivotKFF = 0.0; // Force: Additional gain for creating offsts

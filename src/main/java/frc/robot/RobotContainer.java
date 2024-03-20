@@ -30,14 +30,13 @@ import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.ClimberSubsystem;
 import frc.robot.commands.ShooterController;
 import frc.robot.commands.AmpController;
-import frc.robot.commands.DeployIntake;
-import frc.robot.commands.StoreIntake;
 import frc.robot.commands.IntakePull;
 import frc.robot.commands.IntakePush;
 import frc.robot.commands.ClimberUp;
 import frc.robot.commands.ClimberDown;
 import frc.robot.utilities.Controller;
 import frc.robot.utilities.constants.Constants;
+import frc.robot.commands.StopIntake;
 import frc.robot.subsystems.ClimberSubsystem;
 
 
@@ -81,14 +80,15 @@ public class RobotContainer {
   private final int rotationAxis;
 
   private final ShooterSubsystem shooterSubsystem;
-  private final ShooterController shooterController;
-  private final AmpController ampController;
   private final ClimberSubsystem climberSubsystem;
   private final IntakeSubsystem intakeSubsystem;
-  private final DeployIntake deployIntakeCommand;
-  private final StoreIntake storeIntakeCommand;
+  private final ShooterController shooterController;
+  private final AmpController ampController;
   private final IntakePull pullNote;
   private final IntakePush pushNote;
+  private final StopIntake stopIntake;
+  private final ClimberUp climbingUp;
+  private final ClimberDown climbingDown;
 
   public RobotContainer() {
     swerveSubsystem = new SwerveSubsystem();
@@ -98,6 +98,8 @@ public class RobotContainer {
 
     NamedCommands.registerCommand("Speaker Shooter",  new ShooterController(shooterSubsystem, intakeSubsystem));
     NamedCommands.registerCommand("Amp Shooter",  new AmpController(shooterSubsystem, intakeSubsystem));
+    NamedCommands.registerCommand("Deploy Intake", intakeSubsystem.deployIntake());
+    NamedCommands.registerCommand("Store Intake", intakeSubsystem.storeIntake());
 
     DriverController = Controller.getDriverController();
     OperatorController = Controller.getOperatorController();
@@ -120,11 +122,11 @@ public class RobotContainer {
 
     shooterController = new ShooterController(shooterSubsystem, intakeSubsystem);
     ampController = new AmpController(shooterSubsystem, intakeSubsystem);
-    deployIntakeCommand = new DeployIntake(intakeSubsystem);
-    storeIntakeCommand = new StoreIntake(intakeSubsystem);
     pullNote = new IntakePull(intakeSubsystem);
     pushNote = new IntakePush(intakeSubsystem);
-
+    stopIntake = new StopIntake(intakeSubsystem);
+    climbingUp = new ClimberUp(climberSubsystem);
+    climbingDown = new ClimberDown(climberSubsystem);
 
     swerveSubsystem.setDefaultCommand(new SwerveController(
       swerveSubsystem, 
@@ -139,15 +141,16 @@ public class RobotContainer {
 
   private void configureButtonBindings() {
     resetHeading.whileTrue(new InstantCommand(() -> swerveSubsystem.resetHeading()));
-    ampScoring.whileTrue(new InstantCommand(() -> ampController.execute()));
-    speakerScoring.whileTrue(new InstantCommand(() -> shooterController.execute()));
-    deployIntake.whileTrue(new InstantCommand(() -> deployIntakeCommand.execute()));
-    storeIntake.whileTrue(new InstantCommand(() -> storeIntakeCommand.execute()));
-    intakeGamePiece.whileTrue(new InstantCommand(() -> pullNote.execute()));
-    intakeGamePiece.whileFalse(new InstantCommand(() -> stopIntake.execute()));
-    outtakeGamePiece.whileTrue(new InstantCommand(() -> pushNote.execute()));
-    robotClimbUp.whileTrue(new InstantCommand(() -> climberSubsystem.climbUp()));
-    robotClimbDown.whileTrue(new InstantCommand(() -> climberSubsystem.climbDown()));
+    ampScoring.whileTrue(ampController);
+    speakerScoring.whileTrue(shooterController);
+    deployIntake.whileTrue(intakeSubsystem.deployIntake());
+    storeIntake.whileTrue(intakeSubsystem.storeIntake());
+    intakeGamePiece.whileTrue(pushNote);
+    outtakeGamePiece.whileTrue(pullNote);
+    intakeGamePiece.whileFalse(stopIntake);
+    outtakeGamePiece.whileFalse(stopIntake);
+    robotClimbUp.whileTrue(climbingUp);
+    robotClimbDown.whileTrue(climbingDown);
   }
 
  
