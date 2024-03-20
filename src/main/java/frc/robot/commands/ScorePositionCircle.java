@@ -25,6 +25,7 @@ public class ScorePositionCircle extends Command {
         addRequirements(swerveSubsystem);
         // Create a list of bezier points from poses. Each pose represents one waypoint.
         // The rotation component of the pose should be the direction of travel. Do not use holonomic rotation.
+        // First pose should get robot position from swerveOdometry then create path to speaker.
         List<Translation2d> bezierPoints = PathPlannerPath.bezierFromPoses(
             swerveSubsystem.getPose(),
             new Pose2d(3.0, 1.0, Rotation2d.fromDegrees(0)),
@@ -34,16 +35,22 @@ public class ScorePositionCircle extends Command {
         // Create the path using the bezier points created above
         PathPlannerPath path = new PathPlannerPath(
                 bezierPoints,
-                new PathConstraints(3.0, 3.0, 2 * Math.PI, 4 * Math.PI), // The constraints for this path. If using a differential drivetrain, the angular constraints have no effect.
-                new GoalEndState(0.0, Rotation2d.fromDegrees(-90)) // Goal end state. You can set a holonomic rotation here. If using a differential drivetrain, the rotation will have no effect.
-        );
+                new PathConstraints(3.0, 3.0, 2 * Math.PI, 4 * Math.PI), // The constraints for this path. Please change asap
+                new GoalEndState(0.0, Rotation2d.fromDegrees(-90)) // Goal end state. Set holonomic rotation.
+            );
 
-        // Prevent the path from being flipped if the coordinates are already correct
+        // Prevent the path from being flipped if the coordinates are already correct (works for top left)
         path.preventFlipping = true;
     }
 
     public void execute() {
         AutoBuilder.followPath(path);
+    }
+
+    public void testPos() {
+        if(swerveSubsystem.getPose().getX() < 1) {
+            
+        }
     }
 
 }
