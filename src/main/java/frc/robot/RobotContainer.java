@@ -32,6 +32,7 @@ import frc.robot.commands.ShooterController;
 import frc.robot.commands.SwerveController;
 import frc.robot.commands.AmpController;
 
+import frc.robot.commands.IntakeNote;
 import frc.robot.commands.IntakePull;
 import frc.robot.commands.IntakePush;
 import frc.robot.commands.ClimberUp;
@@ -67,6 +68,7 @@ public class RobotContainer {
 
   private final JoystickButton resetHeading;
   private final JoystickButton robotCentric;
+  private final JoystickButton findScorePosition;
   private final JoystickButton speakerScoring;
   private final JoystickButton ampScoring;
   private final JoystickButton deployIntake;
@@ -102,12 +104,14 @@ public class RobotContainer {
     NamedCommands.registerCommand("Amp Shooter",  new AmpController(shooterSubsystem, intakeSubsystem));
     NamedCommands.registerCommand("Deploy Intake", intakeSubsystem.deployIntake());
     NamedCommands.registerCommand("Store Intake", intakeSubsystem.storeIntake());
+    NamedCommands.registerCommand("Intake Note", new IntakeNote(intakeSubsystem));
 
     DriverController = Controller.getDriverController();
     OperatorController = Controller.getOperatorController();
 
     resetHeading = new JoystickButton(DriverController, Constants.ControllerRawButtons.PS5Controller.Button.kSquare.value);
     robotCentric = new JoystickButton(DriverController, Constants.ControllerRawButtons.PS5Controller.Button.kCircle.value);
+    findScorePosition = new JoystickButton(DriverController, Constants.ControllerRawButtons.PS5Controller.Button.kTriangle.value);
     speakerScoring = new JoystickButton(DriverController, Constants.ControllerRawButtons.PS5Controller.Button.kR1.value);
     ampScoring = new JoystickButton(DriverController, Constants.ControllerRawButtons.PS5Controller.Button.kL1.value);
 
