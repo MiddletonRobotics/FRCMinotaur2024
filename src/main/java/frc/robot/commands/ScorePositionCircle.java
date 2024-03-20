@@ -2,6 +2,7 @@ package frc.robot.commands;
 
 import java.util.List;
 
+import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.path.GoalEndState;
 import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.path.PathPlannerPath;
@@ -25,9 +26,9 @@ public class ScorePositionCircle extends Command {
         // Create a list of bezier points from poses. Each pose represents one waypoint.
         // The rotation component of the pose should be the direction of travel. Do not use holonomic rotation.
         List<Translation2d> bezierPoints = PathPlannerPath.bezierFromPoses(
-            new Pose2d(1.0, 1.0, Rotation2d.fromDegrees(0)),
+            swerveSubsystem.getPose(),
             new Pose2d(3.0, 1.0, Rotation2d.fromDegrees(0)),
-            new Pose2d(5.0, 3.0, Rotation2d.fromDegrees(90))
+            new Pose2d(5.0, 3.0, Rotation2d.fromDegrees(90)) //edit line for final position
         );
 
         // Create the path using the bezier points created above
@@ -42,7 +43,7 @@ public class ScorePositionCircle extends Command {
     }
 
     public void execute() {
-
+        AutoBuilder.followPath(path);
     }
 
 }
