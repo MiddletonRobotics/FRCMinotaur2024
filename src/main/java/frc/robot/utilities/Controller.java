@@ -18,42 +18,42 @@ public class Controller {
     }
 
     public static boolean a(Joystick Controller) {
-        return Controller.getRawButton(Constants.ControllerRawButtons.Button.kA.value);
+        return Controller.getRawButton(Constants.ControllerRawButtons.XboxController.Button.kA.value);
     }
 
     public static boolean b(Joystick Controller) {
-        return Controller.getRawButton(Constants.ControllerRawButtons.Button.kB.value);
+        return Controller.getRawButton(Constants.ControllerRawButtons.XboxController.Button.kB.value);
     }
 
     public static boolean x(Joystick Controller) {
-        return Controller.getRawButton(Constants.ControllerRawButtons.Button.kX.value);
+        return Controller.getRawButton(Constants.ControllerRawButtons.XboxController.Button.kX.value);
     }
 
     public static boolean y(Joystick Controller) {
-        return Controller.getRawButton(Constants.ControllerRawButtons.Button.kY.value);
+        return Controller.getRawButton(Constants.ControllerRawButtons.XboxController.Button.kY.value);
     }
 
     public static boolean leftBumper(Joystick Controller) {
-        return Controller.getRawButton(Constants.ControllerRawButtons.Button.kLeftBumper.value);
+        return Controller.getRawButton(Constants.ControllerRawButtons.XboxController.Button.kLeftBumper.value);
     }
 
     public static boolean rightBumper(Joystick Controller) {
-        return Controller.getRawButton(Constants.ControllerRawButtons.Button.kRightBumper.value);
+        return Controller.getRawButton(Constants.ControllerRawButtons.XboxController.Button.kRightBumper.value);
     }
 
     public static double leftY(Joystick Controller) {
-        return Controller.getRawAxis(Constants.ControllerRawButtons.Axis.kLeftY.value);
+        return Controller.getRawAxis(Constants.ControllerRawButtons.XboxController.Axis.kLeftY.value);
     }
 
     public static double leftX(Joystick Controller) {
-        return Controller.getRawAxis(Constants.ControllerRawButtons.Axis.kLeftX.value);
+        return Controller.getRawAxis(Constants.ControllerRawButtons.XboxController.Axis.kLeftX.value);
     }
 
     public static double rightY(Joystick Controller) {
-        return Controller.getRawAxis(Constants.ControllerRawButtons.Axis.kRightY.value);
+        return Controller.getRawAxis(Constants.ControllerRawButtons.XboxController.Axis.kRightY.value);
     }
 
     public static double rightX(Joystick Controller) {
-        return Controller.getRawAxis(Constants.ControllerRawButtons.Axis.kRightX.value);
+        return Controller.getRawAxis(Constants.ControllerRawButtons.XboxController.Axis.kRightX.value);
     }
 }

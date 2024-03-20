@@ -106,21 +106,21 @@ public class RobotContainer {
     DriverController = Controller.getDriverController();
     OperatorController = Controller.getOperatorController();
 
-    resetHeading = new JoystickButton(DriverController, Constants.ControllerRawButtons.Button.kY.value);
-    robotCentric = new JoystickButton(DriverController, Constants.ControllerRawButtons.Button.kX.value);
-    speakerScoring = new JoystickButton(DriverController, Constants.ControllerRawButtons.Button.kRightBumper.value);
-    ampScoring = new JoystickButton(DriverController, Constants.ControllerRawButtons.Button.kLeftBumper.value);
+    resetHeading = new JoystickButton(DriverController, Constants.ControllerRawButtons.PS5Controller.Button.kSquare.value);
+    robotCentric = new JoystickButton(DriverController, Constants.ControllerRawButtons.PS5Controller.Button.kCircle.value);
+    speakerScoring = new JoystickButton(DriverController, Constants.ControllerRawButtons.PS5Controller.Button.kR1.value);
+    ampScoring = new JoystickButton(DriverController, Constants.ControllerRawButtons.PS5Controller.Button.kL1.value);
 
-    deployIntake = new JoystickButton(OperatorController, Constants.ControllerRawButtons.Button.kA.value);
-    storeIntake = new JoystickButton(OperatorController, Constants.ControllerRawButtons.Button.kB.value);
-    intakeGamePiece = new JoystickButton(OperatorController, Constants.ControllerRawButtons.Button.kX.value);
-    outtakeGamePiece = new JoystickButton(OperatorController, Constants.ControllerRawButtons.Button.kY.value);
-    robotClimbUp = new JoystickButton(OperatorController, Constants.ControllerRawButtons.Button.kLeftBumper.value);
-    robotClimbDown = new JoystickButton(OperatorController, Constants.ControllerRawButtons.Button.kRightBumper.value);
+    deployIntake = new JoystickButton(OperatorController, Constants.ControllerRawButtons.PS5Controller.Button.kCross.value);
+    storeIntake = new JoystickButton(OperatorController, Constants.ControllerRawButtons.PS5Controller.Button.kCircle.value);
+    intakeGamePiece = new JoystickButton(OperatorController, Constants.ControllerRawButtons.PS5Controller.Button.kSquare.value);
+    outtakeGamePiece = new JoystickButton(OperatorController, Constants.ControllerRawButtons.PS5Controller.Button.kTriangle.value);
+    robotClimbUp = new JoystickButton(OperatorController, Constants.ControllerRawButtons.PS5Controller.Button.kL1.value);
+    robotClimbDown = new JoystickButton(OperatorController, Constants.ControllerRawButtons.PS5Controller.Button.kR1.value);
 
-    translationAxis = Constants.ControllerRawButtons.Axis.kLeftY.value;
-    strafeAxis = Constants.ControllerRawButtons.Axis.kLeftX.value;
-    rotationAxis = Constants.ControllerRawButtons.Axis.kRightX.value;
+    translationAxis = Constants.ControllerRawButtons.PS5Controller.Axis.kLeftY.value;
+    strafeAxis = Constants.ControllerRawButtons.PS5Controller.Axis.kLeftX.value;
+    rotationAxis = Constants.ControllerRawButtons.PS5Controller.Axis.kRightX.value;
 
     shooterController = new ShooterController(shooterSubsystem, intakeSubsystem);
     ampController = new AmpController(shooterSubsystem, intakeSubsystem);

@@ -258,56 +258,116 @@ public class Constants {
     }
 
     public static final class ControllerRawButtons {
+        public static final class XboxController {
+            public enum Axis {
+                kLeftX(0),
+                kLeftY(1),
+                kLeftTrigger(2),
+                kRightTrigger(3),
+                kRightX(4),
+                kRightY(5);
+            
+                public final int value;
+            
+                Axis(int value) {
+                    this.value = value;
+                }
+            
+                public String toString() {
+                    var name = this.name().substring(1); // Remove leading `k`
+                    if (name.endsWith("Trigger")) {
+                        return name + "Axis";
+                    }
 
-        /* Axis Constants for Xbox Controllers */
-        public enum Axis {
-            kLeftX(0),
-            kLeftY(1),
-            kLeftTrigger(2),
-            kRightTrigger(3),
-            kRightX(4),
-            kRightY(5);
-        
-            public final int value;
-        
-            Axis(int value) {
-              this.value = value;
+                    return name;
+                }
             }
-        
-            public String toString() {
-              var name = this.name().substring(1); // Remove leading `k`
-              if (name.endsWith("Trigger")) {
-                return name + "Axis";
-              }
-              return name;
+
+            /* Button Constants for Xbox Controllers */
+            public enum Button {
+                kA(1),
+                kB(2),
+                kX(3),
+                kY(4),
+                kLeftBumper(5),
+                kRightBumper(6),
+                kBack(7),
+                kStart(8),
+                kLeftStick(9),
+                kRightStick(10);
+
+                public final int value;
+            
+                Button(int value) {
+                    this.value = value;
+                }
+
+                public String toString() {
+                    var name = this.name().substring(1); // Remove leading `k`
+                    if (name.endsWith("Bumper")) {
+                        return name;
+                    }
+
+                    return name + "Button";
+                }
             }
         }
 
-        /* Button Constants for Xbox Controllers */
-        public enum Button {
-            kA(1),
-            kB(2),
-            kX(3),
-            kY(4),
-            kLeftBumper(5),
-            kRightBumper(6),
-            kBack(7),
-            kStart(8),
-            kLeftStick(9),
-            kRightStick(10);
-
-            public final int value;
-        
-            Button(int value) {
-              this.value = value;
+        public final static class PS5Controller {
+            public enum Button {
+                kSquare(1),
+                kCross(2),
+                kCircle(3),
+                kTriangle(4),
+                kL1(5),
+                kR1(6),
+                kL2(7),
+                kR2(8),
+                kCreate(9),
+                kOptions(10),
+                kL3(11),
+                kR3(12),
+                kPS(13),
+                kTouchpad(14);
+            
+                public final int value;
+            
+                Button(int index) {
+                    this.value = index;
+                }
+            
+                public String toString() {
+                    var name = this.name().substring(1); // Remove leading `k`
+                    if (this == kTouchpad) {
+                        return name;
+                    }
+                    
+                    return name + "Button";
+                }
             }
 
-            public String toString() {
-                var name = this.name().substring(1); // Remove leading `k`
-                if (name.endsWith("Bumper")) {
-                  return name;
+            public enum Axis {
+                kLeftX(0),
+                kLeftY(1),
+                kRightX(2),
+                kRightY(5),
+                kL2(3),
+                kR2(4);
+            
+                public final int value;
+            
+                Axis(int index) {
+                    value = index;
                 }
-                return name + "Button";
+            
+                public String toString() {
+                    var name = this.name().substring(1); // Remove leading `k`
+                    if (name.endsWith("2")) {
+                        return name + "Axis";
+                    }
+
+                    return name;
+                }
             }
         }
 
