@@ -8,6 +8,7 @@ import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.subsystems.ClimberSubsystem;
 
 /* This section pulls from autonomous code and the
 * robotContainer to tell robot to follow basic commands
@@ -21,6 +22,7 @@ public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
 
   private RobotContainer m_robotContainer;
+  //private ClimberSubsystem climberSubsystem = new ClimberSubsystem();
 
   @Override
   public void robotInit() {
@@ -31,13 +33,16 @@ public class Robot extends TimedRobot {
   @Override
   public void robotPeriodic() {
     CommandScheduler.getInstance().run();
+    //m_robotContainer.disabled();
   }
 
   @Override
   public void disabledInit() {}
 
   @Override
-  public void disabledPeriodic() {}
+  public void disabledPeriodic() {
+  // m_robotContainer.disabled();
+  }
 
   @Override
   public void disabledExit() {}
@@ -68,7 +73,9 @@ public class Robot extends TimedRobot {
   public void teleopPeriodic() {}
 
   @Override
-  public void teleopExit() {}
+  public void teleopExit() {
+    disabledPeriodic();
+  }
 
   @Override
   public void testInit() {

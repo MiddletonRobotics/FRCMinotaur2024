@@ -77,7 +77,7 @@ public class IntakeSubsystem extends SubsystemBase {
         pivotEncoderConfigurator = intakeEncoder.getConfigurator();
         MagnetSensorConfigs magnetSensorConfiguration = new MagnetSensorConfigs();
 
-        magnetSensorConfiguration.AbsoluteSensorRange = AbsoluteSensorRangeValue.Unsigned_0To1;
+        magnetSensorConfiguration.AbsoluteSensorRange = AbsoluteSensorRangeValue.Signed_PlusMinusHalf;
         magnetSensorConfiguration.SensorDirection = SensorDirectionValue.CounterClockwise_Positive;
         magnetSensorConfiguration.MagnetOffset = angleOffset.getRotations();
         pivotEncoderConfigurator.apply(new CANcoderConfiguration().withMagnetSensor(magnetSensorConfiguration));
@@ -94,9 +94,9 @@ public class IntakeSubsystem extends SubsystemBase {
 
         //} else (switchTouch = false) 
         if(getIntakeEncoder() > Constants.IntakeConstants.storePosition) {
-            pivotMotor.set(-0.1);
+            pivotMotor.set(-0.2);
         } else if(getIntakeEncoder() < Constants.IntakeConstants.storePosition) {
-            pivotMotor.set(0.1);
+            pivotMotor.set(0.2);
         } else {
             pivotMotor.set(0);
             deployPosition = false;
@@ -109,9 +109,9 @@ public class IntakeSubsystem extends SubsystemBase {
 
         //} else (switchTouch = false) 
         if(getIntakeEncoder() < Constants.IntakeConstants.deployPosition) {
-            pivotMotor.set(0.1);
+            pivotMotor.set(0.2);
         } else if(getIntakeEncoder() > Constants.IntakeConstants.deployPosition) {
-            pivotMotor.set(-0.1);
+            pivotMotor.set(-0.2);
         } else {
             pivotMotor.set(0);
             deployPosition = true;
@@ -120,11 +120,11 @@ public class IntakeSubsystem extends SubsystemBase {
 
     //we felt a little silly with the names
     public void intakeConsume() {
-        rollerMotor.set(-0.5); //whatever makes motor take thingy
+        rollerMotor.set(-0.3); //whatever makes motor take thingy
     }
 
     public void intakeRegurgitate() {
-        rollerMotor.set(0.5); //whatever makes motor release thingy
+        rollerMotor.set(0.05); //whatever makes motor release thingy
     }
 
     public void reset() {

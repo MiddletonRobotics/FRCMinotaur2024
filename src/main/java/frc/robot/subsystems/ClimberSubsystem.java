@@ -18,10 +18,6 @@ public class ClimberSubsystem extends SubsystemBase {
     private RelativeEncoder rightClimbEncoder;
     private RelativeEncoder leftClimbEncoder;
 
-    public SparkPIDController rightPID;
-    public SparkPIDController leftPID;
-    
-
     public ClimberSubsystem() {
         rightClimbMotor = new CANSparkMax(ClimberConstants.RightClimbMotorID, MotorType.kBrushless);
         leftClimbMotor = new CANSparkMax(ClimberConstants.LeftClimbMotorID, MotorType.kBrushless);
@@ -29,23 +25,15 @@ public class ClimberSubsystem extends SubsystemBase {
         rightClimbEncoder = rightClimbMotor.getEncoder();
         leftClimbEncoder = leftClimbMotor.getEncoder();
 
-        rightPID = rightClimbMotor.getPIDController();
-        leftPID = leftClimbMotor.getPIDController();
         configureRightClimbMotor();
         configureLeftClimbMotor();
     }
 
     private void configureRightClimbMotor() {
         rightClimbMotor.restoreFactoryDefaults();
-        CANSparkMaxUtil.setCANSparkMaxBusUsage(rightClimbMotor, Usage.kPositionOnly);
         rightClimbMotor.setSmartCurrentLimit(ClimberConstants.rightClimbContinuousCurrentLimit);
         rightClimbMotor.setInverted(ClimberConstants.rightClimbInvert);
         rightClimbMotor.setIdleMode(ClimberConstants.rightClimbNeutralMode);
-        rightPID.setFeedbackDevice(rightClimbEncoder); // Setting the encoder to be the feedback device (EXPERIMENTAL)
-        rightPID.setP(ClimberConstants.climbKP);
-        rightPID.setI(ClimberConstants.climbKI);
-        rightPID.setD(ClimberConstants.climbKD);
-        rightPID.setFF(ClimberConstants.climbKFF);
         rightClimbMotor.enableVoltageCompensation(ClimberConstants.voltageCompensation);
         rightClimbMotor.burnFlash();
         rightClimbEncoder.setPosition(0.0);
@@ -53,15 +41,9 @@ public class ClimberSubsystem extends SubsystemBase {
 
     private void configureLeftClimbMotor() {
         leftClimbMotor.restoreFactoryDefaults();
-        CANSparkMaxUtil.setCANSparkMaxBusUsage(leftClimbMotor, Usage.kAll);
         leftClimbMotor.setSmartCurrentLimit(ClimberConstants.leftClimbContinuousCurrentLimit);
         leftClimbMotor.setInverted(ClimberConstants.leftClimbInvert);
         leftClimbMotor.setIdleMode(ClimberConstants.leftClimbNeutralMode);
-        leftPID.setFeedbackDevice(leftClimbEncoder); // Setting the encoder to be the feedback device (EXPERIMENTAL)
-        leftPID.setP(ClimberConstants.climbKP);
-        leftPID.setI(ClimberConstants.climbKI);
-        leftPID.setD(ClimberConstants.climbKD);
-        leftPID.setFF(ClimberConstants.climbKFF);
         leftClimbMotor.enableVoltageCompensation(ClimberConstants.voltageCompensation);
         leftClimbMotor.burnFlash();
         leftClimbEncoder.setPosition(0.0);
@@ -75,6 +57,11 @@ public class ClimberSubsystem extends SubsystemBase {
     public void climbDown() {
         rightClimbMotor.set(-ClimberConstants.climbSpeed);
         leftClimbMotor.set(-ClimberConstants.climbSpeed);
+    }
+
+    public void climbHold() {
+        rightClimbMotor.set(-0.06);
+        leftClimbMotor.set(-0.06);
     }
 
     public void reset() {

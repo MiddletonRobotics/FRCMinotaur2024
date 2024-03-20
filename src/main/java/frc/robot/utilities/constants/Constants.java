@@ -25,12 +25,12 @@ public class Constants {
         /* PID Values for the Motors. Used to correct the error when trying to move the motors to a desired location */
         public static final double angleKP = 0.01; // Propotional: If there is error, move the motor propotional to the error
         public static final double angleKI = 0.0; // Intergral: If the error is taking too long to correct, move the motor faster
-        public static final double angleKD = 0.0; // Derivative: If the motor is getting close to reaching the target, slow it down
+        public static final double angleKD = 0.1; // Derivative: If the motor is getting close to reaching the target, slow it down
         public static final double angleKFF = 0.0; // Force: Additional gain for creating offsts
 
-        public static final double driveKP = 0.2; // Propotional: If there is error, move the motor propotional to the error
+        public static final double driveKP = 0.1; // Propotional: If there is error, move the motor propotional to the error
         public static final double driveKI = 0.0; // Intergral: If the error is taking too long to correct, move the motor faster
-        public static final double driveKD = 0.0; // Derivative: If the motor is getting close to reaching the target, slow it down
+        public static final double driveKD = 0.1; // Derivative: If the motor is getting close to reaching the target, slow it down
         public static final double driveKFF = 0.0; // Force: Additional gain for creating offsts
 
         /* Drive Motor Characterization Values */
@@ -101,7 +101,7 @@ public class Constants {
         public static final double AngleConversionFactor = 360.0 / AngleGearRatio;
 
         /* Swerve Profiling Values */
-        public static final double PhysicalMaxSpeedMetersPerSecond = 9.0; // Maximum speed in meters per second that the Swerve Modules allow you to go
+        public static final double PhysicalMaxSpeedMetersPerSecond = 8.0; // 9.0  Maximum speed in meters per second that the Swerve Modules allow you to go
         public static final double AngularMaxVelocity = 12.5; // Maxiumum speed in radians per seconr that the swerve module is able to rotate (6.28 radians per full rotation)
 
         /* Neutral Modes */
@@ -147,12 +147,12 @@ public class Constants {
 
         /* Climber Current Limiting */
         public static final int pivotContinuousCurrentLimit = 60; 
-        public static final int rollerContinuousCurrentLimit = 80; 
+        public static final int rollerContinuousCurrentLimit = 70; 
 
         /* Encoder Offsets and positions */
         public static final Rotation2d angleOffset = Rotation2d.fromRotations(0);
-        public static final double storePosition = 0.761;
-        public static final double deployPosition = 0.198;
+        public static final double storePosition = -0.274;
+        public static final double deployPosition = 0.188;
 
         /* Motor and Encoder Inversions */
         public static final boolean rollerMotorInvert = false;
@@ -201,8 +201,8 @@ public class Constants {
         public static final IdleMode upperShooterMotorIdleMode = IdleMode.kCoast; // What the upper shooter motor should so when the robot hasn't been initialized
 
         /* Spped Profiling */
-        public static final double ampScorerSpeed = 0.45;
-        public static final double shooterScorerSpeed = 0.8;
+        public static final double ampScorerSpeed = 0.55;
+        public static final double shooterScorerSpeed = 0.9;
 
         /* Shooter Voltage Compensation */
         public static final double voltageCompensation = 12.0; // For PID tuning, the max voltage that the PID will compensate for this value (for example at 12V your PID will tune for receiving for 12V, or the max battery output)
@@ -220,21 +220,21 @@ public class Constants {
         public static final int leftClimbContinuousCurrentLimit = 60; // Climbers don't need to be running at maximum amperes due to the extension limit / extension length. Runs at 75%.
 
         /* Motor Inversions */
-        public static final boolean leftClimbInvert = false;
-        public static final boolean rightClimbInvert = false;
+        public static final boolean leftClimbInvert = true;
+        public static final boolean rightClimbInvert = true;
 
         /* Neutral Modes */ 
         public static final IdleMode leftClimbNeutralMode = IdleMode.kBrake;
         public static final IdleMode rightClimbNeutralMode = IdleMode.kBrake;
 
         /* PID Values for the Motors. Used to correct the error when trying to move the motors to a desired location */
-        public static final double climbKP = 0.1; // Propotional: If there is error, move the motor propotional to the error
+        public static final double climbKP = 0.15; // Propotional: If there is error, move the motor propotional to the error
         public static final double climbKI = 0.0; // Intergral: If the error is taking too long to correct, move the motor faster
         public static final double climbKD = 0.0; // Derivative: If the motor is getting close to reaching the target, slow it down
         public static final double climbKFF = 0.0; // Force: Additional gain for creating offsets
 
         /* Speed Profiling */
-        public static final double climbSpeed = 0.5; // Speed to default the climbers at (we have a reduced gearbox)
+        public static final double climbSpeed = 0.25; // Speed to default the climbers at (we have a reduced gearbox)
 
         /* Climber Voltage Compensation */
         public static final double voltageCompensation = 12.0; // For PID tuning, the max voltage that the PID will compensate for this value (for example at 12V your PID will tune for receiving for 12V, or the max battery output)
