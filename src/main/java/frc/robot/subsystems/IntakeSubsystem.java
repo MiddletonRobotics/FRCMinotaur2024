@@ -34,7 +34,20 @@ public class IntakeSubsystem extends SubsystemBase {
     private Rotation2d angleOffset;
     public boolean deployPosition;
 
+    public static enum IntakeDirection {
+        FORWARD, REVERSE, STOPPED
+    }
+
+    public static enum IntakeStatus {
+        EMPTY, LOADED
+    }
+
+    private IntakeStatus status = IntakeStatus.EMPTY;
+    private IntakeDirection direction = IntakeDirection.STOPPED;
+
     public IntakeSubsystem() {
+        setName("Intakaur");
+
         angleOffset = Constants.IntakeConstants.angleOffset;
         deployPosition = false;
 
@@ -112,6 +125,20 @@ public class IntakeSubsystem extends SubsystemBase {
                 deployPosition = false;
             }
         }).withName("Deploy Intake");
+    }
+
+    public void setSpeed(double speed) {
+        rollerMotor.set(speed);
+    }
+
+    public void setIntakeState(IntakeDirection direction) {
+        if (direction == IntakeDirection.FORWARD) {
+            this.direction = IntakeDirection.FORWARD;
+        } else if(direction == IntakeDirection.STOPPED){
+            this.direction = IntakeDirection.STOPPED;
+        } else if(direction == IntakeDirection.REVERSE){
+            this.direction = IntakeDirection.REVERSE;
+        }
     }
 
     //we felt a little silly with the names
