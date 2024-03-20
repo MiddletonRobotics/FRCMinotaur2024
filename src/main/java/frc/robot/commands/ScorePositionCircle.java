@@ -25,12 +25,13 @@ public class ScorePositionCircle extends Command {
         addRequirements(swerveSubsystem);
         // Create a list of bezier points from poses. Each pose represents one waypoint.
         // The rotation component of the pose should be the direction of travel. Do not use holonomic rotation.
-        // First pose should get robot position from swerveOdometry then create path to speaker.
+        // This is basic default list that will be changed
         List<Translation2d> bezierPoints = PathPlannerPath.bezierFromPoses(
-            swerveSubsystem.getPose(),
-            new Pose2d(3.0, 1.0, Rotation2d.fromDegrees(0)),
-            new Pose2d(5.0, 3.0, Rotation2d.fromDegrees(90)) //edit line for final position
-        );
+                new Pose2d(0.0, 0.0, Rotation2d.fromDegrees(0)),
+                new Pose2d(0.0, 0.0, Rotation2d.fromDegrees(0)),
+                new Pose2d(0.0, 0.0, Rotation2d.fromDegrees(0))
+            );
+        makePath(bezierPoints);
 
         // Create the path using the bezier points created above
         PathPlannerPath path = new PathPlannerPath(
@@ -47,9 +48,38 @@ public class ScorePositionCircle extends Command {
         AutoBuilder.followPath(path);
     }
 
-    public void testPos() {
-        if(swerveSubsystem.getPose().getX() < 1) {
-            
+    // First pose should get robot position from swerveOdometry then create path to speaker.
+    // Method creates the path based on the quadrant that the bot is in
+    //SABRINA PLEASE SOMEONE EDIT THESE COORDINATES OR NO WORKEY WORKEY IN THE WORDS OF JUDY'S GRANDSON
+    public List<Translation2d> makePath(List<Translation2d> pathPoints) {
+        if(swerveSubsystem.getPose().getX() < 1 && swerveSubsystem.getPose().getY() > 1) {
+            pathPoints = PathPlannerPath.bezierFromPoses(
+                swerveSubsystem.getPose(),
+                new Pose2d(3.0, 1.0, Rotation2d.fromDegrees(0)),
+                new Pose2d(5.0, 3.0, Rotation2d.fromDegrees(90)) //edit line for final position
+            );
+            return pathPoints;
+        } else if(swerveSubsystem.getPose().getX() < 1 && swerveSubsystem.getPose().getY() > 1) {
+            pathPoints = PathPlannerPath.bezierFromPoses(
+                swerveSubsystem.getPose(),
+                new Pose2d(3.0, 1.0, Rotation2d.fromDegrees(0)),
+                new Pose2d(5.0, 3.0, Rotation2d.fromDegrees(90)) //edit line for final position
+            );
+            return pathPoints;
+        } else if(swerveSubsystem.getPose().getX() < 1 && swerveSubsystem.getPose().getY() > 1) {
+            pathPoints = PathPlannerPath.bezierFromPoses(
+                swerveSubsystem.getPose(),
+                new Pose2d(3.0, 1.0, Rotation2d.fromDegrees(0)),
+                new Pose2d(5.0, 3.0, Rotation2d.fromDegrees(90)) //edit line for final position
+            );
+            return pathPoints;
+        } else {
+            pathPoints = PathPlannerPath.bezierFromPoses(
+                swerveSubsystem.getPose(),
+                new Pose2d(3.0, 1.0, Rotation2d.fromDegrees(0)),
+                new Pose2d(5.0, 3.0, Rotation2d.fromDegrees(90)) //edit line for final position
+            );
+            return pathPoints;
         }
     }
 
