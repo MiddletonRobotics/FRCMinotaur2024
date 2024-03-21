@@ -21,7 +21,7 @@ public class AmpController extends Command {
     public void execute() {
         shooterSubsystem.shooterAmpScoring();
         Timer.delay(1);
-        intakeSubsystem.intakeRegurgitate();
+        intakeSubsystem.intakeToShooter();
         Timer.delay(2);
         shooterSubsystem.stopShooter();
         intakeSubsystem.reset();

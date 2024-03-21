@@ -39,10 +39,10 @@ public class IntakeSubsystem extends SubsystemBase {
     }
 
     public static enum IntakeStatus {
-        EMPTY, LOADED
+        DEPLOYED, STORED
     }
 
-    private IntakeStatus status = IntakeStatus.EMPTY;
+    private IntakeStatus status = IntakeStatus.STORED;
     private IntakeDirection direction = IntakeDirection.STOPPED;
 
     public IntakeSubsystem() {
@@ -101,6 +101,10 @@ public class IntakeSubsystem extends SubsystemBase {
         return intakeEncoder.getAbsolutePosition().getValueAsDouble(); // Getting
     }
 
+    public void setSpeed(double speed) {
+        rollerMotor.set(speed);
+    }
+
     public Command deployIntake() {
         return run(() -> {
             if(getIntakeEncoder() < Constants.IntakeConstants.deployPosition) {
@@ -109,7 +113,7 @@ public class IntakeSubsystem extends SubsystemBase {
                 pivotMotor.set(-0.4);
             } else {
                 pivotMotor.set(0);
-                deployPosition = true;
+                status = IntakeStatus.DEPLOYED;
             }
         }).withName("Deploy Intake");
     }
@@ -122,13 +126,9 @@ public class IntakeSubsystem extends SubsystemBase {
                 pivotMotor.set(0.4);
             } else {
                 pivotMotor.set(0);
-                deployPosition = false;
+                status = IntakeStatus.STORED;
             }
         }).withName("Deploy Intake");
-    }
-
-    public void setSpeed(double speed) {
-        rollerMotor.set(speed);
     }
 
     public void setIntakeState(IntakeDirection direction) {
@@ -147,7 +147,11 @@ public class IntakeSubsystem extends SubsystemBase {
     }
 
     public void intakeRegurgitate() {
-        rollerMotor.set(0.05); //whatever makes motor release thingy
+        rollerMotor.set(0.3); //whatever makes motor release thingy
+    }
+
+    public void intakeToShooter() {
+        rollerMotor.set(0.1)
     }
 
     public void reset() {

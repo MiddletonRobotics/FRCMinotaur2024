@@ -20,7 +20,7 @@ public class ShooterController extends Command {
     public void execute() {
         shooterSubsystem.shooterSpeakerScoring();
         Timer.delay(1);
-        intakeSubsystem.intakeRegurgitate();
+        intakeSubsystem.intakeToShooter();
         Timer.delay(2);
         shooterSubsystem.stopShooter();
         intakeSubsystem.reset();
