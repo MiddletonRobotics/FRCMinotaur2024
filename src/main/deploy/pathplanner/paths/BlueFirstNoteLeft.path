@@ -8,24 +8,24 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 0.3599999999999999,
-        "y": 5.51
+        "x": 1.4408703461281565,
+        "y": 5.89385383898973
       },
-      "isLocked": true,
+      "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 2.4348734737355513,
-        "y": 6.946327738809324
+        "x": 2.481650091505311,
+        "y": 7.004798511021523
       },
       "prevControl": {
-        "x": 2.2227893504090876,
-        "y": 6.946327738809324
+        "x": 2.2893532420963023,
+        "y": 6.908650086317018
       },
       "nextControl": {
-        "x": 2.646957597062015,
-        "y": 6.946327738809324
+        "x": 2.69214487146923,
+        "y": 7.110045901003483
       },
       "isLocked": false,
       "linkedName": null
@@ -36,25 +36,19 @@
         "y": 5.51
       },
       "prevControl": {
-        "x": 0.3600000000000001,
-        "y": 5.51
+        "x": 1.733224207189155,
+        "y": 5.776912294565331
       },
       "nextControl": null,
       "isLocked": false,
       "linkedName": null
     }
   ],
-  "rotationTargets": [
-    {
-      "waypointRelativePos": 0.9,
-      "rotationDegrees": 180.0,
-      "rotateFast": false
-    }
-  ],
+  "rotationTargets": [],
   "constraintZones": [],
   "eventMarkers": [
     {
-      "name": "Deploy Intake",
+      "name": "Intake",
       "waypointRelativePos": 1.0,
       "command": {
         "type": "sequential",
@@ -63,31 +57,24 @@
             {
               "type": "named",
               "data": {
-                "name": "Deploy Intake"
+                "name": "Intake Note"
               }
-            },
-            {
-              "type": "wait",
-              "data": {
-                "waitTime": 1.0
-              }
-            },
-            {
-              "type": "named",
-              "data": {
-                "name": "Spin Intake"
-              }
-            },
-            {
-              "type": "wait",
-              "data": {
-                "waitTime": 1.0
-              }
-            },
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Shoot",
+      "waypointRelativePos": 1.95,
+      "command": {
+        "type": "sequential",
+        "data": {
+          "commands": [
             {
               "type": "named",
               "data": {
-                "name": "Stop Intake"
+                "name": "Speaker Shooter"
               }
             }
           ]
@@ -103,7 +90,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 180.0,
+    "rotation": 0.0,
     "rotateFast": false
   },
   "reversed": false,

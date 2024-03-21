@@ -1,0 +1,37 @@
+{
+  "version": 1.0,
+  "startingPose": {
+    "position": {
+      "x": 0.5521146085027211,
+      "y": 6.993104356579084
+    },
+    "rotation": 0
+  },
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "PNBlueLeft"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "BlueFirstNoteLeft"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "BlueSecondNote1"
+          }
+        }
+      ]
+    }
+  },
+  "folder": "BlueSide",
+  "choreoAuto": false
+}

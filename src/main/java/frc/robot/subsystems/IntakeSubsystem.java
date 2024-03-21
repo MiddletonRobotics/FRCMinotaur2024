@@ -104,9 +104,9 @@ public class IntakeSubsystem extends SubsystemBase {
     public Command deployIntake() {
         return run(() -> {
             if(getIntakeEncoder() < Constants.IntakeConstants.deployPosition) {
-                pivotMotor.set(0.2);
+                pivotMotor.set(0.4);
             } else if(getIntakeEncoder() > Constants.IntakeConstants.deployPosition) {
-                pivotMotor.set(-0.2);
+                pivotMotor.set(-0.4);
             } else {
                 pivotMotor.set(0);
                 deployPosition = true;
@@ -117,9 +117,9 @@ public class IntakeSubsystem extends SubsystemBase {
     public Command storeIntake() {
         return run(() -> {
             if(getIntakeEncoder() > Constants.IntakeConstants.storePosition) {
-                pivotMotor.set(-0.2);
+                pivotMotor.set(-0.4);
             } else if(getIntakeEncoder() < Constants.IntakeConstants.storePosition) {
-                pivotMotor.set(0.2);
+                pivotMotor.set(0.4);
             } else {
                 pivotMotor.set(0);
                 deployPosition = false;

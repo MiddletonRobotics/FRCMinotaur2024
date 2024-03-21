@@ -20,7 +20,7 @@ public class Constants {
 
         /* Swerve Current Limiting */
         public static final int angleContinuousCurrentLimit = 20; // Steering the swerve modules requires less power, and doesn't have a lot of movement, therefore we can reduce the amperes we are feeding it
-        public static final int driveContinuousCurrentLimit = 60; // Drive motors should be at the maximum reccomended amperes to get the most power and speed from it
+        public static final int driveContinuousCurrentLimit = 40; // Drive motors should be at the maximum reccomended amperes to get the most power and speed from it
 
         /* PID Values for the Motors. Used to correct the error when trying to move the motors to a desired location */
         public static final double angleKP = 0.01; // Propotional: If there is error, move the motor propotional to the error
@@ -101,10 +101,11 @@ public class Constants {
         public static final double AngleConversionFactor = 360.0 / AngleGearRatio;
 
         /* Swerve Profiling Values */
-        public static final double PhysicalMaxSpeedMetersPerSecond = 8.0; // 9.0  Maximum speed in meters per second that the Swerve Modules allow you to go
-        public static final double AngularMaxVelocity = 12.5; // Maxiumum speed in radians per seconr that the swerve module is able to rotate (6.28 radians per full rotation)
+        public static final double PhysicalMaxSpeedMetersPerSecond = 9.0; // 9.0  Maximum speed in meters per second that the Swerve Modules allow you to go
+        public static final double AngularMaxVelocity = 10.5; // Maxiumum speed in radians per seconr that the swerve module is able to rotate (6.28 radians per full rotation)
 
         /* Neutral Modes */
+
         public static final IdleMode angleNeutralMode = IdleMode.kBrake; // What the steering motor should do when not applied with any power (should always be brake while running to prevent overshooting target)
         public static final IdleMode driveNeutralMode = IdleMode.kBrake; // What the drive motor should do when not applied with any power (should always be brake while running to prevent overshooting target)
 
@@ -151,12 +152,13 @@ public class Constants {
 
         /* Encoder Offsets and positions */
         public static final Rotation2d angleOffset = Rotation2d.fromRotations(0);
-        public static final double storePosition = -0.274;
+        public static final double storePosition = -0.273;
         public static final double deployPosition = 0.188;
 
         /* Motor and Encoder Inversions */
-        public static final boolean rollerMotorInvert = false;
+        public static final boolean rollerMotorInvert = true;
         public static final boolean pivotMotorInvert = false;
+
         public static final boolean pivotEnocderInverted = false;
 
         /* Gear Ratios */
@@ -211,7 +213,6 @@ public class Constants {
     public static final class ClimberConstants {
 
         /* Hardware ID from CAN */
-
         public static final int LeftClimbMotorID = 17; // Motor ID of the motor thats attched on the left climber of the robot
         public static final int RightClimbMotorID = 18; // Motor ID of the motor thats attached on the right climber of the robot
 
@@ -220,7 +221,7 @@ public class Constants {
         public static final int leftClimbContinuousCurrentLimit = 60; // Climbers don't need to be running at maximum amperes due to the extension limit / extension length. Runs at 75%.
 
         /* Motor Inversions */
-        public static final boolean leftClimbInvert = true;
+        public static final boolean leftClimbInvert = false;
         public static final boolean rightClimbInvert = true;
 
         /* Neutral Modes */ 
@@ -234,7 +235,7 @@ public class Constants {
         public static final double climbKFF = 0.0; // Force: Additional gain for creating offsets
 
         /* Speed Profiling */
-        public static final double climbSpeed = 0.25; // Speed to default the climbers at (we have a reduced gearbox)
+        public static final double climbSpeed = 0.75; // Speed to default the climbers at (we have a reduced gearbox)
 
         /* Climber Voltage Compensation */
         public static final double voltageCompensation = 12.0; // For PID tuning, the max voltage that the PID will compensate for this value (for example at 12V your PID will tune for receiving for 12V, or the max battery output)

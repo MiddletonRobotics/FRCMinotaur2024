@@ -3,25 +3,41 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 2.0,
-        "y": 7.0
+        "x": 15.2,
+        "y": 5.58
       },
       "prevControl": null,
       "nextControl": {
-        "x": 3.0,
-        "y": 7.0
+        "x": 14.655264866085288,
+        "y": 7.074963437676163
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 4.0,
-        "y": 6.0
+        "x": 8.878352571519958,
+        "y": 7.425788070949362
       },
       "prevControl": {
-        "x": 3.0,
-        "y": 6.0
+        "x": 10.464340544849183,
+        "y": 7.431517127485823
+      },
+      "nextControl": {
+        "x": 7.2923645981907335,
+        "y": 7.4200590144129
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 15.2,
+        "y": 5.58
+      },
+      "prevControl": {
+        "x": 14.222581151715008,
+        "y": 7.729836086452799
       },
       "nextControl": null,
       "isLocked": false,
@@ -29,8 +45,66 @@
     }
   ],
   "rotationTargets": [],
-  "constraintZones": [],
-  "eventMarkers": [],
+  "constraintZones": [
+    {
+      "name": "slow",
+      "minWaypointRelativePos": 1.4,
+      "maxWaypointRelativePos": 1.7,
+      "constraints": {
+        "maxVelocity": 1.0,
+        "maxAcceleration": 4.4,
+        "maxAngularVelocity": 500.0,
+        "maxAngularAcceleration": 600.0
+      }
+    },
+    {
+      "name": "slow",
+      "minWaypointRelativePos": 1.9,
+      "maxWaypointRelativePos": 1.95,
+      "constraints": {
+        "maxVelocity": 1.0,
+        "maxAcceleration": 4.4,
+        "maxAngularVelocity": 500.0,
+        "maxAngularAcceleration": 600.0
+      }
+    }
+  ],
+  "eventMarkers": [
+    {
+      "name": "Intake",
+      "waypointRelativePos": 1.2,
+      "command": {
+        "type": "parallel",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "Intake Note"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Shoot",
+      "waypointRelativePos": 2.0,
+      "command": {
+        "type": "parallel",
+        "data": {
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "Speaker Shooter"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
   "globalConstraints": {
     "maxVelocity": 4.4,
     "maxAcceleration": 4.4,
@@ -39,13 +113,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 0,
+    "rotation": 180.0,
     "rotateFast": false
   },
   "reversed": false,
   "folder": "Red",
   "previewStartingState": {
-    "rotation": 0,
+    "rotation": 180.0,
     "velocity": 0
   },
   "useDefaultConstraints": true
