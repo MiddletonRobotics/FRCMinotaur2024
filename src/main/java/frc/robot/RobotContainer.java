@@ -105,6 +105,8 @@ public class RobotContainer {
     NamedCommands.registerCommand("Speaker Shooter",  new ShooterController(shooterSubsystem, intakeSubsystem));
     NamedCommands.registerCommand("Amp Shooter",  new AmpController(shooterSubsystem, intakeSubsystem));
     NamedCommands.registerCommand("Deploy Intake", intakeSubsystem.deployIntake());
+    NamedCommands.registerCommand("Spin Intake", new IntakePull(intakeSubsystem));
+    NamedCommands.registerCommand("Stop Intake", new StopIntake(intakeSubsystem));
     NamedCommands.registerCommand("Store Intake", intakeSubsystem.storeIntake());
     NamedCommands.registerCommand("Intake Note", new IntakeNote(intakeSubsystem));
 
