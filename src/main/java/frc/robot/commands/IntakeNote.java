@@ -13,6 +13,7 @@ public class IntakeNote extends Command {
         addRequirements(intakeSubsystem);
     }
 
+    @Override
     public void execute() {
         intakeSubsystem.deployIntake();
         Timer.delay(1); //maybe change
@@ -20,6 +21,10 @@ public class IntakeNote extends Command {
         Timer.delay(1); //maybe change
         intakeSubsystem.storeIntake();
         Timer.delay(1); //maybe change
+        intakeSubsystem.reset();
+    }
+
+    public void end() {
         intakeSubsystem.reset();
     }
 }
