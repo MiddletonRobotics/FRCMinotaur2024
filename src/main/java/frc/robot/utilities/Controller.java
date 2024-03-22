@@ -56,4 +56,12 @@ public class Controller {
     public static double rightX(Joystick Controller) {
         return Controller.getRawAxis(Constants.ControllerRawButtons.XboxController.Axis.kRightX.value);
     }
+
+    public static double rightTrigger(Joystick Controller) {
+        return Controller.getRawAxis(Constants.ControllerRawButtons.XboxController.Axis.kRightTrigger.value);
+    }
+
+    public static double leftTrigger(Joystick Controller) {
+        return Controller.getRawAxis(Constants.ControllerRawButtons.XboxController.Axis.kLeftTrigger.value);
+    }
 }

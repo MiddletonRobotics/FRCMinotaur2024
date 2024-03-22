@@ -108,28 +108,27 @@ public class IntakeSubsystem extends SubsystemBase {
 
     public Command deployIntake() {
         return run(() -> {
-            if(getIntakeEncoder() < Constants.IntakeConstants.deployPosition) {
-                pivotMotor.set(0.4);
-            } else if(getIntakeEncoder() > Constants.IntakeConstants.deployPosition) {
-                pivotMotor.set(-0.4);
-            } else {
-                pivotMotor.set(0);
-                status = IntakeStatus.DEPLOYED;
-            }
+            pivotMotor.set(0.25);
         }).withName("Deploy Intake");
+    }
+
+    public void intkeOut(){
+        pivotMotor.set(0.3);
+        System.out.println("out");
+    }
+
+    public void intkeIn(){
+        pivotMotor.set(-0.3);
+    }
+
+    public void stop(){
+        pivotMotor.set(0);
     }
 
     public Command storeIntake() {
         return run(() -> {
-            if(getIntakeEncoder() > Constants.IntakeConstants.storePosition) {
-                pivotMotor.set(-0.4);
-            } else if(getIntakeEncoder() < Constants.IntakeConstants.storePosition) {
-                pivotMotor.set(0.4);
-            } else {
-                pivotMotor.set(0);
-                status = IntakeStatus.STORED;
-            }
-        }).withName("Deploy Intake");
+            pivotMotor.set(-0.25);
+        }).withName("Store Intake");
     }
 
     public void setIntakeState(IntakeDirection direction) {
@@ -164,7 +163,6 @@ public class IntakeSubsystem extends SubsystemBase {
 
     public void reset() {
         rollerMotor.set(0);
-        pivotMotor.set(0);
     }
 
     @Override

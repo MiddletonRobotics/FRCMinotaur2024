@@ -16,11 +16,11 @@
     },
     {
       "anchor": {
-        "x": 15.2,
+        "x": 13.91853313621157,
         "y": 5.58
       },
       "prevControl": {
-        "x": 14.451574115683846,
+        "x": 13.170107251895416,
         "y": 5.533223382230241
       },
       "nextControl": null,
@@ -45,11 +45,18 @@
   "eventMarkers": [
     {
       "name": "Shot",
-      "waypointRelativePos": 1.0,
+      "waypointRelativePos": 0.15,
       "command": {
         "type": "parallel",
         "data": {
-          "commands": []
+          "commands": [
+            {
+              "type": "named",
+              "data": {
+                "name": "Speaker Shooter"
+              }
+            }
+          ]
         }
       }
     }

@@ -8,6 +8,8 @@
 */
 package frc.robot;
 
+import java.sql.Driver;
+
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
@@ -15,6 +17,7 @@ import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.path.PathPlannerTrajectory;
 
 import edu.wpi.first.cameraserver.CameraServer;
+import edu.wpi.first.networktables.DoubleSubscriber;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -78,14 +81,14 @@ public class RobotContainer {
   private final JoystickButton deployIntake;
   private final JoystickButton storeIntake;
   private final JoystickButton intakeGamePiece;
-  private final JoystickButton outtakeGamePiece;
-  private final JoystickButton rightClimberUp;
+  private final JoystickButton outtakeGamePiece; 
   private final JoystickButton leftClimberUp;
+  private final JoystickButton rightClimberUp;
   private final JoystickButton rightClimberDown;
   private final JoystickButton leftClimberDown;
   private final JoystickButton cycleButton;
 
-  private final SwerveSubsystem swerveSubsystem;
+  public final SwerveSubsystem swerveSubsystem;
   private final int translationAxis;
   private final int strafeAxis;
   private final int rotationAxis;
@@ -123,11 +126,10 @@ public class RobotContainer {
 
     resetHeading = new JoystickButton(DriverController, Constants.ControllerRawButtons.XboxController.Button.kY.value);
     robotCentric = new JoystickButton(DriverController, Constants.ControllerRawButtons.XboxController.Button.kX.value);
-    findScorePosition = new JoystickButton(DriverController, Constants.ControllerRawButtons.XboxController.Button.kB.value);
-    speakerScoring = new JoystickButton(DriverController, Constants.ControllerRawButtons.XboxController.Button.kRightBumper.value);
-    ampScoring = new JoystickButton(DriverController, Constants.ControllerRawButtons.XboxController.Button.kLeftBumper.value);
-    cycleButton = new JoystickButton(DriverController, Constants.ControllerRawButtons.XboxController.Button.kA.value);
-
+    findScorePosition = new JoystickButton(DriverController, Constants.ControllerRawButtons.XboxController.Button.kA.value);
+    speakerScoring = new JoystickButton(OperatorController, Constants.ControllerRawButtons.XboxController.Button.kRightBumper.value);
+    ampScoring = new JoystickButton(OperatorController, Constants.ControllerRawButtons.XboxController.Button.kLeftBumper.value);
+    
     deployIntake = new JoystickButton(OperatorController, Constants.ControllerRawButtons.XboxController.Button.kA.value);
     storeIntake = new JoystickButton(OperatorController, Constants.ControllerRawButtons.XboxController.Button.kB.value);
     intakeGamePiece = new JoystickButton(OperatorController, Constants.ControllerRawButtons.XboxController.Button.kX.value);
@@ -151,8 +153,8 @@ public class RobotContainer {
 
     swerveSubsystem.setDefaultCommand(new SwerveController(
       swerveSubsystem, 
-      () -> -DriverController.getRawAxis(translationAxis),
-      () -> -DriverController.getRawAxis(strafeAxis), 
+      () -> DriverController.getRawAxis(translationAxis),
+      () -> DriverController.getRawAxis(strafeAxis), 
       () -> -DriverController.getRawAxis(rotationAxis), 
       () -> robotCentric.getAsBoolean())
     );
@@ -177,6 +179,11 @@ public class RobotContainer {
     rightClimberUp.whileFalse(new InstantCommand(() -> climberSubsystem.rightClimberReset()));
     leftClimberUp.whileTrue(climberSubsystem.leftClimbUp());
     leftClimberUp.whileFalse(new InstantCommand(() -> climberSubsystem.leftClimberReset()));
+
+    rightClimberDown.whileTrue(climberSubsystem.rightClimbDown());
+    rightClimberDown.whileFalse(new InstantCommand(() -> climberSubsystem.rightClimberReset()));
+    leftClimberDown.whileTrue(climberSubsystem.leftClimbDown());
+    leftClimberDown.whileFalse(new InstantCommand(() -> climberSubsystem.leftClimberReset()));
   }
  
   public Command getAutonomousCommand() {

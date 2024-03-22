@@ -203,7 +203,7 @@ public class Constants {
         public static final IdleMode upperShooterMotorIdleMode = IdleMode.kCoast; // What the upper shooter motor should so when the robot hasn't been initialized
 
         /* Spped Profiling */
-        public static final double ampScorerSpeed = 0.55;
+        public static final double ampScorerSpeed = 0.33;
         public static final double shooterScorerSpeed = 0.9;
 
         /* Shooter Voltage Compensation */
@@ -221,7 +221,7 @@ public class Constants {
         public static final int leftClimbContinuousCurrentLimit = 60; // Climbers don't need to be running at maximum amperes due to the extension limit / extension length. Runs at 75%.
 
         /* Motor Inversions */
-        public static final boolean leftClimbInvert = false;
+        public static final boolean leftClimbInvert = true;
         public static final boolean rightClimbInvert = true;
 
         /* Neutral Modes */ 

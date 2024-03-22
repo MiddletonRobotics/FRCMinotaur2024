@@ -7,9 +7,15 @@ package frc.robot;
 import com.pathplanner.lib.pathfinding.Pathfinding;
 
 import edu.wpi.first.cameraserver.CameraServer;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.commands.ShooterController;
+import frc.robot.subsystems.IntakeSubsystem;
+import frc.robot.subsystems.ShooterSubsystem;
+import frc.robot.subsystems.SwerveSubsystem;
 
 /* This section pulls from autonomous code and the
 * robotContainer to tell robot to follow basic commands
@@ -23,10 +29,21 @@ public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
 
   private RobotContainer m_robotContainer;
+  private IntakeSubsystem intakeSubsystem;
+  private ShooterSubsystem shooterSubsystem;
+  private SwerveSubsystem swerveSubsystem;
+  private ShooterController shooterController;
+
+  private double startTimer;
 
   @Override
   public void robotInit() {
     m_robotContainer = new RobotContainer();
+    //intakeSubsystem = new IntakeSubsystem();
+    //shooterSubsystem = new ShooterSubsystem();
+    //swerveSubsystem = new SwerveSubsystem();
+
+    //shooterController = new ShooterController(shooterSubsystem, intakeSubsystem);
     CameraServer.startAutomaticCapture();
   }
 
@@ -54,10 +71,24 @@ public class Robot extends TimedRobot {
     if (m_autonomousCommand != null) {
       m_autonomousCommand.schedule();
     }
+    
+    /* 
+    try{}
+
+    startTimer = Timer.getFPGATimestamp();
+    shooterController.execute();
+  }catch(Exception e){
+    e.printStackTrace();
+  }
+  */
   }
 
   @Override
-  public void autonomousPeriodic() {}
+  public void autonomousPeriodic() {
+    //if(startTimer > 7 && startTimer < 9) {
+      //swerveSubsystem.driveRobotRelative(new ChassisSpeeds(0, 2, 0));
+  //}
+  }
 
   @Override
   public void autonomousExit() {}

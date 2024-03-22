@@ -3,25 +3,105 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 2.0,
-        "y": 7.0
+        "x": 15.2,
+        "y": 5.58
       },
       "prevControl": null,
       "nextControl": {
-        "x": 3.0,
-        "y": 7.0
+        "x": 16.2,
+        "y": 5.58
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 4.0,
-        "y": 6.0
+        "x": 13.649567584035452,
+        "y": 5.58
       },
       "prevControl": {
-        "x": 3.0,
-        "y": 6.0
+        "x": 13.86156765753406,
+        "y": 5.581711651335988
+      },
+      "nextControl": {
+        "x": 13.415684495186655,
+        "y": 5.578111669043852
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 15.2,
+        "y": 5.58
+      },
+      "prevControl": {
+        "x": 14.515058409219671,
+        "y": 5.59313848291558
+      },
+      "nextControl": {
+        "x": 15.298443360419487,
+        "y": 5.578111669043852
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 15.2,
+        "y": 5.58
+      },
+      "prevControl": {
+        "x": 15.602491375922925,
+        "y": 5.613194132371171
+      },
+      "nextControl": {
+        "x": 14.441645428856633,
+        "y": 5.5174572387766245
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 8.3053390038404,
+        "y": 7.437482225391801
+      },
+      "prevControl": {
+        "x": 7.318766882914264,
+        "y": 7.534522106138636
+      },
+      "nextControl": {
+        "x": 9.018682424829237,
+        "y": 7.367317298737161
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 15.2,
+        "y": 5.58
+      },
+      "prevControl": {
+        "x": 14.870200304970707,
+        "y": 5.694975992462646
+      },
+      "nextControl": {
+        "x": 15.529799695029292,
+        "y": 5.465024007537354
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 9.275953822562915,
+        "y": 6.127736927838528
+      },
+      "prevControl": {
+        "x": 7.860961135027683,
+        "y": 6.314843398917567
       },
       "nextControl": null,
       "isLocked": false,
