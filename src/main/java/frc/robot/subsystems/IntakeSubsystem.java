@@ -1,6 +1,7 @@
 package frc.robot.subsystems;
 
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -144,14 +145,21 @@ public class IntakeSubsystem extends SubsystemBase {
     //we felt a little silly with the names
     public void intakeConsume() {
         rollerMotor.set(-0.3); //whatever makes motor take thingy
+        setIntakeState(IntakeDirection.FORWARD);
     }
 
     public void intakeRegurgitate() {
         rollerMotor.set(0.3); //whatever makes motor release thingy
+        setIntakeState(IntakeDirection.REVERSE);
     }
 
     public void intakeToShooter() {
-        rollerMotor.set(0.1)
+        rollerMotor.set(0.1);
+    }
+
+    public void stopIntake() {
+        rollerMotor.set(0);
+        setIntakeState(IntakeDirection.STOPPED);
     }
 
     public void reset() {
@@ -161,6 +169,6 @@ public class IntakeSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
-
+        
     }
 }

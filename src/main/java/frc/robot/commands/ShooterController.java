@@ -23,7 +23,7 @@ public class ShooterController extends Command {
         intakeSubsystem.intakeToShooter();
         Timer.delay(2);
         shooterSubsystem.stopShooter();
-        intakeSubsystem.reset();
+        intakeSubsystem.stopIntake();
     }
 
     public void end() {
