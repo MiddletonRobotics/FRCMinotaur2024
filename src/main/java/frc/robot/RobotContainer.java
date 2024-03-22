@@ -39,7 +39,7 @@ import frc.robot.commands.IntakeNote;
 import frc.robot.commands.IntakePull;
 import frc.robot.commands.IntakePush;
 import frc.robot.commands.StopIntake;
-import frc.robot.commands.ScorePositionCircle;
+import frc.robot.commands.ScorePositionQuad;
 
 import frc.robot.utilities.Controller;
 import frc.robot.utilities.constants.Constants;
@@ -98,7 +98,7 @@ public class RobotContainer {
   private final IntakePull pullNote;
   private final IntakePush pushNote;
   private final StopIntake stopIntake;
-  private final ScorePositionCircle goScorePosition;
+  private final ScorePositionQuad goScorePosition;
   private final CycleShooter cyclingShooter;
 
   public RobotContainer() {
@@ -147,7 +147,7 @@ public class RobotContainer {
     pushNote = new IntakePush(intakeSubsystem);
     stopIntake = new StopIntake(intakeSubsystem);
     cyclingShooter = new CycleShooter(shooterSubsystem, intakeSubsystem);
-    goScorePosition = new ScorePositionCircle(swerveSubsystem);
+    goScorePosition = new ScorePositionQuad(swerveSubsystem);
 
     swerveSubsystem.setDefaultCommand(new SwerveController(
       swerveSubsystem, 
