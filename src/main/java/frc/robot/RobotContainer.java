@@ -126,7 +126,8 @@ public class RobotContainer {
 
     resetHeading = new JoystickButton(DriverController, Constants.ControllerRawButtons.XboxController.Button.kY.value);
     robotCentric = new JoystickButton(DriverController, Constants.ControllerRawButtons.XboxController.Button.kX.value);
-    findScorePosition = new JoystickButton(DriverController, Constants.ControllerRawButtons.XboxController.Button.kA.value);
+    findScorePosition = new JoystickButton(DriverController, Constants.ControllerRawButtons.XboxController.Button.kB.value);
+    cycleButton = new JoystickButton(DriverController, Constants.ControllerRawButtons.XboxController.Button.kA.value);
     speakerScoring = new JoystickButton(OperatorController, Constants.ControllerRawButtons.XboxController.Button.kRightBumper.value);
     ampScoring = new JoystickButton(OperatorController, Constants.ControllerRawButtons.XboxController.Button.kLeftBumper.value);
     
