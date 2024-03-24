@@ -6,10 +6,12 @@ import java.util.Map;
 import com.kauailabs.navx.frc.AHRS;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.util.PathPlannerLogging;
 import com.pathplanner.lib.util.ReplanningConfig;
 
+import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -27,10 +29,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import frc.robot.utilities.constants.Constants;
-import frc.robot.utilities.constants.Constants.ModuleConstants.BackLeftModule;
-import frc.robot.utilities.constants.Constants.ModuleConstants.BackRightModule;
-import frc.robot.utilities.constants.Constants.ModuleConstants.FrontLeftModule;
-import frc.robot.utilities.constants.Constants.ModuleConstants.FrontRightModule;
 
 /* Sets up class that assigns motors to each swerve module and get swerving.
 * Methods created to handle different actions taken on the controls.
@@ -39,6 +37,7 @@ public class SwerveSubsystem extends SubsystemBase {
     private final AHRS gyro;
 
     private SwerveDriveOdometry swerveOdometry;
+    private SwerveDrivePoseEstimator swervePoseEstimator;
     private SwerveModule[] swerveModules;
 
     private SlewRateLimiter translationLimiter = new SlewRateLimiter(Constants.SwerveConstants.PhysicalMaxAcceleration);
@@ -59,7 +58,7 @@ public class SwerveSubsystem extends SubsystemBase {
             new SwerveModule(3,Constants.ModuleConstants.BackRightModule.constants)
         };
 
-        swerveOdometry = new SwerveDriveOdometry(Constants.SwerveConstants.SwerveKinematics, getHeading(), getSwerveModulePositions());
+        swerveOdometry = new SwerveDriveOdometry(Constants.SwerveConstants.SwerveKinematics, getHeading(), getSwerveModulePositions(), new Pose2d(new Translation2d(0, 0), Rotation2d.fromDegrees(0)));
         field = new Field2d();
 
         AutoBuilder.configureHolonomic(
@@ -83,6 +82,8 @@ public class SwerveSubsystem extends SubsystemBase {
             },
             this
         );
+
+        swervePoseEstimator = new SwerveDrivePoseEstimator(Constants.SwerveConstants.SwerveKinematics, getHeading(), getSwerveModulePositions(), getPose());
 
         PathPlannerLogging.setLogActivePathCallback((poses) -> field.getObject("path").setPoses(poses));
         SmartDashboard.putData("Field", field);
@@ -198,7 +199,7 @@ public class SwerveSubsystem extends SubsystemBase {
     */
 
     public Pose2d getPose() {
-       return swerveOdometry.getPoseMeters();
+       return swervePoseEstimator.getEstimatedPosition();
     }
 
     public Rotation2d getHeading() {
@@ -222,6 +223,22 @@ public class SwerveSubsystem extends SubsystemBase {
     public void resetHeading() {
         gyro.zeroYaw();
     }
+
+    public Command driveToPose(Pose2d pose) {
+    // Create the constraints to use while pathfinding
+    PathConstraints constraints = new PathConstraints(
+        Constants.SwerveConstants.PhysicalMaxSpeedMetersPerSecond, Constants.SwerveConstants.PhysicalMaxAcceleration,
+        Constants.SwerveConstants.PhysicalAngularMaxVelocity, Constants.SwerveConstants.PhysicalAngularMaxVelocity
+    );
+
+    // Since AutoBuilder is configured, we can use it to build pathfinding commands
+    return AutoBuilder.pathfindToPose(
+        pose,
+        constraints,
+        0.0, // Goal end velocity in meters/sec
+        0.0 // Rotation delay distance in meters. This is how far the robot should travel before attempting to rotate.
+    );
+  }
 
     @Override
     public void periodic() {
