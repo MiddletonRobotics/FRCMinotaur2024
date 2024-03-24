@@ -25,15 +25,11 @@ public class Geometry {
         return rotations * 2 * Math.PI;
     }
 
-    public double angleWrapper(double angle) {
-        while (angle < 0) {
-            angle += 360;
-        }
-        while (angle >= 360) {
-            angle -= 360;
-        }
+    public double angleWrapper(double angle, boolean negative) {
+        angle = angle % 360; // reduce the angle
+        angle = (angle + 360) % 360; // force it to be the postive remainder, so that 0 <= angle <= 360
+
         return angle;
-       
     }
 
     public double radiansWrapper(double radians) {
@@ -56,3 +52,4 @@ public class Geometry {
         return rotations;
     }
 }
+ 
