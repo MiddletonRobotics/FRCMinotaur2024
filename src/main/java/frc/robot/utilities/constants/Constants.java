@@ -22,16 +22,24 @@ public class Constants {
         public static final int angleContinuousCurrentLimit = 20; // Steering the swerve modules requires less power, and doesn't have a lot of movement, therefore we can reduce the amperes we are feeding it
         public static final int driveContinuousCurrentLimit = 40; // Drive motors should be at the maximum reccomended amperes to get the most power and speed from it
 
+        /* PID Wrapping Outputs */
+        public static final double angleEncoderPIDMinInput = 0;
+        public static final double angleEncoderPIDMaxInput = 2 * Math.PI;
+
         /* PID Values for the Motors. Used to correct the error when trying to move the motors to a desired location */
         public static final double angleKP = 0.01; // Propotional: If there is error, move the motor propotional to the error
         public static final double angleKI = 0.0; // Intergral: If the error is taking too long to correct, move the motor faster
         public static final double angleKD = 0.1; // Derivative: If the motor is getting close to reaching the target, slow it down
         public static final double angleKFF = 0.0; // Force: Additional gain for creating offsts
+        public static final double angleMinOutput = -1;
+        public static final double angleMaxOutput = 1;
 
         public static final double driveKP = 0.1; // Propotional: If there is error, move the motor propotional to the error
         public static final double driveKI = 0.0; // Intergral: If the error is taking too long to correct, move the motor faster
         public static final double driveKD = 0.1; // Derivative: If the motor is getting close to reaching the target, slow it down
         public static final double driveKFF = 0.0; // Force: Additional gain for creating offsts
+        public static final double driveMinOutput = -1;
+        public static final double driveMaxOutput = 1;
 
         /* Drive Motor Characterization Values */
         public static final double driveKS = 0.667;
@@ -96,16 +104,18 @@ public class Constants {
         );
 
         /* Drive Motor Conversion Factors */
-        public static final double DriveConversionPositionFactor = (WheelDiameter * Math.PI) / DriveGearRatio;
-        public static final double DriveConversionVelocityFactor = DriveConversionPositionFactor / 60.0;
-        public static final double AngleConversionFactor = 360.0 / AngleGearRatio;
+        public static final double DriveConversionPositionFactor = ((WheelDiameter * Math.PI) / DriveGearRatio);
+        public static final double DriveConversionVelocityFactor = ((WheelDiameter * Math.PI) / DriveGearRatio) / 60;
+        public static final double AngleConversionPositionFactor = (2 * Math.PI) / AngleGearRatio;
+        public static final double AngleConversionVelocityFactor = (2 * Math.PI) /(60 * AngleGearRatio);
 
         /* Swerve Profiling Values */
-        public static final double PhysicalMaxSpeedMetersPerSecond = 9.0; // 9.0  Maximum speed in meters per second that the Swerve Modules allow you to go
-        public static final double AngularMaxVelocity = 10.5; // Maxiumum speed in radians per seconr that the swerve module is able to rotate (6.28 radians per full rotation)
+        public static final double PhysicalMaxSpeedMetersPerSecond = 4.1; // Maximum speed in meters per second that the Swerve Modules allow you to go
+        public static final double PhysicalMaxAcceleration = 1.9;
+        public static final double PhysicalAngularMaxVelocity = 2 * Math.PI; // Maxiumum speed in radians per seconr that the swerve module is able to rotate (6.28 radians per full rotation)
+        public static final double PhysicalMaxAngularAcceleration = 3.2;
 
         /* Neutral Modes */
-
         public static final IdleMode angleNeutralMode = IdleMode.kBrake; // What the steering motor should do when not applied with any power (should always be brake while running to prevent overshooting target)
         public static final IdleMode driveNeutralMode = IdleMode.kBrake; // What the drive motor should do when not applied with any power (should always be brake while running to prevent overshooting target)
 
@@ -391,5 +401,6 @@ public class Constants {
         public static final int operatorControllerPort = 1; // Operator Controllers helps with all of the other mechanisms and subsystems attached on the robot.
 
         public static final double kDeadband = 0.1; // Default deband to help with stick drift on the controllers, recorded values we get is usually (+- 0.05)
+        public static boolean disableHAL = false;
     }
 }

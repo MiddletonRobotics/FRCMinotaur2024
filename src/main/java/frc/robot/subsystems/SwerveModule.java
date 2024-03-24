@@ -18,6 +18,7 @@ import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+
 import frc.robot.Robot;
 import frc.robot.utilities.CANSparkMaxUtil;
 import frc.robot.utilities.OnboardModuleState;
@@ -28,21 +29,23 @@ import frc.robot.utilities.constants.SwerveModuleConstants;
 //Sets up swerve drive class with encoders. This section can and should be added to.
 public class SwerveModule {
     public int moduleNumber;
+    private double chassisAngularOffset = 0;
+
     private Rotation2d lastAngle;
     private Rotation2d angleOffset;
 
-    private SwerveModuleState expectedState = new SwerveModuleState();
+    private SwerveModuleState expectedState = new SwerveModuleState(0.0, new Rotation2d());
 
     private CANSparkMax driveMotor;
-    private CANSparkMax angleMotor;
+    private CANSparkMax steeringMotor;
 
     private RelativeEncoder driveEncocder;
-    private RelativeEncoder angleEncoder;
+    private RelativeEncoder steeringEncoder;
     private CANcoder swerveEncoder;
     private CANcoderConfigurator swerveEncoderConfigurator;
 
     private final SparkPIDController drivePIDController;
-    private final SparkPIDController anglePIDController;
+    private final SparkPIDController steeringPIDController;
 
     private final SimpleMotorFeedforward feedforward = new SimpleMotorFeedforward(Constants.ModuleConstants.driveKS, Constants.ModuleConstants.driveKV, Constants.ModuleConstants.driveKA);
 
@@ -53,9 +56,9 @@ public class SwerveModule {
         swerveEncoder = new CANcoder(moduleConstants.swerveEncoderID);
         configureSwerveEncoder();
 
-        angleMotor = new CANSparkMax(moduleConstants.angleMotorID, MotorType.kBrushless);
-        angleEncoder = angleMotor.getEncoder();
-        anglePIDController = angleMotor.getPIDController();
+        steeringMotor = new CANSparkMax(moduleConstants.angleMotorID, MotorType.kBrushless);
+        steeringEncoder = steeringMotor.getEncoder();
+        steeringPIDController = steeringMotor.getPIDController();
         configureAngleMotor();
 
         driveMotor = new CANSparkMax(moduleConstants.driveMotorID, MotorType.kBrushless);
@@ -78,19 +81,24 @@ public class SwerveModule {
     }
 
     private void configureAngleMotor() {
-        angleMotor.restoreFactoryDefaults();
-        CANSparkMaxUtil.setCANSparkMaxBusUsage(angleMotor, Usage.kPositionOnly);
-        angleMotor.setSmartCurrentLimit(Constants.ModuleConstants.angleContinuousCurrentLimit);
-        angleMotor.setInverted(Constants.SwerveConstants.angleInvert);
-        angleMotor.setIdleMode(Constants.SwerveConstants.angleNeutralMode);
-        angleEncoder.setPositionConversionFactor(Constants.SwerveConstants.AngleConversionFactor);
-        anglePIDController.setFeedbackDevice(angleEncoder);
-        anglePIDController.setP(Constants.ModuleConstants.angleKP);
-        anglePIDController.setI(Constants.ModuleConstants.angleKI);
-        anglePIDController.setD(Constants.ModuleConstants.angleKD);
-        anglePIDController.setFF(Constants.ModuleConstants.angleKFF);
-        angleMotor.enableVoltageCompensation(Constants.ModuleConstants.voltageCompensation);
-        angleMotor.burnFlash();
+        steeringMotor.restoreFactoryDefaults();
+        CANSparkMaxUtil.setCANSparkMaxBusUsage(steeringMotor, Usage.kPositionOnly);
+        steeringMotor.setSmartCurrentLimit(Constants.ModuleConstants.angleContinuousCurrentLimit);
+        steeringMotor.setInverted(Constants.SwerveConstants.angleInvert);
+        steeringMotor.setIdleMode(Constants.SwerveConstants.angleNeutralMode);
+        steeringEncoder.setPositionConversionFactor(Constants.SwerveConstants.AngleConversionPositionFactor);
+        steeringEncoder.setVelocityConversionFactor(Constants.SwerveConstants.AngleConversionVelocityFactor);
+        steeringPIDController.setFeedbackDevice(steeringEncoder);
+        steeringPIDController.setPositionPIDWrappingEnabled(true);
+        steeringPIDController.setPositionPIDWrappingMinInput(Constants.ModuleConstants.angleEncoderPIDMinInput);
+        steeringPIDController.setPositionPIDWrappingMaxInput(Constants.ModuleConstants.angleEncoderPIDMaxInput);
+        steeringPIDController.setP(Constants.ModuleConstants.angleKP);
+        steeringPIDController.setI(Constants.ModuleConstants.angleKI);
+        steeringPIDController.setD(Constants.ModuleConstants.angleKD);
+        steeringPIDController.setFF(Constants.ModuleConstants.angleKFF);
+        steeringPIDController.setOutputRange(Constants.ModuleConstants.angleMinOutput, Constants.ModuleConstants.angleMaxOutput);
+        steeringMotor.enableVoltageCompensation(Constants.ModuleConstants.voltageCompensation);
+        steeringMotor.burnFlash();
         resetToAbsolute();
     }
 
@@ -107,6 +115,7 @@ public class SwerveModule {
         drivePIDController.setI(Constants.ModuleConstants.angleKI);
         drivePIDController.setD(Constants.ModuleConstants.angleKD);
         drivePIDController.setFF(Constants.ModuleConstants.angleKFF);
+        drivePIDController.setOutputRange(Constants.ModuleConstants.driveMinOutput, Constants.ModuleConstants.driveMaxOutput);
         driveMotor.enableVoltageCompensation(Constants.ModuleConstants.voltageCompensation);
         driveMotor.burnFlash();
         driveEncocder.setPosition(0.0);
@@ -117,7 +126,7 @@ public class SwerveModule {
     }
 
     public Rotation2d getAngle() {
-        return Rotation2d.fromDegrees(angleEncoder.getPosition());
+        return Rotation2d.fromDegrees(steeringEncoder.getPosition());
     }
 
     public SwerveModuleState getDesiredState() {
@@ -134,15 +143,57 @@ public class SwerveModule {
 
     public void resetToAbsolute() {
         double absolutePosition = getSwerveEncoder().getDegrees();
-        angleEncoder.setPosition(absolutePosition);
+        steeringEncoder.setPosition(absolutePosition);
     }
 
+    /* 
+
     public void setDesiredState(SwerveModuleState desiredState, boolean isOpenLoop) {
+        if (Math.abs(desiredState.speedMetersPerSecond) < 0.005) { 
+            driveMotor.set(0);
+            steeringMotor.set(0);
+
+            if (desiredState.angle == lastAngle) {   
+                resetToAbsolute();
+            }
+
+            return; 
+        }
+
         desiredState = OnboardModuleState.optimize(desiredState, getSwerveModuleState().angle);
 
         this.expectedState = desiredState;
 
         setAngle(desiredState);
+        setSpeed(desiredState, isOpenLoop);
+    }
+
+    */
+
+    public void setDesiredState(SwerveModuleState desiredState) {        
+        // Apply chassis angular offset to the desired state.
+        SwerveModuleState correctedDesiredState = new SwerveModuleState();
+    
+        correctedDesiredState.speedMetersPerSecond = desiredState.speedMetersPerSecond;
+        correctedDesiredState.angle = desiredState.angle.plus(Rotation2d.fromRadians(chassisAngularOffset));
+    
+        // Optimize the reference state to avoid spinning further than 90 degrees.
+        SwerveModuleState optimizedDesiredState = OnboardModuleState.optimize(correctedDesiredState,
+            new Rotation2d(steeringEncoder.getPosition()));
+    
+        // Command driving and turning SPARKS MAX towards their respective setpoints.
+        driveMotor.set(optimizedDesiredState.speedMetersPerSecond / Constants.SwerveConstants.PhysicalMaxSpeedMetersPerSecond);
+        if (Math.abs(optimizedDesiredState.speedMetersPerSecond) < 0.006)
+          driveMotor.stopMotor();
+        steeringPIDController.setReference(optimizedDesiredState.angle.getRadians(), CANSparkMax.ControlType.kPosition);
+    
+        expectedState = desiredState;
+      }
+
+    public void setDesiredStateForXlock(SwerveModuleState desiredState, boolean isOpenLoop) {
+        desiredState = OnboardModuleState.optimize(desiredState, getSwerveModuleState().angle);
+    
+        setAngleForXlock(desiredState);
         setSpeed(desiredState, isOpenLoop);
     }
 
@@ -157,13 +208,18 @@ public class SwerveModule {
 
     private void setAngle(SwerveModuleState desiredState) {
         Rotation2d angle = (Math.abs(desiredState.speedMetersPerSecond) <= (Constants.SwerveConstants.PhysicalMaxSpeedMetersPerSecond * 0.01)) ? lastAngle : desiredState.angle;
-        anglePIDController.setReference(angle.getDegrees(), CANSparkMax.ControlType.kPosition);
+        steeringPIDController.setReference(angle.getDegrees(), CANSparkMax.ControlType.kPosition);
 
         if(Robot.isSimulation()) {
-            angleEncoder.setPosition(angle.getDegrees());
+            steeringEncoder.setPosition(angle.getDegrees());
         }
 
         lastAngle = angle;
-        
+    }
+
+    private void setAngleForXlock(SwerveModuleState desiredState) {
+        Rotation2d angle = (Math.abs(desiredState.speedMetersPerSecond) <= (Constants.SwerveConstants.PhysicalMaxSpeedMetersPerSecond * 0.01)) ? desiredState.angle : desiredState.angle;
+        steeringPIDController.setReference(angle.getDegrees(), CANSparkMax.ControlType.kPosition);
+        lastAngle = angle;
     }
 }

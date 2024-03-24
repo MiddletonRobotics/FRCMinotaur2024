@@ -17,6 +17,7 @@ import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.path.PathPlannerTrajectory;
 
 import edu.wpi.first.cameraserver.CameraServer;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.networktables.DoubleSubscriber;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
@@ -25,6 +26,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
 // import frc.robot.subsystems.TankSubsystem;
@@ -35,7 +37,6 @@ import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.ClimberSubsystem;
 
 import frc.robot.commands.ShooterController;
-import frc.robot.commands.SwerveController;
 import frc.robot.commands.AmpController;
 import frc.robot.commands.CycleShooter;
 import frc.robot.commands.IntakeNote;
@@ -72,6 +73,7 @@ public class RobotContainer {
   private final Joystick OperatorController;
 
   private final SendableChooser<Command> autonomousChooser;
+  private boolean slowSpeedEnabled;
 
   private final JoystickButton resetHeading;
   private final JoystickButton robotCentric;
@@ -124,6 +126,8 @@ public class RobotContainer {
     DriverController = Controller.getDriverController();
     OperatorController = Controller.getOperatorController();
 
+    slowSpeedEnabled = false;
+
     resetHeading = new JoystickButton(DriverController, Constants.ControllerRawButtons.XboxController.Button.kY.value);
     robotCentric = new JoystickButton(DriverController, Constants.ControllerRawButtons.XboxController.Button.kX.value);
     findScorePosition = new JoystickButton(DriverController, Constants.ControllerRawButtons.XboxController.Button.kB.value);
@@ -152,12 +156,13 @@ public class RobotContainer {
     cyclingShooter = new CycleShooter(shooterSubsystem, intakeSubsystem);
     goScorePosition = new ScorePositionQuad(swerveSubsystem);
 
-    swerveSubsystem.setDefaultCommand(new SwerveController(
-      swerveSubsystem, 
-      () -> DriverController.getRawAxis(translationAxis),
-      () -> DriverController.getRawAxis(strafeAxis), 
-      () -> -DriverController.getRawAxis(rotationAxis), 
-      () -> robotCentric.getAsBoolean())
+    swerveSubsystem.setDefaultCommand(new RunCommand(() -> swerveSubsystem.drive(
+      -MathUtil.applyDeadband(translationAxis, Constants.DriverConstants.kDeadband),
+      -MathUtil.applyDeadband(strafeAxis, Constants.DriverConstants.kDeadband),
+      -MathUtil.applyDeadband(rotationAxis, Constants.DriverConstants.kDeadband) / 1.4,
+      true,
+      slowSpeedEnabled),
+      swerveSubsystem)
     );
       
     configureButtonBindings();
