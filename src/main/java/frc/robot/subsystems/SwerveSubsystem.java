@@ -2,15 +2,25 @@
 package frc.robot.subsystems;
 
 import java.util.Map;
+import java.util.Set;
+import java.util.function.BooleanSupplier;
+import java.util.function.Supplier;
 
 import com.kauailabs.navx.frc.AHRS;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.commands.FollowPathHolonomic;
+import com.pathplanner.lib.commands.PathfindThenFollowPathHolonomic;
+import com.pathplanner.lib.path.GoalEndState;
 import com.pathplanner.lib.path.PathConstraints;
+import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
+import com.pathplanner.lib.util.PIDConstants;
 import com.pathplanner.lib.util.PathPlannerLogging;
 import com.pathplanner.lib.util.ReplanningConfig;
 
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -21,14 +31,24 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.math.util.Units;
+import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.SPI;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.DeferredCommand;
+import edu.wpi.first.wpilibj2.command.FunctionalCommand;
+import edu.wpi.first.wpilibj2.command.RepeatCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import frc.robot.utilities.constants.Constants;
+import frc.robot.utilities.PoseEstimator;
 
 /* Sets up class that assigns motors to each swerve module and get swerving.
 * Methods created to handle different actions taken on the controls.
@@ -38,13 +58,23 @@ public class SwerveSubsystem extends SubsystemBase {
 
     private SwerveDriveOdometry swerveOdometry;
     private SwerveDrivePoseEstimator swervePoseEstimator;
-    private SwerveModule[] swerveModules;
+    public SwerveModule[] swerveModules;
 
     private SlewRateLimiter translationLimiter = new SlewRateLimiter(Constants.SwerveConstants.PhysicalMaxAcceleration);
     private SlewRateLimiter strafeLimiter = new SlewRateLimiter(Constants.SwerveConstants.PhysicalMaxAcceleration);
     private SlewRateLimiter rotationLimiter = new SlewRateLimiter(Constants.SwerveConstants.PhysicalMaxAngularAcceleration);
 
+    private ShuffleboardTab tab = Shuffleboard.getTab("Drivetrain Debugging");
+    private double targetAngleTelemetry = 0;
+    GenericEntry targetAngleEntry = tab.add("Target Angle", 0).getEntry();
+    GenericEntry currentAngleEntry = tab.add("Current Angle", 0).getEntry();
+
     private Field2d field;
+
+    /**
+     * Initialize the SwerveSubsystem with the four seperate modules, along with the gyro mounted to the RoboRIO. Also
+     * includes built-in odometry and pathfinding to make life on the driver easier and to map where the robot is on the field
+     */
 
     public SwerveSubsystem() {
         gyro = new AHRS(SPI.Port.kMXP);
@@ -83,11 +113,25 @@ public class SwerveSubsystem extends SubsystemBase {
             this
         );
 
+        var tab = Shuffleboard.getTab("Swerve");
+        tab.add(this);
+
         swervePoseEstimator = new SwerveDrivePoseEstimator(Constants.SwerveConstants.SwerveKinematics, getHeading(), getSwerveModulePositions(), getPose());
 
         PathPlannerLogging.setLogActivePathCallback((poses) -> field.getObject("path").setPoses(poses));
         SmartDashboard.putData("Field", field);
     }
+
+    /**
+    * Allows the robot to drive using field oriented view, and the ability to change the view of the robot to robotCentric, as
+    * well as support to slow down the drive for testing purposes
+    *
+    * @param xSpeed Controller input that controls the strafing movement.
+    * @param ySpeed Controller input that controls the forward movement.
+    * @param rot Controller input that controls the rotational movement.
+    * @param robotCentric Changing the view from the front of the field to the front of the robot.
+    * @param slowSpeed Enables slow mode for the drivetrain (uesful for testing).
+    */
 
     public void drive(double xSpeed, double ySpeed, double rot, boolean robotCentric, boolean slowSpeed) {
         double xSpeedDelivered, ySpeedDelivered, rotDelivered;
@@ -109,33 +153,242 @@ public class SwerveSubsystem extends SubsystemBase {
         var swerveModuleStates = Constants.SwerveConstants.SwerveKinematics.toSwerveModuleStates(
             robotCentric ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeedDelivered, ySpeedDelivered, rotDelivered, getHeading()) : new ChassisSpeeds(xSpeedDelivered, ySpeedDelivered, rotDelivered));
             setModuleStates(swerveModuleStates);
-      }
+    }
 
-    /*
-
-    public void drive(Translation2d translation, double rotation, boolean fieldRelative, boolean isOpenLoop) {
-        SwerveModuleState[] swerveModuleStates = Constants.SwerveConstants.SwerveKinematics.toSwerveModuleStates(fieldRelative 
-            ? ChassisSpeeds.fromFieldRelativeSpeeds(translation.getX(), translation.getY(), rotation, getYaw())
-            : new ChassisSpeeds(translation.getX(), translation.getY(), rotation)
+    public Command driveToPose(Pose2d pose) {
+        PathConstraints constraints = new PathConstraints(
+            Constants.SwerveConstants.PhysicalMaxSpeedMetersPerSecond, Constants.SwerveConstants.PhysicalMaxAcceleration,
+            Constants.SwerveConstants.PhysicalAngularMaxVelocity, Constants.SwerveConstants.PhysicalAngularMaxVelocity
         );
 
-        SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, Constants.SwerveConstants.PhysicalMaxSpeedMetersPerSecond);
-
-        for(SwerveModule module : swerveModules) {
-            module.setDesiredState(swerveModuleStates[module.moduleNumber], false);
-        }
+        // Since AutoBuilder is configured, we can use it to build pathfinding commands
+        return AutoBuilder.pathfindToPose(
+            pose,
+            constraints,
+            0.0, // Goal end velocity in meters/sec
+            0.0 // Rotation delay distance in meters. This is how far the robot should travel before attempting to rotate.
+        );
     }
 
-    public void goStraight(Translation2d translation, boolean isOpenLoop) {
-        SwerveModuleState[] swerveModuleStates = Constants.SwerveConstants.SwerveKinematics.toSwerveModuleStates(new ChassisSpeeds(translation.getX(), translation.getY(), 0.0));
-        SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, Constants.SwerveConstants.PhysicalMaxSpeedMetersPerSecond);
+    public Command goToPoint(Pose2d targetPose) {
+        PIDController xController = new PIDController(Constants.ModuleConstants.driveKP, Constants.ModuleConstants.driveKI, Constants.ModuleConstants.driveKD);
+        PIDController yController = new PIDController(Constants.ModuleConstants.driveKP, Constants.ModuleConstants.driveKI, Constants.ModuleConstants.driveKD);
+        PIDController thetaController = new PIDController(Constants.ModuleConstants.angleKP, Constants.ModuleConstants.angleKI, Constants.ModuleConstants.angleKD);
 
-        for (SwerveModule module : swerveModules) {
-            module.setDesiredState(swerveModuleStates[module.moduleNumber], isOpenLoop);
-        }
+        return new FunctionalCommand(
+            () ->
+                System.out.println(String.format("Traveling to x:%s, y:%s, z:%s", targetPose.getX(), targetPose.getY(), targetPose.getRotation().getDegrees())),
+            () -> {
+                double sX = xController.calculate(getPose().getX(), targetPose.getX());
+                double sY = yController.calculate(getPose().getY(), targetPose.getY());
+                double sR = thetaController.calculate(getPose().getRotation().getRadians(), targetPose.getRotation().getRadians());
+
+                drive(sX, sY, sR, true, true);
+            },
+            interrupted -> {
+                xController.close();
+                yController.close();
+                thetaController.close();
+            },
+            () -> xController.atSetpoint() && yController.atSetpoint() && thetaController.atSetpoint(),
+            this
+        );
     }
 
-    */
+    public Command chasePoseCommand(Supplier<Pose2d> target){
+        TrapezoidProfile.Constraints X_CONSTRAINTS = new TrapezoidProfile.Constraints(3, 2);
+        TrapezoidProfile.Constraints Y_CONSTRAINTS = new TrapezoidProfile.Constraints(3, 2);
+        TrapezoidProfile.Constraints OMEGA_CONSTRAINTS =   new TrapezoidProfile.Constraints(1, 1.5);
+        
+        ProfiledPIDController xController = new ProfiledPIDController(0.1, 0, 0, X_CONSTRAINTS);
+        ProfiledPIDController yController = new ProfiledPIDController(0.1, 0, 0, Y_CONSTRAINTS);
+        ProfiledPIDController omegaController = new ProfiledPIDController(0.01, 0, 0, OMEGA_CONSTRAINTS);
+
+        xController.setTolerance(0.3);
+        yController.setTolerance(0.3);
+        omegaController.setTolerance(Units.degreesToRadians(3));
+        omegaController.enableContinuousInput(-180, 180);
+
+        return new DeferredCommand(() ->
+            new RepeatCommand(
+                new FunctionalCommand(
+                () -> {
+                    // Init
+                },
+                () -> {
+                    double xSpeed = xController.calculate(this.getPose().getX(), target.get().getX());
+                    double ySpeed = yController.calculate(this.getPose().getY(), target.get().getY());
+                    double omegaSpeed = omegaController.calculate(this.getRawHeading(), target.get().getRotation().getDegrees());
+
+                    this.drive(xSpeed,ySpeed, omegaSpeed, true, true);
+                },
+                interrupted -> {
+                    this.drive(0,0,0, true, true);
+                    System.out.println("30 cm away now");
+                },
+                () -> {
+                    return xController.atGoal() && yController.atGoal() && omegaController.atGoal();
+                },
+                this)
+            ), Set.of(this)
+        );
+    }
+
+    public Command chasePoseRobotRelativeCommand(Supplier<Pose2d> target){
+        TrapezoidProfile.Constraints X_CONSTRAINTS = new TrapezoidProfile.Constraints(3, 2);
+        TrapezoidProfile.Constraints Y_CONSTRAINTS = new TrapezoidProfile.Constraints(3, 2);
+        //TrapezoidProfile.Constraints OMEGA_CONSTRAINTS =   new TrapezoidProfile.Constraints(1, 1.5);
+        
+        ProfiledPIDController xController = new ProfiledPIDController(0.5, 0, 0, X_CONSTRAINTS);
+        ProfiledPIDController yController = new ProfiledPIDController(0.5, 0, 0, Y_CONSTRAINTS);
+        PIDController omegaPID = new PIDController(0.01, 0, 0);
+    
+        xController.setTolerance(0.10);
+        yController.setTolerance(0.03);
+        omegaPID.setTolerance(1.5);
+        omegaPID.enableContinuousInput(-180, 180);
+    
+        return new DeferredCommand(() ->
+            new FunctionalCommand(
+                () -> {
+                    // Init
+                },
+                () -> {
+                    double xSpeed = xController.calculate(0, target.get().getX());
+                    double ySpeed = yController.calculate(0, target.get().getY());
+                    double omegaSpeed = omegaPID.calculate(0, target.get().getRotation().getDegrees());
+        
+                    this.drive(xSpeed, 0, omegaSpeed, false, true);
+                },
+                interrupted -> {
+                    this.drive(0,0,0, false, true);
+                    omegaPID.close();
+                    System.out.println("Aligned now");
+                },
+        
+                () -> {
+                    return omegaPID.atSetpoint() && xController.atGoal() && yController.atGoal();
+                },
+                this
+            ), Set.of(this)
+        );
+    }
+
+
+    public Command followUnflippedPathCommand(PathPlannerPath pathName){
+      return new FollowPathHolonomic(
+            pathName,
+            this::getPose, // Robot pose supplier
+            this::getRobotRelativeSpeeds, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
+            this::driveRobotRelative, // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds
+            new HolonomicPathFollowerConfig( // HolonomicPathFollowerConfig, this should likely live in your Constants class
+                new PIDConstants(5.0, 0.0, 0.0), // Translation PID constants
+                new PIDConstants(5.0, 0.0, 0.0), // Rotation PID constants
+                Constants.SwerveConstants.PhysicalMaxSpeedMetersPerSecond, // Max module speed, in m/s
+                Constants.AutonomousConstants.DriveBaseRadius, // Drive base radius in meters. Distance from robot center to furthest module.
+                new ReplanningConfig(true, true) // Default path replanning config. See the API for the options here
+            ),
+            () -> {
+                return false;
+            },
+            this
+        );
+    }
+
+    public Command pathFindThenFollowPathCommand(String pathName){
+    return new PathfindThenFollowPathHolonomic(
+        PathPlannerPath.fromPathFile(pathName),
+        new PathConstraints(
+                Constants.SwerveConstants.PhysicalMaxSpeedMetersPerSecond,
+                Constants.SwerveConstants.PhysicalMaxAcceleration,
+                Constants.SwerveConstants.PhysicalAngularMaxVelocity,
+                Constants.SwerveConstants.PhysicalMaxAngularAcceleration),
+        this::getPose,
+        this::getRobotRelativeSpeeds,
+        this::driveRobotRelative,
+        new HolonomicPathFollowerConfig( // HolonomicPathFollowerConfig, this should likely live
+                // in
+                // your Constants class
+                new PIDConstants(5.0, 0.0, 0.0), // Translation PID constants
+                new PIDConstants(5.0, 0.0, 0.0), // Rotation PID constants
+                Constants.SwerveConstants.PhysicalMaxSpeedMetersPerSecond, // Max module speed, in m/s
+                Constants.AutonomousConstants.DriveBaseRadius, // Drive base radius in meters. Distance from robot center to furthest module.
+                new ReplanningConfig(true, true) // Default path replanning config. See the API for the
+            // options
+            // here
+            ),
+        1.0, // Rotation delay distance in meters. This is how far the robot should travel before attempting to rotate. Optional
+            
+            // Boolean supplier that controls when the path will be mirrored for the red alliance
+            // This will flip the path being followed to the red side of the field.
+            // THE ORIGIN WILL REMAIN ON THE BLUE SIDE
+            getShouldFlip(),
+            
+        this // Reference to drive subsystem to set requirements
+      );
+  }
+
+
+    public Command onTheFlyPathCommand(Supplier<Pose2d> targetPose) {
+        return new DeferredCommand(() -> followUnflippedPathCommand(
+            new PathPlannerPath(
+                PathPlannerPath.bezierFromPoses(new Pose2d(this.getPose().getTranslation(),
+                                                    Rotation2d.fromDegrees(0)),
+                                                targetPose.get()),
+                new PathConstraints(
+                    Constants.SwerveConstants.PhysicalMaxSpeedMetersPerSecond,
+                    Constants.SwerveConstants.PhysicalMaxAcceleration,
+                    Constants.SwerveConstants.PhysicalAngularMaxVelocity,
+                    Constants.SwerveConstants.PhysicalMaxAngularAcceleration),
+                new GoalEndState(0, targetPose.get().getRotation()),
+                false)),
+            //.until(
+                // () -> targetPose.get().getTranslation().getDistance(PoseEstimator.getInstance().getPosition().getTranslation())<1.5))
+                //.finallyDo(() -> System.out.println("uwu owo"));
+        Set.of(this));
+    }
+
+    public Command chaseThenOnTheFlyCommand(Supplier<Pose2d> target){
+        return new SequentialCommandGroup(chasePoseCommand(target), onTheFlyPathCommand(target));
+    }
+
+    public Command alignCommand(Supplier<Translation2d> target){
+        PIDController pid = new PIDController(0.01, 0, 0);
+        pid.setTolerance(1.5);
+        pid.enableContinuousInput(-180, 180);
+        return new DeferredCommand(() ->
+            new FunctionalCommand(
+                () -> {
+                // Init
+                },
+                () -> {
+                    Translation2d currentTranslation = this.getPose().getTranslation();
+                    Translation2d targetVector = currentTranslation.minus(target.get());
+                    Rotation2d targetAngle = targetVector.getAngle();
+                    double newSpeed;
+                    // if(DriverStation.getAlliance().get() == DriverStation.Alliance.Red)
+                    if(Constants.DriverConstants.IS_ALLIANCE_RED)
+                    newSpeed = pid.calculate(this.getRawHeading(), targetAngle.getDegrees());
+                    else
+                    newSpeed = pid.calculate(this.getRawHeading(), targetAngle.getDegrees());
+                    this.drive(0,0,
+                    newSpeed, true, true);
+        
+                    targetAngleEntry.setDouble(targetAngle.getDegrees());
+                    currentAngleEntry.setDouble(this.getRawHeading());
+                },
+                interrupted -> {
+                    pid.close();
+                    //this.drive(0,0,0,true,true);
+                    System.out.println("Allignment Over");  
+                },
+                () -> {
+                    return pid.atSetpoint();
+                },
+                this), 
+            Set.of(this)
+        );
+    }
 
     public void driveRobotRelative(ChassisSpeeds speeds) {
         SwerveModuleState[] states =  Constants.SwerveConstants.SwerveKinematics.toSwerveModuleStates(speeds);
@@ -184,19 +437,26 @@ public class SwerveSubsystem extends SubsystemBase {
         for (SwerveModule module : swerveModules) {
             module.setDesiredState(desiredStates[module.moduleNumber]);
         } 
-      }
-
-    /*
-
-    public void setModuleStates(SwerveModuleState[] desiredStates) {
-        SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, Constants.SwerveConstants.PhysicalMaxSpeedMetersPerSecond);
-
-        for(SwerveModule module : swerveModules) {
-            module.setDesiredState(desiredStates[module.moduleNumber], false);
-        }
     }
 
-    */
+    public BooleanSupplier getShouldFlip() {
+        return () -> {
+        // var alliance = DriverStation.getAlliance();
+        // if (alliance.isPresent()) {
+        //   return alliance.get() == DriverStation.Alliance.Red;
+        // }
+
+            return Constants.DriverConstants.IS_ALLIANCE_RED; 
+        };
+    }
+
+    public void startingOdometry(Pose2d startingPose) {
+        PoseEstimator.getInstance().resetPoseEstimate(new Pose2d(startingPose.getX(), startingPose.getY(), this.getHeading()));
+    }
+
+    public void resetSwerveOdometry(Pose2d pose) {
+        swerveOdometry.resetPosition(getHeading(), getSwerveModulePositions(), pose);
+    }
 
     public Pose2d getPose() {
        return swervePoseEstimator.getEstimatedPosition();
@@ -206,13 +466,14 @@ public class SwerveSubsystem extends SubsystemBase {
         return gyro.getRotation2d();
     }
 
+    public double getRawHeading() {
+        return -Double.valueOf(((AHRS)gyro).getYaw());
+    }
+
     public double getTurnRate() {
         return gyro.getRate() * (Constants.SwerveConstants.gyroInverted ? -1.0 : 1.0);
       }
 
-    public void resetSwerveOdometry(Pose2d pose) {
-        swerveOdometry.resetPosition(getHeading(), getSwerveModulePositions(), pose);
-    }
 
     public void resetModulesToAbsolute() {
         for(SwerveModule module : swerveModules) {
@@ -224,27 +485,18 @@ public class SwerveSubsystem extends SubsystemBase {
         gyro.zeroYaw();
     }
 
-    public Command driveToPose(Pose2d pose) {
-    // Create the constraints to use while pathfinding
-    PathConstraints constraints = new PathConstraints(
-        Constants.SwerveConstants.PhysicalMaxSpeedMetersPerSecond, Constants.SwerveConstants.PhysicalMaxAcceleration,
-        Constants.SwerveConstants.PhysicalAngularMaxVelocity, Constants.SwerveConstants.PhysicalAngularMaxVelocity
-    );
-
-    // Since AutoBuilder is configured, we can use it to build pathfinding commands
-    return AutoBuilder.pathfindToPose(
-        pose,
-        constraints,
-        0.0, // Goal end velocity in meters/sec
-        0.0 // Rotation delay distance in meters. This is how far the robot should travel before attempting to rotate.
-    );
-  }
-
     @Override
     public void periodic() {
 
-        swerveOdometry.update(getHeading(), getSwerveModulePositions());
-        field.setRobotPose(getPose());
+        swerveOdometry.update(getHeading(), new SwerveModulePosition[] {
+            swerveModules[0].getSwerveModulePosition(), 
+            swerveModules[1].getSwerveModulePosition(), 
+            swerveModules[2].getSwerveModulePosition(), 
+            swerveModules[4].getSwerveModulePosition()
+        });
+
+        targetAngleEntry.setDouble(targetAngleTelemetry);
+        currentAngleEntry.setDouble(getRawHeading() % 360);
 
         double measuredStates[] = {
             swerveModules[0].getSwerveModuleState().angle.getDegrees(),

@@ -162,8 +162,8 @@ public class RobotContainer {
       -MathUtil.applyDeadband(rotationAxis, Constants.DriverConstants.kDeadband) / 1.4,
       true,
       slowSpeedEnabled),
-      swerveSubsystem)
-    );
+      swerveSubsystem
+    ));
       
     configureButtonBindings();
   }
