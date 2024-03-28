@@ -133,29 +133,16 @@ public class SwerveSubsystem extends SubsystemBase {
     * @param slowSpeed Enables slow mode for the drivetrain (uesful for testing).
     */
 
-    public void drive(double xSpeed, double ySpeed, double rot, boolean robotCentric, boolean slowSpeed) {
-        double xSpeedDelivered, ySpeedDelivered, rotDelivered;
-    
-        if (slowSpeed) {
-          // Convert the commanded speeds into the correct units for the drivetrain
-          xSpeedDelivered = translationLimiter.calculate(xSpeed * 0.3) * Constants.SwerveConstants.PhysicalMaxSpeedMetersPerSecond;
-          ySpeedDelivered = strafeLimiter.calculate(ySpeed * 0.3) * Constants.SwerveConstants.PhysicalMaxSpeedMetersPerSecond;
-          rotDelivered = rotationLimiter.calculate(rot * 0.3) * Constants.SwerveConstants.PhysicalAngularMaxVelocity;
-    
-        } else {
-          // Convert the commanded speeds into the correct units for the drivetrain
-          xSpeedDelivered = translationLimiter.calculate(xSpeed) * Constants.SwerveConstants.PhysicalMaxSpeedMetersPerSecond;
-          ySpeedDelivered = strafeLimiter.calculate(ySpeed) * Constants.SwerveConstants.PhysicalMaxSpeedMetersPerSecond;
-          rotDelivered = rotationLimiter.calculate(rot) * Constants.SwerveConstants.PhysicalAngularMaxVelocity;
-    
-        }
-    
-        SwerveModuleState[] swerveModuleStates = Constants.SwerveConstants.SwerveKinematics.toSwerveModuleStates(
-            robotCentric ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeedDelivered, ySpeedDelivered, rotDelivered, getHeading()) : new ChassisSpeeds(xSpeedDelivered, ySpeedDelivered, rotDelivered));
-            
+    public void drive(Translation2d translation, double rotation, boolean fieldRelative, boolean isOpenLoop) {
+        SwerveModuleState[] swerveModuleStates = Constants.SwerveConstants.SwerveKinematics.toSwerveModuleStates(fieldRelative 
+            ? ChassisSpeeds.fromFieldRelativeSpeeds(translation.getX(), translation.getY(), rotation, getHeading())
+            : new ChassisSpeeds(translation.getX(), translation.getY(), rotation)
+        );
+
         SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, Constants.SwerveConstants.PhysicalMaxSpeedMetersPerSecond);
-        for(SwerveModule module: swerveModules) {
-            module.setDesiredState(swerveModuleStates[module.moduleNumber], false);;
+
+        for(SwerveModule module : swerveModules) {
+            module.setDesiredState(swerveModuleStates[module.moduleNumber], false);
         }
     }
 
@@ -187,7 +174,11 @@ public class SwerveSubsystem extends SubsystemBase {
                 double sY = yController.calculate(getPose().getY(), targetPose.getY());
                 double sR = thetaController.calculate(getPose().getRotation().getRadians(), targetPose.getRotation().getRadians());
 
-                drive(sX, sY, sR, true, true);
+                double xSpeedDelivered = translationLimiter.calculate(sX) * Constants.SwerveConstants.PhysicalMaxSpeedMetersPerSecond;
+                double ySpeedDelivered = strafeLimiter.calculate(sY) * Constants.SwerveConstants.PhysicalMaxSpeedMetersPerSecond;
+                double rotDelivered = rotationLimiter.calculate(sR) * Constants.SwerveConstants.PhysicalAngularMaxVelocity;
+
+                drive(new Translation2d(xSpeedDelivered, ySpeedDelivered).times(Constants.SwerveConstants.PhysicalMaxSpeedMetersPerSecond), rotDelivered * Constants.SwerveConstants.PhysicalAngularMaxVelocity, false, true);
             },
             interrupted -> {
                 xController.close();
@@ -224,10 +215,14 @@ public class SwerveSubsystem extends SubsystemBase {
                     double ySpeed = yController.calculate(this.getPose().getY(), target.get().getY());
                     double omegaSpeed = omegaController.calculate(this.getRawHeading(), target.get().getRotation().getDegrees());
 
-                    this.drive(xSpeed,ySpeed, omegaSpeed, true, true);
+                    double xSpeedDelivered = translationLimiter.calculate(xSpeed) * (Constants.SwerveConstants.PhysicalMaxSpeedMetersPerSecond * 0.3);
+                    double ySpeedDelivered = strafeLimiter.calculate(ySpeed) * (Constants.SwerveConstants.PhysicalMaxSpeedMetersPerSecond * 0.3);
+                    double rotDelivered = rotationLimiter.calculate(omegaSpeed) * (Constants.SwerveConstants.PhysicalMaxSpeedMetersPerSecond * 0.3);
+
+                    drive(new Translation2d(xSpeedDelivered, ySpeedDelivered).times(Constants.SwerveConstants.PhysicalMaxSpeedMetersPerSecond), rotDelivered * Constants.SwerveConstants.PhysicalAngularMaxVelocity, false, true);
                 },
                 interrupted -> {
-                    this.drive(0,0,0, true, true);
+                    this.drive(new Translation2d(0, 0),0, true, true);
                     System.out.println("30 cm away now");
                 },
                 () -> {
@@ -262,10 +257,14 @@ public class SwerveSubsystem extends SubsystemBase {
                     double ySpeed = yController.calculate(0, target.get().getY());
                     double omegaSpeed = omegaPID.calculate(0, target.get().getRotation().getDegrees());
         
-                    this.drive(xSpeed, 0, omegaSpeed, false, true);
+                    double xSpeedDelivered = translationLimiter.calculate(xSpeed) * (Constants.SwerveConstants.PhysicalMaxSpeedMetersPerSecond * 0.3);
+                    double ySpeedDelivered = strafeLimiter.calculate(ySpeed) * (Constants.SwerveConstants.PhysicalMaxSpeedMetersPerSecond * 0.3);
+                    double rotDelivered = rotationLimiter.calculate(omegaSpeed) * (Constants.SwerveConstants.PhysicalMaxSpeedMetersPerSecond * 0.3);
+
+                    drive(new Translation2d(xSpeedDelivered, ySpeedDelivered).times(Constants.SwerveConstants.PhysicalMaxSpeedMetersPerSecond), rotDelivered * Constants.SwerveConstants.PhysicalAngularMaxVelocity, true, true);
                 },
                 interrupted -> {
-                    this.drive(0,0,0, false, true);
+                    this.drive(new Translation2d(0, 0),0, true, true);
                     omegaPID.close();
                     System.out.println("Aligned now");
                 },
@@ -375,8 +374,7 @@ public class SwerveSubsystem extends SubsystemBase {
                     newSpeed = pid.calculate(this.getRawHeading(), targetAngle.getDegrees());
                     else
                     newSpeed = pid.calculate(this.getRawHeading(), targetAngle.getDegrees());
-                    this.drive(0,0,
-                    newSpeed, true, true);
+                    this.drive(new Translation2d(0, 0),0, false, true);
         
                     targetAngleEntry.setDouble(targetAngle.getDegrees());
                     currentAngleEntry.setDouble(this.getRawHeading());

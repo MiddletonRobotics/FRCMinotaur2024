@@ -43,6 +43,7 @@ import frc.robot.commands.IntakeNote;
 import frc.robot.commands.IntakePull;
 import frc.robot.commands.IntakePush;
 import frc.robot.commands.StopIntake;
+import frc.robot.commands.SwerveController;
 import frc.robot.commands.ScorePositionQuad;
 
 import frc.robot.utilities.Controller;
@@ -156,14 +157,13 @@ public class RobotContainer {
     cyclingShooter = new CycleShooter(shooterSubsystem, intakeSubsystem);
     goScorePosition = new ScorePositionQuad(swerveSubsystem);
 
-    swerveSubsystem.setDefaultCommand(new RunCommand(() -> swerveSubsystem.drive(
-      -MathUtil.applyDeadband(translationAxis, Constants.DriverConstants.kDeadband),
-      -MathUtil.applyDeadband(strafeAxis, Constants.DriverConstants.kDeadband),
-      -MathUtil.applyDeadband(rotationAxis, Constants.DriverConstants.kDeadband) / 1.4,
-      !robotCentric.getAsBoolean()  ,
-      false),
-      swerveSubsystem
-    ));
+    swerveSubsystem.setDefaultCommand(new SwerveController(
+      swerveSubsystem, 
+      () -> DriverController.getRawAxis(translationAxis),
+      () -> DriverController.getRawAxis(strafeAxis), 
+      () -> -DriverController.getRawAxis(rotationAxis), 
+      () -> robotCentric.getAsBoolean())
+    );
       
     configureButtonBindings();
   }
