@@ -92,14 +92,14 @@ public class SwerveModule {
         steeringEncoder.setPositionConversionFactor(Constants.SwerveConstants.AngleConversionPositionFactor);
         steeringEncoder.setVelocityConversionFactor(Constants.SwerveConstants.AngleConversionVelocityFactor);
         steeringPIDController.setFeedbackDevice(steeringEncoder);
-        //steeringPIDController.setPositionPIDWrappingEnabled(true);
-        //steeringPIDController.setPositionPIDWrappingMinInput(Constants.ModuleConstants.angleEncoderPIDMinInput);
-        //steeringPIDController.setPositionPIDWrappingMaxInput(Constants.ModuleConstants.angleEncoderPIDMaxInput);
+        steeringPIDController.setPositionPIDWrappingEnabled(true);
+        steeringPIDController.setPositionPIDWrappingMinInput(Constants.ModuleConstants.angleEncoderPIDMinInput);
+        steeringPIDController.setPositionPIDWrappingMaxInput(Constants.ModuleConstants.angleEncoderPIDMaxInput);
         steeringPIDController.setP(Constants.ModuleConstants.angleKP);
         steeringPIDController.setI(Constants.ModuleConstants.angleKI);
         steeringPIDController.setD(Constants.ModuleConstants.angleKD);
         steeringPIDController.setFF(Constants.ModuleConstants.angleKFF);
-        //steeringPIDController.setOutputRange(Constants.ModuleConstants.angleMinOutput, Constants.ModuleConstants.angleMaxOutput);
+        steeringPIDController.setOutputRange(Constants.ModuleConstants.angleMinOutput, Constants.ModuleConstants.angleMaxOutput);
         steeringMotor.enableVoltageCompensation(Constants.ModuleConstants.voltageCompensation);
         steeringMotor.burnFlash();
         resetToAbsolute();
@@ -157,6 +157,8 @@ public class SwerveModule {
             if (desiredState.angle == lastAngle) {   
                 resetToAbsolute();
             }
+
+            return; 
         }
 
         desiredState = OnboardModuleState.optimize(desiredState, getSwerveModuleState().angle);
