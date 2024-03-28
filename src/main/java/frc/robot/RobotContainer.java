@@ -160,8 +160,8 @@ public class RobotContainer {
       -MathUtil.applyDeadband(translationAxis, Constants.DriverConstants.kDeadband),
       -MathUtil.applyDeadband(strafeAxis, Constants.DriverConstants.kDeadband),
       -MathUtil.applyDeadband(rotationAxis, Constants.DriverConstants.kDeadband) / 1.4,
-      true,
-      slowSpeedEnabled),
+      !robotCentric.getAsBoolean()  ,
+      false),
       swerveSubsystem
     ));
       

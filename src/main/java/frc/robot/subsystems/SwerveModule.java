@@ -18,7 +18,10 @@ import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-
+import edu.wpi.first.units.Measure;
+import edu.wpi.first.units.Voltage;
+import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Robot;
 import frc.robot.utilities.CANSparkMaxUtil;
 import frc.robot.utilities.OnboardModuleState;
@@ -146,8 +149,6 @@ public class SwerveModule {
         steeringEncoder.setPosition(absolutePosition);
     }
 
-    /* 
-
     public void setDesiredState(SwerveModuleState desiredState, boolean isOpenLoop) {
         if (Math.abs(desiredState.speedMetersPerSecond) < 0.005) { 
             driveMotor.set(0);
@@ -168,7 +169,7 @@ public class SwerveModule {
         setSpeed(desiredState, isOpenLoop);
     }
 
-    */
+    /* 
 
     public void setDesiredState(SwerveModuleState desiredState) {        
         // Apply chassis angular offset to the desired state.
@@ -188,7 +189,9 @@ public class SwerveModule {
         steeringPIDController.setReference(optimizedDesiredState.angle.getRadians(), CANSparkMax.ControlType.kPosition);
     
         expectedState = desiredState;
-      }
+    }
+
+    */
 
     public void setDesiredStateForXlock(SwerveModuleState desiredState, boolean isOpenLoop) {
         desiredState = OnboardModuleState.optimize(desiredState, getSwerveModuleState().angle);

@@ -116,7 +116,7 @@ public class SwerveSubsystem extends SubsystemBase {
         var tab = Shuffleboard.getTab("Swerve");
         tab.add(this);
 
-        swervePoseEstimator = new SwerveDrivePoseEstimator(Constants.SwerveConstants.SwerveKinematics, getHeading(), getSwerveModulePositions(), getPose());
+        swervePoseEstimator = new SwerveDrivePoseEstimator(Constants.SwerveConstants.SwerveKinematics, getHeading(), getSwerveModulePositions(), new Pose2d());
 
         PathPlannerLogging.setLogActivePathCallback((poses) -> field.getObject("path").setPoses(poses));
         SmartDashboard.putData("Field", field);
@@ -150,9 +150,13 @@ public class SwerveSubsystem extends SubsystemBase {
     
         }
     
-        var swerveModuleStates = Constants.SwerveConstants.SwerveKinematics.toSwerveModuleStates(
+        SwerveModuleState[] swerveModuleStates = Constants.SwerveConstants.SwerveKinematics.toSwerveModuleStates(
             robotCentric ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeedDelivered, ySpeedDelivered, rotDelivered, getHeading()) : new ChassisSpeeds(xSpeedDelivered, ySpeedDelivered, rotDelivered));
-            setModuleStates(swerveModuleStates);
+            
+        SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, Constants.SwerveConstants.PhysicalMaxSpeedMetersPerSecond);
+        for(SwerveModule module: swerveModules) {
+            module.setDesiredState(swerveModuleStates[module.moduleNumber], false);;
+        }
     }
 
     public Command driveToPose(Pose2d pose) {
@@ -435,18 +439,17 @@ public class SwerveSubsystem extends SubsystemBase {
         SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, Constants.SwerveConstants.PhysicalMaxSpeedMetersPerSecond);
 
         for (SwerveModule module : swerveModules) {
-            module.setDesiredState(desiredStates[module.moduleNumber]);
+            module.setDesiredState(desiredStates[module.moduleNumber], true);
         } 
     }
 
     public BooleanSupplier getShouldFlip() {
         return () -> {
-        // var alliance = DriverStation.getAlliance();
-        // if (alliance.isPresent()) {
-        //   return alliance.get() == DriverStation.Alliance.Red;
-        // }
-
-            return Constants.DriverConstants.IS_ALLIANCE_RED; 
+            var alliance = DriverStation.getAlliance();
+            if (alliance.isPresent()) {
+                return alliance.get() == DriverStation.Alliance.Red;
+            }
+            return false;
         };
     }
 
@@ -487,12 +490,11 @@ public class SwerveSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
-
         swerveOdometry.update(getHeading(), new SwerveModulePosition[] {
             swerveModules[0].getSwerveModulePosition(), 
             swerveModules[1].getSwerveModulePosition(), 
             swerveModules[2].getSwerveModulePosition(), 
-            swerveModules[4].getSwerveModulePosition()
+            swerveModules[3].getSwerveModulePosition()
         });
 
         targetAngleEntry.setDouble(targetAngleTelemetry);
