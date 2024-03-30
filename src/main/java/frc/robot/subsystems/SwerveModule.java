@@ -5,6 +5,7 @@ package frc.robot.subsystems;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.signals.AbsoluteSensorRangeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
+import com.fasterxml.jackson.databind.jsontype.impl.LaissezFaireSubTypeValidator;
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.CANcoderConfigurator;
 import com.ctre.phoenix6.configs.MagnetSensorConfigs;
@@ -138,8 +139,19 @@ public class SwerveModule {
     }
 
     public void setDesiredState(SwerveModuleState desiredState, boolean isOpenLoop) {
-        desiredState = OnboardModuleState.optimize(desiredState, getSwerveModuleState().angle);
 
+        if(Math.abs(desiredState.speedMetersPerSecond) < 0.006) {
+            driveMotor.set(0);
+            angleMotor.set(0);
+
+            if(desiredState.angle == lastAngle) {
+                resetToAbsolute();;
+            }
+
+            return;
+        }
+
+        desiredState = OnboardModuleState.optimize(desiredState, getSwerveModuleState().angle);
         this.expectedState = desiredState;
 
         setAngle(desiredState);
@@ -164,6 +176,18 @@ public class SwerveModule {
         }
 
         lastAngle = angle;
-        
+    }
+
+    public void stopDriveMotor() {
+        driveMotor.set(0);
+    }
+
+    public void stopAngleMotor() {
+        angleMotor.set(0);
+    }
+
+    public void stop() {
+        stopDriveMotor();
+        stopAngleMotor();
     }
 }
