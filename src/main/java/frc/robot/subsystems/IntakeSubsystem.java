@@ -90,7 +90,7 @@ public class IntakeSubsystem extends SubsystemBase {
         pivotPIDController.setFF(Constants.IntakeConstants.pivotKFF);
         pivotMotor.enableVoltageCompensation(Constants.IntakeConstants.voltageCompensation);
         pivotMotor.burnFlash();
-        resetToAbsolute();
+        //resetToAbsolute();
     }
 
     private void configurePivotEncoder() {
@@ -102,6 +102,8 @@ public class IntakeSubsystem extends SubsystemBase {
         magnetSensorConfiguration.MagnetOffset = angleOffset.getRotations();
         pivotEncoderConfigurator.apply(new CANcoderConfiguration().withMagnetSensor(magnetSensorConfiguration));
     }
+
+    /* 
 
     public Rotation2d getIntakeEncoder() {
         return Rotation2d.fromRotations(intakeEncoder.getAbsolutePosition().getValueAsDouble());
@@ -134,6 +136,8 @@ public class IntakeSubsystem extends SubsystemBase {
         double absolutePosition = getIntakeEncoder().getDegrees();
         pivotEncoder.setPosition(absolutePosition);
     }
+
+    */
 
     public Command deployIntake() {
         return run(() -> {
