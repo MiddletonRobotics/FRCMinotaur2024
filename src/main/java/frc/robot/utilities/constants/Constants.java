@@ -5,6 +5,9 @@ import com.pathplanner.lib.util.PIDConstants;
 import com.revrobotics.CANSparkBase.IdleMode;
 
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
@@ -14,7 +17,6 @@ import edu.wpi.first.math.util.Units;
 
 public class Constants {
     public static final class ModuleConstants {
-
         /* Swerve Voltage Compensation */
         public static final double voltageCompensation = 12.0; // For PID tuning, the max voltage that the PID will compensate for this value (for example at 12V your PID will tune for receiving for 12V, or the max battery output)
 
@@ -101,8 +103,10 @@ public class Constants {
         public static final double AngleConversionFactor = 360.0 / AngleGearRatio;
 
         /* Swerve Profiling Values */
-        public static final double PhysicalMaxSpeedMetersPerSecond = 9.0; // 9.0  Maximum speed in meters per second that the Swerve Modules allow you to go
-        public static final double AngularMaxVelocity = 10.5; // Maxiumum speed in radians per seconr that the swerve module is able to rotate (6.28 radians per full rotation)
+        public static final double PhysicalMaxSpeedMetersPerSecond = 4.1; // Maximum speed in meters per second that the Swerve Modules allow you to go
+        public static final double PhysicalMaxAcceleration = 1.9;
+        public static final double PhysicalAngularMaxVelocity = 3 * Math.PI; // Maxiumum speed in radians per seconr that the swerve module is able to rotate (6.28 radians per full rotation)
+        public static final double PhysicalMaxAngularAcceleration = 3.2;
 
         /* Neutral Modes */
 
@@ -139,8 +143,89 @@ public class Constants {
         public static final PIDConstants RotationalPID = new PIDConstants(4.0, 0.0, 0.0);
     }
 
-    public static final class IntakeConstants {
+     public static class VisionConstants {
+        public static final boolean DRIVER_CAMERA_ACTIVE = false;
+        public static final boolean VISION_OVERRIDE_ENABLED = false;
+        public static final boolean IS_LIMELIGHT_MODE = false;
+        public static final boolean IS_PHOTON_VISION_MODE = true;// TODO: Change to false
+        public static final boolean IS_NEURAL_NET = true;
+        public static final double DIFFERENCE_CUTOFF_THRESHOLD = 1.5; // Max difference between vision and odometry pose estimate
+        public static final String DRIVER_CAM_STREAM = "http://drivercam.local:1182/stream.mjpg";    
+    
+        // Field limits
+        public static final double FIELD_LENGTH_METERS = 16.54175;
+        public static final double FIELD_WIDTH_METERS = 8.0137;
+        public static final double VISION_X_MIN_CUTOFF = 3.0;
+        public static final double VISION_X_MAX_CUTOFF = 13.5;
+    
+        // Limelight - units are meters
+        public static final String POSE_LIMELIGHT = "limelight-pose";
+        public static final String NN_LIMELIGHT = "limelight-nn";
+        public static final int APRILTAG_PIPELINE = 1;
+        public static final int NOTE_DETECTOR_PIPELINE = 2;
+    
+        public static final double POSE_LIME_X = 0.322; // Forward - Meters
+        public static final double POSE_LIME_Y = -0.274; // Side - Right is positive on the limelight
+        public static final double POSE_LIME_Z = 0.21; // Up
+        public static final double POSE_LIME_PITCH = 30; // NEED to find units - degrees for now
+        public static final double POSE_LIME_ROLL = 0.0;
+        public static final double POSE_LIME_YAW = 0.0;
+    
+        //THESE ARE ALL ROBOT RELATIVE (CENTER OF THE ROBOT IS THE ORIGIN)
+        public static final double NN_LIME_X = -0.308; // +X is forward on the robot
+        public static final double NN_LIME_Y = -0.300; // +Y is the the left of the robot
+        public static final double NN_LIME_Z = 0.497; // +Z is up
+        public static final double NN_LIME_PITCH = -0.349;
+        public static final double NN_LIME_ROLL = 0.0;
+        public static final double NN_LIME_YAW = Math.PI;
+    
+        public static final Transform2d NN_ROBOT_TO_LIME_2D = new Transform2d(NN_LIME_X, NN_LIME_Y, new Rotation2d(NN_LIME_YAW));
+        public static final Transform2d NN_LIME_TO_ROBOT_2D = new Transform2d(-NN_LIME_X, -NN_LIME_Y, new Rotation2d(-NN_LIME_YAW));
+    
+        // Photonvision
+        public static final double POSE_AMBIGUITY_CUTOFF = 0.2;
+        public static final String POSE_PHOTON_1 = "photoncam-1";
 
+        // Translation Values (location relative to robot center)
+        public static final double CAM_1_X = 0.3079; // Forward: camera To Robot XMeters
+        public static final double CAM_1_Y = -0.0762; // Left: camera To Robot YMeters
+        public static final double CAM_1_Z = 0.156; // Up: camera To Robot ZMeters
+    
+        // Rotation mounting angles (roll-pitch-yaw) in RADIANS
+        public static final double CAM_1_ROLL_RADIANS = 0.0; // camera Roll Radians
+        public static final double CAM_1_PITCH_RADIANS = 0.436; // camera Pitch Radians
+        public static final double CAM_1_YAW_RADIANS = 0.0; // camera Yaw Radians, +CCW
+    
+        public static final Transform3d PHOTON_1_ROBOT_TO_CAM = new Transform3d(CAM_1_X, CAM_1_Y, CAM_1_Z, new Rotation3d(CAM_1_ROLL_RADIANS, CAM_1_PITCH_RADIANS, CAM_1_YAW_RADIANS));
+        public static final Transform3d PHOTON_1_CAM_TO_ROBOT = new Transform3d(-CAM_1_X, -CAM_1_Y, -CAM_1_Z, new Rotation3d(-CAM_1_ROLL_RADIANS, -CAM_1_PITCH_RADIANS, -CAM_1_YAW_RADIANS)); 
+    
+        // Photonvision
+        public static final String POSE_PHOTON_2 = "photoncam-2";
+        // Translation Values (location relative to robot center)
+        public static final double CAM_2_X = 0.5; // Forward: camera To Robot XMeters
+        public static final double CAM_2_Y = 0.0; // Right: camera To Robot YMeters
+        public static final double CAM_2_Z = 0.2; // Up: camera To Robot ZMeters
+    
+        // Rotation mounting angles (roll-pitch-yaw) in RADIANS
+        public static final double CAM_2_ROLL_RADIANS = 0.0; // camera Roll Radians
+        public static final double CAM_2_PITCH_RADIANS = 0.2618; // camera Pitch Radians
+        public static final double CAM_2_YAW_RADIANS = 0.0; // camera Yaw Radians
+    }
+
+
+    public static class PoseConstants {
+        // Increase these numbers to trust your model's state estimates less.
+        public static final double kPositionStdDevX = 0.1;
+        public static final double kPositionStdDevY = 0.1;
+        public static final double kPositionStdDevTheta = 10;
+    
+        // Increase these numbers to trust global measurements from vision less.
+        public static final double kVisionStdDevX = 2.5;
+        public static final double kVisionStdDevY = 2.5;
+        public static final double kVisionStdDevTheta = 500;
+      }
+
+    public static final class IntakeConstants {
         /* Hardware ID of CAN */
         public static final int rollerMotorID = 16;
         public static final int pivotMotorID = 15;
@@ -156,8 +241,8 @@ public class Constants {
         public static final double deployPosition = 0.188;
 
         /* Motor and Encoder Inversions */
-        public static final boolean rollerMotorInvert = true;
-        public static final boolean pivotMotorInvert = false;
+        public static final boolean rollerMotorInvert = false;
+        public static final boolean pivotMotorInvert = true;
 
         public static final boolean pivotEnocderInverted = false;
 
@@ -391,5 +476,9 @@ public class Constants {
         public static final int operatorControllerPort = 1; // Operator Controllers helps with all of the other mechanisms and subsystems attached on the robot.
 
         public static final double kDeadband = 0.1; // Default deband to help with stick drift on the controllers, recorded values we get is usually (+- 0.05)
+        public static final boolean disableHAL = false; // Disables the HAL for the robot, used for testing purposes
+
+        public static final boolean IS_ALLIANCE_RED = true;
+        public static final boolean IS_ALLIANCE_BLUE = !IS_ALLIANCE_RED;
     }
 }

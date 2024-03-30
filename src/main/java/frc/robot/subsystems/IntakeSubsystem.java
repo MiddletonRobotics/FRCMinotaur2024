@@ -1,6 +1,7 @@
 package frc.robot.subsystems;
 
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -8,8 +9,9 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkPIDController;
+import com.revrobotics.CANSparkBase.ControlType;
 import com.revrobotics.CANSparkLowLevel.MotorType;
-
+import com.revrobotics.SparkPIDController.ArbFFUnits;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.signals.AbsoluteSensorRangeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
@@ -31,6 +33,8 @@ public class IntakeSubsystem extends SubsystemBase {
     private CANcoderConfigurator pivotEncoderConfigurator;
 
     private SparkPIDController pivotPIDController;
+
+    private double localSetpoint, processVariable;
 
     private Rotation2d angleOffset;
     public boolean deployPosition;
@@ -86,6 +90,7 @@ public class IntakeSubsystem extends SubsystemBase {
         pivotPIDController.setFF(Constants.IntakeConstants.pivotKFF);
         pivotMotor.enableVoltageCompensation(Constants.IntakeConstants.voltageCompensation);
         pivotMotor.burnFlash();
+        resetToAbsolute();
     }
 
     private void configurePivotEncoder() {
@@ -98,12 +103,36 @@ public class IntakeSubsystem extends SubsystemBase {
         pivotEncoderConfigurator.apply(new CANcoderConfiguration().withMagnetSensor(magnetSensorConfiguration));
     }
 
-    public double getIntakeEncoder() {
-        return intakeEncoder.getAbsolutePosition().getValueAsDouble(); // Getting
+    public Rotation2d getIntakeEncoder() {
+        return Rotation2d.fromRotations(intakeEncoder.getAbsolutePosition().getValueAsDouble());
     }
+
+    public Rotation2d getAngle() {
+        return Rotation2d.fromDegrees(pivotEncoder.getPosition());
+    }
+
+    public double getMeasurement(){
+        return pivotEncoder.getVelocity();
+    }
+
+    public double getnewFF(){
+        double GRAVITY_FF = 0.01;
+        double cosineScalar = Math.cos(Units.degreesToRadians(pivotEncoder.getPosition()));
+        double feedForward = GRAVITY_FF * cosineScalar;
+        return feedForward;
+      }
 
     public void setSpeed(double speed) {
         rollerMotor.set(speed);
+    }
+
+    public void setSetpoint(double setpoint) {
+        localSetpoint = setpoint;
+    }
+
+    public void resetToAbsolute() {
+        double absolutePosition = getIntakeEncoder().getDegrees();
+        pivotEncoder.setPosition(absolutePosition);
     }
 
     public Command deployIntake() {
@@ -167,6 +196,18 @@ public class IntakeSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
-        
+        SmartDashboard.getNumber("intake p", Constants.IntakeConstants.pivotKP);
+        SmartDashboard.getNumber("intake i", Constants.IntakeConstants.pivotKI);
+        SmartDashboard.getNumber("intake d", Constants.IntakeConstants.pivotKD);
+
+        if(localSetpoint == 0) {
+            pivotPIDController.setReference(0, ControlType.kDutyCycle);
+        } else {
+            pivotPIDController.setP(Constants.IntakeConstants.pivotKP);
+            pivotPIDController.setI(Constants.IntakeConstants.pivotKI);
+            pivotPIDController.setD(Constants.IntakeConstants.pivotKD);
+            pivotPIDController.setReference(localSetpoint, CANSparkMax.ControlType.kSmartMotion, 0, getnewFF(), ArbFFUnits.kPercentOut); //feedIN
+            processVariable = pivotEncoder.getPosition();
+        }
     }
 }

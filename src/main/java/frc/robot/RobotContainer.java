@@ -169,7 +169,9 @@ public class RobotContainer {
     speakerScoring.whileTrue(shooterController);
     cycleButton.whileTrue(cyclingShooter);
     deployIntake.whileTrue(intakeSubsystem.deployIntake());
+    deployIntake.whileFalse(new InstantCommand(() -> intakeSubsystem.stop()));
     storeIntake.whileTrue(intakeSubsystem.storeIntake());
+    storeIntake.whileFalse(new InstantCommand(() -> intakeSubsystem.stop()));
     intakeGamePiece.whileTrue(pushNote);
     outtakeGamePiece.whileTrue(pullNote);
     intakeGamePiece.whileFalse(stopIntake);
