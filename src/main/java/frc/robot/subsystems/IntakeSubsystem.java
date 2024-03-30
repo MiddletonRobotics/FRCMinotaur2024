@@ -194,6 +194,8 @@ public class IntakeSubsystem extends SubsystemBase {
         rollerMotor.set(0);
     }
 
+    /* 
+
     @Override
     public void periodic() {
         SmartDashboard.getNumber("intake p", Constants.IntakeConstants.pivotKP);
@@ -210,4 +212,6 @@ public class IntakeSubsystem extends SubsystemBase {
             processVariable = pivotEncoder.getPosition();
         }
     }
+
+    */
 }
