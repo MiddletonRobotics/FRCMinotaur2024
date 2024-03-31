@@ -25,7 +25,7 @@ public class Constants {
         public static final int driveContinuousCurrentLimit = 20; // Drive motors should be at the maximum reccomended amperes to get the most power and speed from it
 
         /* PID Values for the Motors. Used to correct the error when trying to move the motors to a desired location */
-        public static final double angleKP = 0.01; // Propotional: If there is error, move the motor propotional to the error
+        public static final double angleKP = 0.004; // Propotional: If there is error, move the motor propotional to the error
         public static final double angleKI = 0.0; // Intergral: If the error is taking too long to correct, move the motor faster
         public static final double angleKD = 0.1; // Derivative: If the motor is getting close to reaching the target, slow it down
         public static final double angleKFF = 0.0; // Force: Additional gain for creating offsts
@@ -104,12 +104,11 @@ public class Constants {
 
         /* Swerve Profiling Values */
         public static final double PhysicalMaxSpeedMetersPerSecond = 9; // (4.1) Maximum speed in meters per second that the Swerve Modules allow you to go
-        public static final double PhysicalMaxAcceleration = 1.9;
+        public static final double PhysicalMaxAcceleration = 1.9; // (1.9)
         public static final double PhysicalAngularMaxVelocity = 3 * Math.PI; // Maxiumum speed in radians per seconr that the swerve module is able to rotate (6.28 radians per full rotation)
         public static final double PhysicalMaxAngularAcceleration = 3.2;
 
         /* Neutral Modes */
-
         public static final IdleMode angleNeutralMode = IdleMode.kBrake; // What the steering motor should do when not applied with any power (should always be brake while running to prevent overshooting target)
         public static final IdleMode driveNeutralMode = IdleMode.kBrake; // What the drive motor should do when not applied with any power (should always be brake while running to prevent overshooting target)
 
@@ -140,7 +139,7 @@ public class Constants {
         public static final TrapezoidProfile.Constraints kThetaControllerConstraints = new TrapezoidProfile.Constraints(MaxAngularSpeedRadiansPerSecond, MaxAngularSpeedRadiansPerSecondSquared);
 
         public static final PIDConstants TranslationPID = new PIDConstants(5.0, 0.0, 0.0);
-        public static final PIDConstants RotationalPID = new PIDConstants(4.0, 0.0, 0.0);
+        public static final PIDConstants RotationalPID = new PIDConstants(9, 5.0, 0.0);
     }
 
      public static class VisionConstants {
@@ -237,8 +236,9 @@ public class Constants {
 
         /* Encoder Offsets and positions */
         public static final Rotation2d angleOffset = Rotation2d.fromRotations(0);
-        public static final double storePosition = -0.273;
-        public static final double deployPosition = 0.188;
+        public static final double deployIntakeSetpoint = 0.0;
+        public static final double storeIntakeSetpoint = 0.0;
+        public static final double goalSetpointErrorTolerence = 0.3;
 
         /* Motor and Encoder Inversions */
         public static final boolean rollerMotorInvert = false;
@@ -288,7 +288,7 @@ public class Constants {
         public static final IdleMode upperShooterMotorIdleMode = IdleMode.kCoast; // What the upper shooter motor should so when the robot hasn't been initialized
 
         /* Spped Profiling */
-        public static final double ampScorerSpeed = 0.33;
+        public static final double ampScorerSpeed = 0.45;
         public static final double shooterScorerSpeed = 0.9;
 
         /* Shooter Voltage Compensation */
