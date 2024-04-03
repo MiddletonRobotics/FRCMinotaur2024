@@ -259,6 +259,12 @@ public class Constants {
         public static final double pivotKD = 0.0; // Derivative: If the motor is getting close to reaching the target, slow it down
         public static final double pivotKFF = 0.0; // Force: Additional gain for creating offsts
 
+        /* PID Values for the Motors. Used to correct the error when trying to move the motors to a desired location */
+        public static final double rollerKP = 0.05; // Propotional: If there is error, move the motor propotional to the error
+        public static final double rollerKI = 0.0; // Intergral: If the error is taking too long to correct, move the motor faster
+        public static final double rollerKD = 0.0; // Derivative: If the motor is getting close to reaching the target, slow it down
+        public static final double rollerKFF = 0.0; // Force: Additional gain for creating offsts
+
        /* Neutral Modes */ 
         public static final IdleMode rollerMotorNeutralMode = IdleMode.kBrake; // What the roller motor should do when not applied with any power (should always be brake while running to prevent overshooting target)
         public static final IdleMode pivotMotorNeutralMode = IdleMode.kBrake; // What the pivot motor should do when not applied with any power (should always be brake while running to prevent overshooting target)
@@ -296,7 +302,6 @@ public class Constants {
     }
 
     public static final class ClimberConstants {
-
         /* Hardware ID from CAN */
         public static final int LeftClimbMotorID = 17; // Motor ID of the motor thats attched on the left climber of the robot
         public static final int RightClimbMotorID = 18; // Motor ID of the motor thats attached on the right climber of the robot
@@ -327,7 +332,6 @@ public class Constants {
     }
 
     public static final class TankConstants {
-
         /* Hardware ID from CAN */
         public static final int FrontLeftID = 1; // Motor ID of the motor thats closest to the front in the left gearbox
         public static final int FrontRightID = 2; // Motor ID of the motor thats closest to the front in the right gearbox
