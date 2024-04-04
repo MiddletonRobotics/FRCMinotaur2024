@@ -34,6 +34,8 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.SPI;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -55,6 +57,8 @@ public class SwerveSubsystem extends SubsystemBase {
     private SwerveDriveOdometry swerveOdometry;
     private SwerveModule[] swerveModules;
 
+    private ShuffleboardTab swerveLogger;
+
     private SlewRateLimiter translationLimiter = new SlewRateLimiter(2.9);
     private SlewRateLimiter strafeLimiter = new SlewRateLimiter(2.9);
     private SlewRateLimiter rotationLimiter = new SlewRateLimiter(2.9);
@@ -62,6 +66,9 @@ public class SwerveSubsystem extends SubsystemBase {
     private Field2d field;
 
     public SwerveSubsystem() {
+        setName("SwerveSubsystem");
+        swerveLogger = Shuffleboard.getTab("Swerve Subsystem");
+
         gyro = new AHRS(SPI.Port.kMXP);
 
         resetHeading();
@@ -99,7 +106,7 @@ public class SwerveSubsystem extends SubsystemBase {
         );
 
         PathPlannerLogging.setLogActivePathCallback((poses) -> field.getObject("path").setPoses(poses));
-        SmartDashboard.putData("Field", field);
+        swerveLogger.add("Field", field);
     }
 
     public void drive(Translation2d translation, double rotation, boolean fieldRelative, boolean isOpenLoop) {
@@ -125,9 +132,9 @@ public class SwerveSubsystem extends SubsystemBase {
     }
 
     /**
-     * Command to drive the robot using robot relative speeds
-     * @param speeds The ChassisSpeeds that contains the movement as vx, vy, and omega
-     */
+    * Command to drive the robot using robot relative speeds
+    * @param speeds The ChassisSpeeds that contains the movement as vx, vy, and omega
+    */
 
     public void driveRobotRelative(ChassisSpeeds speeds) {
         SwerveModuleState[] states =  Constants.SwerveConstants.SwerveKinematics.toSwerveModuleStates(speeds);
@@ -136,10 +143,10 @@ public class SwerveSubsystem extends SubsystemBase {
     }
 
     /**
-     * Command to follow a unflipped path using the PathPlanner library that is robot relative
-     * @param pathName The name of the path that is wanted to run
-     * @return
-     */
+    * Command to follow a unflipped path using the PathPlanner library that is robot relative
+    * @param pathName The name of the path that is wanted to run
+    * @return
+    */
 
     public Command followUnflippedPathCommand(PathPlannerPath pathName){
         return new FollowPathHolonomic(
@@ -211,10 +218,10 @@ public class SwerveSubsystem extends SubsystemBase {
     }
 
     /**
-   * Command to go to a pose using a Trapezoidal PID profile for increased accuracy compared to a pure on the fly
-   * @param targetPose the Supplier<Pose2d> that the robot should drive to ROBOT RELATIVE
-   * @return command to PID align to a pose that is ROBOT RELATIVE
-   */
+    * Command to go to a pose using a Trapezoidal PID profile for increased accuracy compared to a pure on the fly
+    * @param targetPose the Supplier<Pose2d> that the robot should drive to ROBOT RELATIVE
+    * @return command to PID align to a pose that is ROBOT RELATIVE
+    */
 
     public Command chasePoseRobotRelativeCommand(Supplier<Pose2d> target){
         TrapezoidProfile.Constraints X_CONSTRAINTS = new TrapezoidProfile.Constraints(3, 2);
@@ -424,21 +431,13 @@ public class SwerveSubsystem extends SubsystemBase {
             swerveModules[3].getDesiredState().speedMetersPerSecond,
         };
 
-        double loggingEncoders[] = {
-            swerveModules[0].getSwerveEncoder().getDegrees(),
-            swerveModules[1].getSwerveEncoder().getDegrees(),
-            swerveModules[2].getSwerveEncoder().getDegrees(),
-            swerveModules[3].getSwerveEncoder().getDegrees(),
-        };
+        swerveLogger.add("Measured Swerve States", measuredStates);
+        swerveLogger.add("Desired Swerve States", desiredStates);
+        swerveLogger.add("NavX Yaw Value", getYawRotation2d().getDegrees());
 
-        SmartDashboard.putNumberArray("MeasuredSwerveStates", measuredStates);
-        SmartDashboard.putNumberArray("DesiredSwerveStates", desiredStates);
-
-        SmartDashboard.putNumber("Front-Left Encoder Position", loggingEncoders[0]);
-        SmartDashboard.putNumber("Front-Right Encoder Position", loggingEncoders[1]);
-        SmartDashboard.putNumber("Back-Left Encoder Position", loggingEncoders[2]);
-        SmartDashboard.putNumber("Back-Right Encoder Position", loggingEncoders[3]);
-
-        SmartDashboard.putNumber("NavX Yaw Value", getYawRotation2d().getDegrees());
+        swerveLogger.add("FL Absolute Encoder Position", swerveModules[0].getSwerveEncoder().getDegrees());
+        swerveLogger.add("FR Absolute Encoder Position", swerveModules[1].getSwerveEncoder().getDegrees());
+        swerveLogger.add("BL Absolute Encoder Position", swerveModules[2].getSwerveEncoder().getDegrees());
+        swerveLogger.add("BR Absolute Encoder Position", swerveModules[3].getSwerveEncoder().getDegrees());
   }
 }
