@@ -51,7 +51,7 @@ public class SwerveModule {
     private CANSparkMax driveMotor;
     private CANSparkMax angleMotor;
 
-    private RelativeEncoder driveEncocder;
+    private RelativeEncoder driveEncoder;
     private RelativeEncoder angleEncoder;
     private CANcoder swerveEncoder;
     private CANcoderConfigurator swerveEncoderConfigurator;
@@ -59,24 +59,11 @@ public class SwerveModule {
     private final SparkPIDController drivePIDController;
     private final SparkPIDController anglePIDController;
 
-    /* 
-
     private final MutableMeasure<Voltage> m_appliedVoltage = mutable(Volts.of(0));
     private final MutableMeasure<Distance> m_distance = mutable(Meters.of(0));
     private final MutableMeasure<Velocity<Distance>> m_velocity = mutable(MetersPerSecond.of(0));
 
-    private final SysIdRoutine m_sysIdRoutine = new SysIdRoutine(new SysIdRoutine.Config(), new SysIdRoutine.Mechanism((Measure<Voltage> volts) -> {
-            driveMotor.setVoltage(volts.in(Volts));
-        },
-        log -> {
-            log.motor("swerveDriveMotor").voltage(m_appliedVoltage.mut_replace(driveMotor.get() * RobotController.getBatteryVoltage(), Volts))
-                .linearPosition(m_distance.mut_replace(driveEncocder.getPosition(), Meters))
-                .linearVelocity(m_velocity.mut_replace(driveEncocder.getVelocity(), MetersPerSecond));
-        },
-        (Subsystem) this)
-    );
-
-    */
+    private final SysIdRoutine m_sysIdRoutine;
 
     private final SimpleMotorFeedforward feedforward = new SimpleMotorFeedforward(Constants.ModuleConstants.driveKS, Constants.ModuleConstants.driveKV, Constants.ModuleConstants.driveKA);
 
@@ -94,11 +81,22 @@ public class SwerveModule {
 
         driveMotor = new CANSparkMax(moduleConstants.driveMotorID, MotorType.kBrushless);
         driveMotor.setInverted(Constants.SwerveConstants.driveInvert);
-        driveEncocder = driveMotor.getEncoder();
+        driveEncoder = driveMotor.getEncoder();
         drivePIDController = driveMotor.getPIDController();
         configureDriveMotor();
 
         lastAngle = getSwerveModuleState().angle;
+
+        m_sysIdRoutine = new SysIdRoutine(new SysIdRoutine.Config(), new SysIdRoutine.Mechanism((Measure<Voltage> volts) -> {
+            driveMotor.setVoltage(volts.in(Volts));
+        },
+        log -> {
+            log.motor("swerveDriveMotor").voltage(m_appliedVoltage.mut_replace(driveMotor.get() * RobotController.getBatteryVoltage(), Volts))
+                .linearPosition(m_distance.mut_replace(driveEncoder.getPosition(), Meters))
+                .linearVelocity(m_velocity.mut_replace(driveEncoder.getVelocity(), MetersPerSecond));
+        },
+        (Subsystem) this)
+        );
     }
 
     private void configureSwerveEncoder() {
@@ -134,16 +132,16 @@ public class SwerveModule {
         driveMotor.setSmartCurrentLimit(Constants.ModuleConstants.driveContinuousCurrentLimit);
         driveMotor.setInverted(Constants.SwerveConstants.driveInvert);
         driveMotor.setIdleMode(Constants.SwerveConstants.driveNeutralMode);
-        driveEncocder.setVelocityConversionFactor(Constants.SwerveConstants.DriveConversionPositionFactor);
-        driveEncocder.setPositionConversionFactor(Constants.SwerveConstants.DriveConversionVelocityFactor);
-        drivePIDController.setFeedbackDevice(driveEncocder);
+        driveEncoder.setVelocityConversionFactor(Constants.SwerveConstants.DriveConversionPositionFactor);
+        driveEncoder.setPositionConversionFactor(Constants.SwerveConstants.DriveConversionVelocityFactor);
+        drivePIDController.setFeedbackDevice(driveEncoder);
         drivePIDController.setP(Constants.ModuleConstants.angleKP);
         drivePIDController.setI(Constants.ModuleConstants.angleKI);
         drivePIDController.setD(Constants.ModuleConstants.angleKD);
         drivePIDController.setFF(Constants.ModuleConstants.angleKFF);
         driveMotor.enableVoltageCompensation(Constants.ModuleConstants.voltageCompensation);
         driveMotor.burnFlash();
-        driveEncocder.setPosition(0.0);
+        driveEncoder.setPosition(0.0);
     }
 
     public Rotation2d getSwerveEncoder() {
@@ -159,11 +157,15 @@ public class SwerveModule {
     }
 
     public SwerveModuleState getSwerveModuleState() {
-        return new SwerveModuleState(driveEncocder.getVelocity(), getAngle());
+        return new SwerveModuleState(driveEncoder.getVelocity(), getAngle());
     }
 
     public SwerveModulePosition getSwerveModulePosition() {
-        return new SwerveModulePosition(driveEncocder.getPosition(), getAngle());
+        return new SwerveModulePosition(driveEncoder.getPosition(), getAngle());
+    }
+
+    public double getDriveP() {
+        return drivePIDController.getP();
     }
 
     public void resetToAbsolute() {
@@ -224,8 +226,6 @@ public class SwerveModule {
         stopAngleMotor();
     }
 
-    /* 
-
     public Command sysIdQuasistatic(SysIdRoutine.Direction direction) {
         return m_sysIdRoutine.quasistatic(direction);
     }
@@ -233,6 +233,4 @@ public class SwerveModule {
     public Command sysIdDynamic(SysIdRoutine.Direction direction) {
         return m_sysIdRoutine.dynamic(direction);
     }
-
-    */
 }

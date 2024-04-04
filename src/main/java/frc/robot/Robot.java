@@ -66,29 +66,16 @@ public class Robot extends TimedRobot {
 
   @Override
   public void autonomousInit() {
+    m_robotContainer.swerveSubsystem.resetHeading();
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
 
     if (m_autonomousCommand != null) {
       m_autonomousCommand.schedule();
     }
-    
-    /* 
-    try{}
-
-    startTimer = Timer.getFPGATimestamp();
-    shooterController.execute();
-  }catch(Exception e){
-    e.printStackTrace();
-  }
-  */
   }
 
   @Override
-  public void autonomousPeriodic() {
-    //if(startTimer > 7 && startTimer < 9) {
-      //swerveSubsystem.driveRobotRelative(new ChassisSpeeds(0, 2, 0));
-  //}
-  }
+  public void autonomousPeriodic() {}
 
   @Override
   public void autonomousExit() {}
