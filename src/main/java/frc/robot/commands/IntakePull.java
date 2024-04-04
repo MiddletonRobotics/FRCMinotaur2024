@@ -14,11 +14,11 @@ public class IntakePull extends Command {
 
     @Override
     public void execute() {
-        intakeSubsystem.intakeConsume();
+        intakeSubsystem.intakeGamePiece();
     }
 
     @Override
     public void end(boolean interrupted) {
-        intakeSubsystem.reset();
+        intakeSubsystem.stopIntaking();
     }
 }

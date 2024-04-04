@@ -20,15 +20,15 @@ public class CycleShooter extends Command {
     @Override
     public void execute() {
         shooterSubsystem.shooterSpeakerScoring();
-        intakeSubsystem.intakeToShooter();
+        intakeSubsystem.outtakeToShooter();
         Timer.delay(2.5);
         shooterSubsystem.stopShooter();
-        intakeSubsystem.stopIntake();
+        intakeSubsystem.stopIntaking();
     }
 
     public void end() {
         shooterSubsystem.stopShooter();
-        intakeSubsystem.stopIntake();
+        intakeSubsystem.stopIntaking();
     }
     
 }

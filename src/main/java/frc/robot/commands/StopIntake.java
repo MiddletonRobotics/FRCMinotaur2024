@@ -14,11 +14,11 @@ public class StopIntake extends Command {
 
     @Override
     public void execute() {
-        intakeSubsystem.reset();
+        intakeSubsystem.stopIntaking();
     }
 
     @Override
     public void end(boolean interrupted) {
-        intakeSubsystem.reset();
+        intakeSubsystem.stopIntaking();
     }
 }

@@ -21,10 +21,10 @@ public class AmpController extends Command {
     public void execute() {
         shooterSubsystem.shooterAmpScoring();
         Timer.delay(1);
-        intakeSubsystem.intakeToShooter();
+        intakeSubsystem.outtakeToShooter();
         Timer.delay(2);
         shooterSubsystem.stopShooter();
-        intakeSubsystem.stopIntake();
+        intakeSubsystem.stopIntaking();
     }
 
     public void end() {

@@ -14,11 +14,11 @@ public class IntakePush extends Command {
 
     @Override
     public void execute() {
-        intakeSubsystem.intakeRegurgitate();
+        intakeSubsystem.outtakeGamePiece();
     }
 
     @Override
     public void end(boolean interrupted) {
-        intakeSubsystem.reset();
+        intakeSubsystem.stopIntaking();
     }
 }

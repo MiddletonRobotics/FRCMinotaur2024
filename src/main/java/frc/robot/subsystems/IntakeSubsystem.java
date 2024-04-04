@@ -2,8 +2,13 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.FunctionalCommand;
+import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import com.revrobotics.CANSparkMax;
@@ -24,17 +29,20 @@ import frc.robot.utilities.CANSparkMaxUtil.Usage;
 import frc.robot.utilities.constants.Constants;
 
 public class IntakeSubsystem extends SubsystemBase {
+    private ShuffleboardTab intakeLogger;
 
     private CANSparkMax rollerMotor;
     private CANSparkMax pivotMotor;
 
     private RelativeEncoder pivotEncoder;
+    private RelativeEncoder rollerEncoder;
     private CANcoder intakeEncoder;
     private CANcoderConfigurator pivotEncoderConfigurator;
 
     private SparkPIDController pivotPIDController;
+    private SparkPIDController rollerPIDController;
 
-    private double localSetpoint, processVariable;
+    private double localSetpoint;
 
     private Rotation2d angleOffset;
     public boolean deployPosition;
@@ -52,12 +60,15 @@ public class IntakeSubsystem extends SubsystemBase {
 
     public IntakeSubsystem() {
         setName("Intakaur");
+        intakeLogger = Shuffleboard.getTab("Intake Subsystem");
 
         angleOffset = Constants.IntakeConstants.angleOffset;
         deployPosition = false;
 
         rollerMotor = new CANSparkMax(Constants.IntakeConstants.rollerMotorID, MotorType.kBrushless);
         rollerMotor.setInverted(Constants.IntakeConstants.rollerMotorInvert);
+        rollerEncoder = rollerMotor.getEncoder();
+        rollerPIDController = rollerMotor.getPIDController();
         configureRollerMotor();
 
         pivotMotor = new CANSparkMax(Constants.IntakeConstants.pivotMotorID, MotorType.kBrushless);
@@ -67,33 +78,40 @@ public class IntakeSubsystem extends SubsystemBase {
         configurePivotMotor();
 
         intakeEncoder = new CANcoder(Constants.IntakeConstants.pivotEncoderID);
-        configurePivotEncoder();
+        configureIntakeEncoder();
     }
 
     private void configureRollerMotor() {
         rollerMotor.restoreFactoryDefaults();
         CANSparkMaxUtil.setCANSparkMaxBusUsage(rollerMotor, Usage.kAll);
         rollerMotor.setIdleMode(Constants.IntakeConstants.rollerMotorNeutralMode);
+        pivotPIDController.setFeedbackDevice(rollerEncoder);
+        rollerPIDController.setP(Constants.IntakeConstants.rollerKP);
+        rollerPIDController.setI(Constants.IntakeConstants.rollerKI);
+        rollerPIDController.setD(Constants.IntakeConstants.rollerKD);
+        rollerPIDController.setFF(Constants.IntakeConstants.rollerKFF);
         rollerMotor.enableVoltageCompensation(Constants.IntakeConstants.voltageCompensation);
         rollerMotor.burnFlash();
+        rollerEncoder.setPosition(0);
     }
 
     private void configurePivotMotor() {
         pivotMotor.restoreFactoryDefaults();
-        CANSparkMaxUtil.setCANSparkMaxBusUsage(pivotMotor, Usage.kAll);
+        CANSparkMaxUtil.setCANSparkMaxBusUsage(pivotMotor, Usage.kPositionOnly);
         pivotMotor.setIdleMode(Constants.IntakeConstants.pivotMotorNeutralMode);
         pivotEncoder.setPositionConversionFactor(Constants.IntakeConstants.AngleConversionFactor);
         pivotPIDController.setFeedbackDevice(pivotEncoder);
-        pivotPIDController.setP(Constants.IntakeConstants.pivotKP);
-        pivotPIDController.setI(Constants.IntakeConstants.pivotKI);
-        pivotPIDController.setD(Constants.IntakeConstants.pivotKD);
-        pivotPIDController.setFF(Constants.IntakeConstants.pivotKFF);
+        pivotPIDController.setOutputRange(0, 0.4);
+        //pivotPIDController.setP(Constants.IntakeConstants.pivotKP);
+        //pivotPIDController.setI(Constants.IntakeConstants.pivotKI);
+        //pivotPIDController.setD(Constants.IntakeConstants.pivotKD);
+        //pivotPIDController.setFF(Constants.IntakeConstants.pivotKFF);
         pivotMotor.enableVoltageCompensation(Constants.IntakeConstants.voltageCompensation);
         pivotMotor.burnFlash();
-        //resetToAbsolute();
+        resetToAbsolute();
     }
 
-    private void configurePivotEncoder() {
+    private void configureIntakeEncoder() {
         pivotEncoderConfigurator = intakeEncoder.getConfigurator();
         MagnetSensorConfigs magnetSensorConfiguration = new MagnetSensorConfigs();
 
@@ -103,8 +121,6 @@ public class IntakeSubsystem extends SubsystemBase {
         pivotEncoderConfigurator.apply(new CANcoderConfiguration().withMagnetSensor(magnetSensorConfiguration));
     }
 
-    /* 
-
     public Rotation2d getIntakeEncoder() {
         return Rotation2d.fromRotations(intakeEncoder.getAbsolutePosition().getValueAsDouble());
     }
@@ -113,18 +129,34 @@ public class IntakeSubsystem extends SubsystemBase {
         return Rotation2d.fromDegrees(pivotEncoder.getPosition());
     }
 
-    public double getMeasurement(){
-        return pivotEncoder.getVelocity();
-    }
-
-    public double getnewFF(){
+    public double getnewFF() {
         double GRAVITY_FF = 0.01;
         double cosineScalar = Math.cos(Units.degreesToRadians(pivotEncoder.getPosition()));
         double feedForward = GRAVITY_FF * cosineScalar;
         return feedForward;
-      }
+    }
 
-    public void setSpeed(double speed) {
+    public double getPivotError() {
+        return localSetpoint - pivotEncoder.getPosition();
+    }
+
+    public boolean getAtGoal() {
+        return (Math.abs(localSetpoint - pivotEncoder.getPosition()) < Constants.IntakeConstants.goalSetpointErrorTolerence);
+    }
+
+    public double getSetpoint() {
+        return localSetpoint;
+    }
+
+    public IntakeStatus getIntakeStatus() {
+        return status;
+    }
+
+    public IntakeDirection getIntakeDirection() {
+        return direction;
+    }
+
+    public void setRollerSpeed(double speed) {
         rollerMotor.set(speed);
     }
 
@@ -132,39 +164,7 @@ public class IntakeSubsystem extends SubsystemBase {
         localSetpoint = setpoint;
     }
 
-    public void resetToAbsolute() {
-        double absolutePosition = getIntakeEncoder().getDegrees();
-        pivotEncoder.setPosition(absolutePosition);
-    }
-
-    */
-
-    public Command deployIntake() {
-        return run(() -> {
-            pivotMotor.set(0.25);
-        }).withName("Deploy Intake");
-    }
-
-    public void intkeOut(){
-        pivotMotor.set(0.3);
-        System.out.println("out");
-    }
-
-    public void intkeIn(){
-        pivotMotor.set(-0.3);
-    }
-
-    public void stop(){
-        pivotMotor.set(0);
-    }
-
-    public Command storeIntake() {
-        return run(() -> {
-            pivotMotor.set(-0.25);
-        }).withName("Store Intake");
-    }
-
-    public void setIntakeState(IntakeDirection direction) {
+    public void setIntakeDirection(IntakeDirection direction) {
         if (direction == IntakeDirection.FORWARD) {
             this.direction = IntakeDirection.FORWARD;
         } else if(direction == IntakeDirection.STOPPED){
@@ -174,48 +174,69 @@ public class IntakeSubsystem extends SubsystemBase {
         }
     }
 
-    //we felt a little silly with the names
-    public void intakeConsume() {
-        rollerMotor.set(-0.3); //whatever makes motor take thingy
-        setIntakeState(IntakeDirection.FORWARD);
-    }
-
-    public void intakeRegurgitate() {
-        rollerMotor.set(0.3); //whatever makes motor release thingy
-        setIntakeState(IntakeDirection.REVERSE);
-    }
-
-    public void intakeToShooter() {
-        rollerMotor.set(0.1);
-    }
-
-    public void stopIntake() {
-        rollerMotor.set(0);
-        setIntakeState(IntakeDirection.STOPPED);
-    }
-
-    public void reset() {
-        rollerMotor.set(0);
-    }
-
-    /* 
-
-    @Override
-    public void periodic() {
-        SmartDashboard.getNumber("intake p", Constants.IntakeConstants.pivotKP);
-        SmartDashboard.getNumber("intake i", Constants.IntakeConstants.pivotKI);
-        SmartDashboard.getNumber("intake d", Constants.IntakeConstants.pivotKD);
-
-        if(localSetpoint == 0) {
-            pivotPIDController.setReference(0, ControlType.kDutyCycle);
-        } else {
-            pivotPIDController.setP(Constants.IntakeConstants.pivotKP);
-            pivotPIDController.setI(Constants.IntakeConstants.pivotKI);
-            pivotPIDController.setD(Constants.IntakeConstants.pivotKD);
-            pivotPIDController.setReference(localSetpoint, CANSparkMax.ControlType.kSmartMotion, 0, getnewFF(), ArbFFUnits.kPercentOut); //feedIN
-            processVariable = pivotEncoder.getPosition();
+    public void setIntakeStatus(IntakeStatus status) {
+        if (status == IntakeStatus.DEPLOYED) {
+            this.status = IntakeStatus.DEPLOYED;
+        } else if(status == IntakeStatus.STORED){
+            this.status = IntakeStatus.STORED;
         }
     }
 
-    */
+    public void outtakeGamePiece() {
+        rollerMotor.set(0.3);
+        setIntakeDirection(IntakeDirection.REVERSE);
+    }
+
+    public void intakeGamePiece() {
+        rollerMotor.set(-0.3);
+        setIntakeDirection(IntakeDirection.FORWARD);
+    }
+
+    public void outtakeToShooter() {
+        rollerMotor.set(0.1);
+        setIntakeDirection(IntakeDirection.REVERSE);
+    }
+
+    public void stopIntaking() {
+        rollerMotor.set(0);
+        setIntakeDirection(IntakeDirection.STOPPED);
+    }
+
+    public void deployIntake() {
+        setSetpoint(Constants.IntakeConstants.deployIntakeSetpoint);
+    }
+
+    public void storeIntake() {
+        setSetpoint(Constants.IntakeConstants.storeIntakeSetpoint);
+    }
+
+    public void resetToAbsolute() {
+        double absolutePosition = getIntakeEncoder().getDegrees();
+        pivotEncoder.setPosition(absolutePosition);
+    }
+
+    @Override
+    public void periodic() {
+        intakeLogger.add("Pivot Proportional", Constants.IntakeConstants.pivotKP);
+        intakeLogger.add("Pivot Integral", Constants.IntakeConstants.pivotKI);
+        intakeLogger.add("Pivot Derivative ", Constants.IntakeConstants.pivotKD);
+        intakeLogger.add("Pivot Error", getPivotError());
+
+        intakeLogger.add("Roller Proportional", Constants.IntakeConstants.rollerKP);
+        intakeLogger.add("Roller Integral", Constants.IntakeConstants.rollerKI);
+        intakeLogger.add("Roller Derivative ", Constants.IntakeConstants.rollerKD);
+
+        intakeLogger.add("Intake Status ", getIntakeStatus());
+        intakeLogger.add("Intake Direction ", getIntakeDirection());
+
+        if(localSetpoint == Constants.IntakeConstants.storeIntakeSetpoint) { 
+            pivotPIDController.setReference(0, ControlType.kDutyCycle);
+            setIntakeStatus(IntakeStatus.STORED);
+        } else {
+            pivotPIDController.setReference(localSetpoint, CANSparkMax.ControlType.kPosition, 0, getnewFF(), ArbFFUnits.kPercentOut); //feedIN
+            if(getAtGoal()) {
+                setIntakeStatus(IntakeStatus.DEPLOYED);
+            }
+        }
+    }
 }
