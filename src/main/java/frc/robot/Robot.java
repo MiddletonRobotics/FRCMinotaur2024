@@ -39,18 +39,12 @@ public class Robot extends TimedRobot {
   @Override
   public void robotInit() {
     m_robotContainer = new RobotContainer();
-    //intakeSubsystem = new IntakeSubsystem();
-    //shooterSubsystem = new ShooterSubsystem();
-    //swerveSubsystem = new SwerveSubsystem();
-
-    //shooterController = new ShooterController(shooterSubsystem, intakeSubsystem);
     CameraServer.startAutomaticCapture();
   }
 
   @Override
   public void robotPeriodic() {
     CommandScheduler.getInstance().run();
-    //m_robotContainer.disabled();
   }
 
   @Override
@@ -58,7 +52,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void disabledPeriodic() {
-  // m_robotContainer.disabled();
+    m_robotContainer.onDisabled();
   }
 
   @Override
@@ -85,6 +79,8 @@ public class Robot extends TimedRobot {
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
+
+    m_robotContainer.onTeleopInit();
   }
 
   @Override
