@@ -48,19 +48,19 @@ public class Robot extends TimedRobot {
   }
 
   @Override
-  public void disabledInit() {}
-
-  @Override
-  public void disabledPeriodic() {
+  public void disabledInit() {
     m_robotContainer.onDisabled();
   }
+
+  @Override
+  public void disabledPeriodic() {}
 
   @Override
   public void disabledExit() {}
 
   @Override
   public void autonomousInit() {
-    m_robotContainer.swerveSubsystem.resetHeading();
+    m_robotContainer.swerveSubsystem.zeroYaw();
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
 
     if (m_autonomousCommand != null) {

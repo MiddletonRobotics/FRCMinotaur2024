@@ -5,7 +5,6 @@ package frc.robot.subsystems;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.signals.AbsoluteSensorRangeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
-import com.fasterxml.jackson.databind.jsontype.impl.LaissezFaireSubTypeValidator;
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.CANcoderConfigurator;
 import com.ctre.phoenix6.configs.MagnetSensorConfigs;
@@ -15,32 +14,20 @@ import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkPIDController;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 
-import static edu.wpi.first.units.MutableMeasure.mutable;
-import static edu.wpi.first.units.Units.Meters;
-import static edu.wpi.first.units.Units.MetersPerSecond;
-import static edu.wpi.first.units.Units.Volts;
-
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.units.Distance;
-import edu.wpi.first.units.Measure;
-import edu.wpi.first.units.MutableMeasure;
-import edu.wpi.first.units.Velocity;
-import edu.wpi.first.units.Voltage;
-import edu.wpi.first.wpilibj.RobotController;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Subsystem;
-import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+
 import frc.robot.Robot;
 import frc.robot.utilities.CANSparkMaxUtil;
 import frc.robot.utilities.OnboardModuleState;
 import frc.robot.utilities.CANSparkMaxUtil.Usage;
 import frc.robot.utilities.constants.Constants;
+import frc.robot.utilities.TunableNumber;
+import frc.robot.utilities.Conversions;
 import frc.robot.utilities.constants.SwerveModuleConstants;
 
-//Sets up swerve drive class with encoders. This section can and should be added to.
 public class SwerveModule {
     public int moduleNumber;
     private Rotation2d lastAngle;
@@ -59,13 +46,13 @@ public class SwerveModule {
     private final SparkPIDController drivePIDController;
     private final SparkPIDController anglePIDController;
 
-    private final MutableMeasure<Voltage> m_appliedVoltage = mutable(Volts.of(0));
-    private final MutableMeasure<Distance> m_distance = mutable(Meters.of(0));
-    private final MutableMeasure<Velocity<Distance>> m_velocity = mutable(MetersPerSecond.of(0));
-
-    private final SysIdRoutine m_sysIdRoutine;
-
     private final SimpleMotorFeedforward feedforward = new SimpleMotorFeedforward(Constants.ModuleConstants.driveKS, Constants.ModuleConstants.driveKV, Constants.ModuleConstants.driveKA);
+    private final TunableNumber driveKp = new TunableNumber("SwerveModule/DriveKP", Constants.ModuleConstants.driveKP);
+    private final TunableNumber driveKi = new TunableNumber("SwerveModule/DriveKP", Constants.ModuleConstants.driveKI);
+    private final TunableNumber driveKd = new TunableNumber("SwerveModule/DriveKP", Constants.ModuleConstants.driveKD);
+    private final TunableNumber steeringKp = new TunableNumber("SwerveModule/DriveKP", Constants.ModuleConstants.angleKP);
+    private final TunableNumber steeringKi = new TunableNumber("SwerveModule/DriveKP", Constants.ModuleConstants.angleKI);
+    private final TunableNumber steeringKd = new TunableNumber("SwerveModule/DriveKP", Constants.ModuleConstants.angleKD);
 
     public SwerveModule(int moduleNumber, SwerveModuleConstants moduleConstants) {
         this.moduleNumber = moduleNumber;
@@ -86,17 +73,6 @@ public class SwerveModule {
         configureDriveMotor();
 
         lastAngle = getSwerveModuleState().angle;
-
-        m_sysIdRoutine = new SysIdRoutine(new SysIdRoutine.Config(), new SysIdRoutine.Mechanism((Measure<Voltage> volts) -> {
-            driveMotor.setVoltage(volts.in(Volts));
-        },
-        log -> {
-            log.motor("swerveDriveMotor").voltage(m_appliedVoltage.mut_replace(driveMotor.get() * RobotController.getBatteryVoltage(), Volts))
-                .linearPosition(m_distance.mut_replace(driveEncoder.getPosition(), Meters))
-                .linearVelocity(m_velocity.mut_replace(driveEncoder.getVelocity(), MetersPerSecond));
-        },
-        (Subsystem) this)
-        );
     }
 
     private void configureSwerveEncoder() {
@@ -117,10 +93,9 @@ public class SwerveModule {
         angleMotor.setIdleMode(Constants.SwerveConstants.angleNeutralMode);
         angleEncoder.setPositionConversionFactor(Constants.SwerveConstants.AngleConversionFactor);
         anglePIDController.setFeedbackDevice(angleEncoder);
-        anglePIDController.setP(Constants.ModuleConstants.angleKP);
-        anglePIDController.setI(Constants.ModuleConstants.angleKI);
-        anglePIDController.setD(Constants.ModuleConstants.angleKD);
-        anglePIDController.setFF(Constants.ModuleConstants.angleKFF);
+        anglePIDController.setP(driveKp.get());
+        anglePIDController.setI(driveKi.get());
+        anglePIDController.setD(driveKd.get());
         angleMotor.enableVoltageCompensation(Constants.ModuleConstants.voltageCompensation);
         angleMotor.burnFlash();
         resetToAbsolute();
@@ -135,10 +110,9 @@ public class SwerveModule {
         driveEncoder.setVelocityConversionFactor(Constants.SwerveConstants.DriveConversionPositionFactor);
         driveEncoder.setPositionConversionFactor(Constants.SwerveConstants.DriveConversionVelocityFactor);
         drivePIDController.setFeedbackDevice(driveEncoder);
-        drivePIDController.setP(Constants.ModuleConstants.angleKP);
-        drivePIDController.setI(Constants.ModuleConstants.angleKI);
-        drivePIDController.setD(Constants.ModuleConstants.angleKD);
-        drivePIDController.setFF(Constants.ModuleConstants.angleKFF);
+        drivePIDController.setP(steeringKp.get());
+        drivePIDController.setI(steeringKi.get());
+        drivePIDController.setD(steeringKd.get());
         driveMotor.enableVoltageCompensation(Constants.ModuleConstants.voltageCompensation);
         driveMotor.burnFlash();
         driveEncoder.setPosition(0.0);
@@ -152,6 +126,18 @@ public class SwerveModule {
         return Rotation2d.fromDegrees(angleEncoder.getPosition());
     }
 
+    public double getMotorVelocity() {
+        return Conversions.RPSToMPS(driveEncoder.getVelocity(), Constants.SwerveConstants.WheelCircumference);
+    }
+
+    public double getDrivePositionMeters() {
+        return driveEncoder.getPosition();
+    }
+
+    public double getMotorVoltage() {
+        return driveMotor.getBusVoltage();
+    }
+
     public SwerveModuleState getDesiredState() {
         return expectedState;
     }
@@ -161,11 +147,7 @@ public class SwerveModule {
     }
 
     public SwerveModulePosition getSwerveModulePosition() {
-        return new SwerveModulePosition(driveEncoder.getPosition(), getAngle());
-    }
-
-    public double getDriveP() {
-        return drivePIDController.getP();
+        return new SwerveModulePosition(getDrivePositionMeters(), getAngle());
     }
 
     public void resetToAbsolute() {
@@ -173,14 +155,24 @@ public class SwerveModule {
         angleEncoder.setPosition(absolutePosition);
     }
 
-    public void setDesiredState(SwerveModuleState desiredState, boolean isOpenLoop) {
+    public void updateInputs() {
+        if (driveKp.hasChanged() || driveKi.hasChanged() || driveKd.hasChanged() || steeringKp.hasChanged() || steeringKi.hasChanged() || steeringKd.hasChanged()) {
+            drivePIDController.setP(driveKp.get());
+            drivePIDController.setP(driveKi.get());
+            drivePIDController.setP(driveKd.get());
+            anglePIDController.setP(steeringKp.get());
+            anglePIDController.setP(steeringKi.get());
+            anglePIDController.setP(steeringKd.get());
+        }
+    }
 
+    public void setDesiredState(SwerveModuleState desiredState, boolean isOpenLoop) {
         if(Math.abs(desiredState.speedMetersPerSecond) < 0.006) {
             driveMotor.set(0);
             angleMotor.set(0);
 
             if(desiredState.angle == lastAngle) {
-                resetToAbsolute();;
+                resetToAbsolute();
             }
 
             return;
@@ -213,6 +205,10 @@ public class SwerveModule {
         lastAngle = angle;
     }
 
+    public void voltageDrive(double Volts) {
+        driveMotor.setVoltage(Volts);
+    }
+
     public void stopDriveMotor() {
         driveMotor.set(0);
     }
@@ -224,13 +220,5 @@ public class SwerveModule {
     public void stop() {
         stopDriveMotor();
         stopAngleMotor();
-    }
-
-    public Command sysIdQuasistatic(SysIdRoutine.Direction direction) {
-        return m_sysIdRoutine.quasistatic(direction);
-    }
-
-    public Command sysIdDynamic(SysIdRoutine.Direction direction) {
-        return m_sysIdRoutine.dynamic(direction);
     }
 }

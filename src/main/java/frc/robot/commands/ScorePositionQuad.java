@@ -83,5 +83,4 @@ public class ScorePositionQuad extends Command {
             return pathPoints;
         }
     }
-
 }

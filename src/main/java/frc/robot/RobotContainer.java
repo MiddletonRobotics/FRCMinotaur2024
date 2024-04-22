@@ -20,6 +20,9 @@ import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.networktables.DoubleSubscriber;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.PowerDistribution;
+import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -72,6 +75,7 @@ public class RobotContainer {
   private final CommandXboxController OperatorController;
 
   private final SendableChooser<Command> autonomousChooser;
+  private final PowerDistribution pdp;
 
   private final Trigger resetHeading;
   private final Trigger robotCentric;
@@ -101,6 +105,8 @@ public class RobotContainer {
     swerveSubsystem = new SwerveSubsystem();
     shooterSubsystem = new ShooterSubsystem();
     intakeSubsystem = new IntakeSubsystem();
+
+    pdp = new PowerDistribution(0, ModuleType.kCTRE);
 
     NamedCommands.registerCommand("Speaker Shooter",  new ShooterController(shooterSubsystem, intakeSubsystem));
     NamedCommands.registerCommand("Amp Shooter",  new AmpController(shooterSubsystem, intakeSubsystem));
@@ -135,28 +141,34 @@ public class RobotContainer {
     stopIntake = new StopIntake(intakeSubsystem);
     cyclingShooter = new CycleShooter(shooterSubsystem, intakeSubsystem);
 
-    swerveSubsystem.setDefaultCommand(new SwerveController(
-      swerveSubsystem, 
-      () -> DriverController.getRawAxis(translationAxis),
-      () -> DriverController.getRawAxis(strafeAxis), 
-      () -> -DriverController.getRawAxis(rotationAxis), 
-      () -> robotCentric.getAsBoolean())
-    );
+    swerveSubsystem.setDefaultCommand(new SwerveController(swerveSubsystem, DriverController, robotCentric));
       
     configureButtonBindings();
+    RobotController.setBrownoutVoltage(6.75);
+
+    SmartDashboard.putNumber("PDP Current Draw", pdp.getTotalCurrent());
   }
 
   private void configureButtonBindings() {
-    resetHeading.whileTrue(new InstantCommand(() -> swerveSubsystem.resetHeading()));
+    resetHeading.whileTrue(new InstantCommand(() -> swerveSubsystem.zeroYaw()));
     ampScoring.whileTrue(ampController);
     speakerScoring.whileTrue(shooterController);
     cycleButton.whileTrue(cyclingShooter);
-    deployIntake.whileTrue(new InstantCommand(() -> intakeSubsystem.deployIntake()));
-    storeIntake.whileTrue(new InstantCommand(() -> intakeSubsystem.storeIntake()));
+    //deployIntake.whileTrue(intakeSubsystem.deployIntake());
+    //storeIntake.whileTrue(intakeSubsystem.storeIntake());
     intakeGamePiece.whileTrue(pushNote);
     outtakeGamePiece.whileTrue(pullNote);
     intakeGamePiece.whileFalse(stopIntake);
     outtakeGamePiece.whileFalse(stopIntake);
+  }
+
+  public void onTeleopInit() {
+    swerveSubsystem.resetModulesForward(); // TODO: Check if it is needed for this to be here
+    //intakeSubsystem.resetIntake();
+  }
+
+  public void onDisabled() {
+    swerveSubsystem.setStatesForX();
   }
  
   public Command getAutonomousCommand() {
