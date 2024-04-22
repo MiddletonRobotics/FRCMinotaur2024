@@ -1,15 +1,24 @@
 package frc.robot.subsystems;
 
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.ConditionalCommand;
+import edu.wpi.first.wpilibj2.command.DeferredCommand;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.RunCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
+import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
@@ -20,6 +29,9 @@ import com.revrobotics.SparkPIDController.ArbFFUnits;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.signals.AbsoluteSensorRangeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
+
+import java.util.function.BooleanSupplier;
+
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.CANcoderConfigurator;
 import com.ctre.phoenix6.configs.MagnetSensorConfigs;
@@ -29,23 +41,6 @@ import frc.robot.utilities.CANSparkMaxUtil.Usage;
 import frc.robot.utilities.constants.Constants;
 
 public class IntakeSubsystem extends SubsystemBase {
-    private ShuffleboardTab intakeLogger;
-
-    private CANSparkMax rollerMotor;
-    private CANSparkMax pivotMotor;
-
-    private RelativeEncoder pivotEncoder;
-    private RelativeEncoder rollerEncoder;
-    private CANcoder intakeEncoder;
-    private CANcoderConfigurator pivotEncoderConfigurator;
-
-    private SparkPIDController pivotPIDController;
-    private SparkPIDController rollerPIDController;
-
-    private double localSetpoint;
-
-    private Rotation2d angleOffset;
-    public boolean deployPosition;
 
     public static enum IntakeDirection {
         FORWARD, REVERSE, STOPPED
@@ -58,12 +53,28 @@ public class IntakeSubsystem extends SubsystemBase {
     private IntakeStatus status = IntakeStatus.STORED;
     private IntakeDirection direction = IntakeDirection.STOPPED;
 
-    public IntakeSubsystem() {
-        setName("Intakaur");
-        intakeLogger = Shuffleboard.getTab("Intake Subsystem");
+    private CANSparkMax rollerMotor;
+    private CANSparkMax pivotMotor;
 
-        angleOffset = Constants.IntakeConstants.angleOffset;
-        deployPosition = false;
+    private RelativeEncoder pivotEncoder;
+    private RelativeEncoder rollerEncoder;
+    private CANcoder intakeEncoder;
+    private CANcoderConfigurator pivotEncoderConfigurator;
+
+    private DigitalInput intakeLimitSwitch;
+
+    private SparkPIDController pivotPIDController;
+    private SparkPIDController rollerPIDController;
+
+    private double localSetpoint;
+    private double localVelocity;
+    public boolean deployPosition;
+
+    public IntakeSubsystem() {
+        localSetpoint = Constants.IntakeConstants.storeIntakeSetpoint;
+        intakeLimitSwitch = new DigitalInput(Constants.IntakeConstants.intakeLimitSwitch);
+        intakeEncoder = new CANcoder(Constants.IntakeConstants.pivotEncoderID);
+        configureIntakeEncoder();
 
         rollerMotor = new CANSparkMax(Constants.IntakeConstants.rollerMotorID, MotorType.kBrushless);
         rollerMotor.setInverted(Constants.IntakeConstants.rollerMotorInvert);
@@ -76,20 +87,17 @@ public class IntakeSubsystem extends SubsystemBase {
         pivotEncoder = pivotMotor.getEncoder();
         pivotPIDController = pivotMotor.getPIDController();
         configurePivotMotor();
-
-        intakeEncoder = new CANcoder(Constants.IntakeConstants.pivotEncoderID);
-        configureIntakeEncoder();
     }
 
     private void configureRollerMotor() {
         rollerMotor.restoreFactoryDefaults();
         CANSparkMaxUtil.setCANSparkMaxBusUsage(rollerMotor, Usage.kAll);
         rollerMotor.setIdleMode(Constants.IntakeConstants.rollerMotorNeutralMode);
-        pivotPIDController.setFeedbackDevice(rollerEncoder);
-        rollerPIDController.setP(Constants.IntakeConstants.rollerKP);
-        rollerPIDController.setI(Constants.IntakeConstants.rollerKI);
-        rollerPIDController.setD(Constants.IntakeConstants.rollerKD);
-        rollerPIDController.setFF(Constants.IntakeConstants.rollerKFF);
+        rollerPIDController.setFeedbackDevice(rollerEncoder);
+        rollerPIDController.setP(Constants.IntakeConstants.rollerKP, 0);
+        rollerPIDController.setI(Constants.IntakeConstants.rollerKI, 0);
+        rollerPIDController.setD(Constants.IntakeConstants.rollerKD, 0);
+        rollerPIDController.setFF(Constants.IntakeConstants.rollerKFF, 0);
         rollerMotor.enableVoltageCompensation(Constants.IntakeConstants.voltageCompensation);
         rollerMotor.burnFlash();
         rollerEncoder.setPosition(0);
@@ -99,13 +107,13 @@ public class IntakeSubsystem extends SubsystemBase {
         pivotMotor.restoreFactoryDefaults();
         CANSparkMaxUtil.setCANSparkMaxBusUsage(pivotMotor, Usage.kPositionOnly);
         pivotMotor.setIdleMode(Constants.IntakeConstants.pivotMotorNeutralMode);
-        pivotEncoder.setPositionConversionFactor(Constants.IntakeConstants.AngleConversionFactor);
+        pivotEncoder.setPositionConversionFactor(Constants.IntakeConstants.PivotConversionPositionFactor);
         pivotPIDController.setFeedbackDevice(pivotEncoder);
-        pivotPIDController.setOutputRange(0, 0.4);
-        //pivotPIDController.setP(Constants.IntakeConstants.pivotKP);
-        //pivotPIDController.setI(Constants.IntakeConstants.pivotKI);
-        //pivotPIDController.setD(Constants.IntakeConstants.pivotKD);
-        //pivotPIDController.setFF(Constants.IntakeConstants.pivotKFF);
+        pivotPIDController.setOutputRange(-0.1, 0.23);
+        pivotPIDController.setP(Constants.IntakeConstants.pivotKP, 0);
+        pivotPIDController.setI(Constants.IntakeConstants.pivotKI, 0);
+        pivotPIDController.setD(Constants.IntakeConstants.pivotKD, 0);
+        pivotPIDController.setFF(Constants.IntakeConstants.pivotKFF, 0);
         pivotMotor.enableVoltageCompensation(Constants.IntakeConstants.voltageCompensation);
         pivotMotor.burnFlash();
         resetToAbsolute();
@@ -117,7 +125,6 @@ public class IntakeSubsystem extends SubsystemBase {
 
         magnetSensorConfiguration.AbsoluteSensorRange = AbsoluteSensorRangeValue.Signed_PlusMinusHalf;
         magnetSensorConfiguration.SensorDirection = SensorDirectionValue.CounterClockwise_Positive;
-        magnetSensorConfiguration.MagnetOffset = angleOffset.getRotations();
         pivotEncoderConfigurator.apply(new CANcoderConfiguration().withMagnetSensor(magnetSensorConfiguration));
     }
 
@@ -130,7 +137,7 @@ public class IntakeSubsystem extends SubsystemBase {
     }
 
     public double getnewFF() {
-        double GRAVITY_FF = 0.01;
+        double GRAVITY_FF = 1.68;
         double cosineScalar = Math.cos(Units.degreesToRadians(pivotEncoder.getPosition()));
         double feedForward = GRAVITY_FF * cosineScalar;
         return feedForward;
@@ -140,8 +147,14 @@ public class IntakeSubsystem extends SubsystemBase {
         return localSetpoint - pivotEncoder.getPosition();
     }
 
-    public boolean getAtGoal() {
-        return (Math.abs(localSetpoint - pivotEncoder.getPosition()) < Constants.IntakeConstants.goalSetpointErrorTolerence);
+    public BooleanSupplier getAtGoal() {
+        BooleanSupplier targetGoalStatus = () -> (Math.abs(localSetpoint - pivotEncoder.getPosition()) < Constants.IntakeConstants.goalSetpointErrorTolerence);
+        return targetGoalStatus;
+    }
+
+    public BooleanSupplier getLimitSwitch() {
+        BooleanSupplier limitSwitchStatus = () -> intakeLimitSwitch.get();
+        return limitSwitchStatus;
     }
 
     public double getSetpoint() {
@@ -183,31 +196,83 @@ public class IntakeSubsystem extends SubsystemBase {
     }
 
     public void outtakeGamePiece() {
-        rollerMotor.set(0.3);
+        setRollerSpeed(0.3);
+        setIntakeDirection(IntakeDirection.REVERSE);
+    }
+
+    public void feedOuttake() {
+        setRollerSpeed(0.8);
         setIntakeDirection(IntakeDirection.REVERSE);
     }
 
     public void intakeGamePiece() {
-        rollerMotor.set(-0.3);
+        setRollerSpeed(-0.3);
         setIntakeDirection(IntakeDirection.FORWARD);
     }
 
     public void outtakeToShooter() {
-        rollerMotor.set(0.1);
+        setRollerSpeed(0.1);
         setIntakeDirection(IntakeDirection.REVERSE);
     }
 
     public void stopIntaking() {
-        rollerMotor.set(0);
+        setRollerSpeed(0);
         setIntakeDirection(IntakeDirection.STOPPED);
     }
 
-    public void deployIntake() {
+    public void setDeploySetpoint() {
         setSetpoint(Constants.IntakeConstants.deployIntakeSetpoint);
     }
 
-    public void storeIntake() {
+    public void setStoreSetpoint() {
         setSetpoint(Constants.IntakeConstants.storeIntakeSetpoint);
+    }
+
+    public BooleanSupplier isReadyToShoot() {
+        boolean requirements;
+
+        if(getIntakeStatus() == IntakeStatus.STORED) {
+            if(getLimitSwitch().getAsBoolean()) {
+                requirements = true;
+            } else {
+                requirements = false;
+            }
+        } else {
+            requirements = false;
+        }
+
+        BooleanSupplier readyToShoot = () -> requirements;
+        return readyToShoot;
+    }
+
+    public BooleanSupplier isStored() {
+        boolean requirements;
+
+        if(getIntakeStatus() == IntakeStatus.STORED) {
+            if(!getLimitSwitch().getAsBoolean()) {
+                requirements = true;
+            } else {
+                requirements = false;
+            }
+        } else {
+            requirements = false;
+        }
+
+        BooleanSupplier readyToShoot = () -> requirements;
+        return readyToShoot;
+    }
+
+    public BooleanSupplier isDeployed() {
+        boolean requirements;
+
+        if(getIntakeStatus() == IntakeStatus.DEPLOYED) {
+            requirements = true;
+        } else {
+            requirements = false;
+        }
+
+        BooleanSupplier readyToShoot = () -> requirements;
+        return readyToShoot;
     }
 
     public void resetToAbsolute() {
@@ -215,28 +280,77 @@ public class IntakeSubsystem extends SubsystemBase {
         pivotEncoder.setPosition(absolutePosition);
     }
 
+    public Command resetIntake() {
+        return new SequentialCommandGroup(
+            new InstantCommand(() -> setStoreSetpoint()).alongWith(new InstantCommand(() -> stopIntaking()))
+        );
+    }
+
+    /* 
+
+    public Command storeIntake() {
+        return new SequentialCommandGroup(
+            new ConditionalCommand(new InstantCommand(() -> setStoreSetpoint()), null, isDeployed())
+        );
+    }
+
+
+    public Command deployIntake() {
+        return new SequentialCommandGroup(
+            new ConditionalCommand(new InstantCommand(() -> setDeploySetpoint()), null, isStored())
+        );
+    }
+
+    */
+
+    public Command storeIntake() {
+        return new SequentialCommandGroup(
+            new InstantCommand(() -> setStoreSetpoint())
+        );
+    }
+
+
+    public Command deployIntake() {
+        return new SequentialCommandGroup(
+            new InstantCommand(() -> setDeploySetpoint())
+        );
+    }
+
+    public Command dropNoteCommand() {
+        return new SequentialCommandGroup(new ParallelCommandGroup(
+            new InstantCommand(() -> setDeploySetpoint()),
+            new WaitCommand(0.3),
+            new RunCommand(() -> feedOuttake())).alongWith(new InstantCommand(() -> setStoreSetpoint()),
+            new WaitCommand(0.3),
+            new InstantCommand(() -> stopIntaking())
+        ));
+    }
+
+    public Command automaticIntakingCommand() {
+        return new SequentialCommandGroup(
+            new InstantCommand(() -> setDeploySetpoint()),
+            new InstantCommand(() -> intakeGamePiece()).onlyIf(getAtGoal()),
+            new InstantCommand(() -> stopIntaking()).alongWith(new InstantCommand(() -> setStoreSetpoint())).onlyIf(getLimitSwitch()) 
+        );
+    }
+
     @Override
     public void periodic() {
-        intakeLogger.add("Pivot Proportional", Constants.IntakeConstants.pivotKP);
-        intakeLogger.add("Pivot Integral", Constants.IntakeConstants.pivotKI);
-        intakeLogger.add("Pivot Derivative ", Constants.IntakeConstants.pivotKD);
-        intakeLogger.add("Pivot Error", getPivotError());
+        SmartDashboard.putNumber("Pivot Proportional", Constants.IntakeConstants.pivotKP);
+        SmartDashboard.putNumber("Pivot Integral", Constants.IntakeConstants.pivotKI);
+        SmartDashboard.putNumber("Pivot Derivative ", Constants.IntakeConstants.pivotKD);
+        SmartDashboard.putNumber("Pivot Error", getPivotError());
 
-        intakeLogger.add("Roller Proportional", Constants.IntakeConstants.rollerKP);
-        intakeLogger.add("Roller Integral", Constants.IntakeConstants.rollerKI);
-        intakeLogger.add("Roller Derivative ", Constants.IntakeConstants.rollerKD);
+        SmartDashboard.putNumber("Pivot Target Setpoint", localSetpoint);
+        SmartDashboard.putNumber("Pivot Current Setpoint", pivotEncoder.getPosition());
 
-        intakeLogger.add("Intake Status ", getIntakeStatus());
-        intakeLogger.add("Intake Direction ", getIntakeDirection());
+        SmartDashboard.putNumber("Roller Proportional", Constants.IntakeConstants.rollerKP);
+        SmartDashboard.putNumber("Roller Integral", Constants.IntakeConstants.rollerKI);
+        SmartDashboard.putNumber("Roller Derivative ", Constants.IntakeConstants.rollerKD);
 
-        if(localSetpoint == Constants.IntakeConstants.storeIntakeSetpoint) { 
-            pivotPIDController.setReference(0, ControlType.kDutyCycle);
-            setIntakeStatus(IntakeStatus.STORED);
-        } else {
-            pivotPIDController.setReference(localSetpoint, CANSparkMax.ControlType.kPosition, 0, getnewFF(), ArbFFUnits.kPercentOut); //feedIN
-            if(getAtGoal()) {
-                setIntakeStatus(IntakeStatus.DEPLOYED);
-            }
-        }
+        SmartDashboard.putString("Intake Status ", getIntakeStatus().toString());
+        SmartDashboard.putString("Intake Direction ", getIntakeDirection().toString());
+
+        //pivotPIDController.setReference(localSetpoint, ControlType.kPosition, 0, getnewFF());
     }
 }

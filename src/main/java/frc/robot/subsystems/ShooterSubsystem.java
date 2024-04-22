@@ -4,8 +4,12 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.RunCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.utilities.CANSparkMaxUtil;
 import frc.robot.utilities.CANSparkMaxUtil.Usage;
 import frc.robot.utilities.constants.Constants;
@@ -54,6 +58,26 @@ public class ShooterSubsystem extends SubsystemBase {
     public void stopShooter() {
         lowerShooterMotor.set(0.0);
         upperShooterMotor.set(0.0);
+    }
+
+    public SequentialCommandGroup shooterAmpScoringCommand(IntakeSubsystem intakeSubsystem) {
+        return new SequentialCommandGroup(new ParallelCommandGroup( 
+            new RunCommand(() -> shooterAmpScoring()), 
+            new WaitCommand(0.75), 
+            new RunCommand(() -> intakeSubsystem.outtakeToShooter()),
+            new WaitCommand(1.5),
+            new RunCommand(() -> stopShooter()).alongWith(new RunCommand(() -> intakeSubsystem.stopIntaking()))
+        ));
+    }
+
+    public SequentialCommandGroup shooterSpeakerScoringCommand(IntakeSubsystem intakeSubsystem) {
+        return new SequentialCommandGroup(new ParallelCommandGroup( 
+            new RunCommand(() -> shooterSpeakerScoring()), 
+            new WaitCommand(0.75), 
+            new RunCommand(() -> intakeSubsystem.outtakeToShooter()).alongWith(),
+            new WaitCommand(1.5),
+            new RunCommand(() -> stopShooter()).alongWith(new RunCommand(() -> intakeSubsystem.stopIntaking()))
+        ));
     }
 
     @Override

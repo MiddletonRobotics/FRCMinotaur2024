@@ -20,13 +20,17 @@ public class ClimberSubsystem extends SubsystemBase {
 
     private RelativeEncoder rightClimbEncoder;
     private RelativeEncoder leftClimbEncoder;
+    private SparkPIDController rightClimbPIDController;
+    private SparkPIDController leftClimbPIDController;
 
     public ClimberSubsystem() {
         rightClimbMotor = new CANSparkMax(ClimberConstants.RightClimbMotorID, MotorType.kBrushless);
-        leftClimbMotor = new CANSparkMax(ClimberConstants.LeftClimbMotorID, MotorType.kBrushless);
-
         rightClimbEncoder = rightClimbMotor.getEncoder();
+        rightClimbPIDController = rightClimbMotor.getPIDController();
+
+        leftClimbMotor = new CANSparkMax(ClimberConstants.LeftClimbMotorID, MotorType.kBrushless);
         leftClimbEncoder = leftClimbMotor.getEncoder();
+        leftClimbPIDController = leftClimbMotor.getPIDController();
 
         configureRightClimbMotor();
         configureLeftClimbMotor();
@@ -38,6 +42,11 @@ public class ClimberSubsystem extends SubsystemBase {
         rightClimbMotor.setInverted(ClimberConstants.rightClimbInvert);
         rightClimbMotor.setIdleMode(ClimberConstants.rightClimbNeutralMode);
         rightClimbMotor.enableVoltageCompensation(ClimberConstants.voltageCompensation);
+        rightClimbPIDController.setFeedbackDevice(rightClimbEncoder);
+        rightClimbPIDController.setP(ClimberConstants.rclimbKI);
+        rightClimbPIDController.setI(ClimberConstants.rclimbKI);
+        rightClimbPIDController.setD(ClimberConstants.rclimbKD);
+        rightClimbPIDController.setFF(ClimberConstants.rclimbKFF);
         rightClimbMotor.burnFlash();
         rightClimbEncoder.setPosition(0.0);
     }
@@ -48,40 +57,13 @@ public class ClimberSubsystem extends SubsystemBase {
         leftClimbMotor.setInverted(ClimberConstants.leftClimbInvert);
         leftClimbMotor.setIdleMode(ClimberConstants.leftClimbNeutralMode);
         leftClimbMotor.enableVoltageCompensation(ClimberConstants.voltageCompensation);
+        leftClimbPIDController.setFeedbackDevice(leftClimbEncoder);
+        leftClimbPIDController.setP(ClimberConstants.lclimbKP);
+        leftClimbPIDController.setI(ClimberConstants.lclimbKI);
+        leftClimbPIDController.setD(ClimberConstants.lclimbKD);
+        leftClimbPIDController.setFF(ClimberConstants.lclimbKFF);
         leftClimbMotor.burnFlash();
         leftClimbEncoder.setPosition(0.0);
-    }
-
-    public Command rightClimbUp() {
-        return run(() -> {
-            rightClimbMotor.set(ClimberConstants.climbSpeed);
-        }).withName("RightClimbUp");
-    }
-
-    public Command rightClimbDown() {
-        return run(() -> {
-            rightClimbMotor.set(-ClimberConstants.climbSpeed);
-        }).withName("RightClimbDown");
-    }
-
-    public Command leftClimbUp() {
-        return run(() -> {
-            leftClimbMotor.set(ClimberConstants.climbSpeed);
-        }).withName("LeftClimbUp");
-    }
-
-    public Command leftClimbDown() {
-        return run(() -> {
-            leftClimbMotor.set(-ClimberConstants.climbSpeed);
-        }).withName("LeftClimbDown");
-    }
-
-    public void rightClimberReset() {
-        rightClimbMotor.set(0.0);
-    }
-
-    public void leftClimberReset() {
-        leftClimbMotor.set(0.0);
     }
 
     @Override

@@ -12,6 +12,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
+import frc.robot.utilities.MotorParameters;
 
 // All of the constants that are accessed by other files, to prevent repetition and allows easy changing
 
@@ -41,38 +42,38 @@ public class Constants {
         public static final double driveKA = 0.27;
 
         /* Front Left Module - Module 0 */
-        public static final class FrontLeftModule {
+        public static final class BackRightModule {
             public static final int driveMotorID = 1;
             public static final int angleMotorID = 2;
-            public static final int canCoderID = 9;
-            public static final Rotation2d angleOffset = Rotation2d.fromRotations(0.742);
+            public static final int canCoderID = 12;
+            public static final Rotation2d angleOffset = Rotation2d.fromRotations(0.849);
             public static final SwerveModuleConstants constants = new SwerveModuleConstants(driveMotorID, angleMotorID, canCoderID, angleOffset);
         }
 
         /* Front Right Module - Module 1 */
-        public static final class FrontRightModule {
+        public static final class BackLeftModule {
             public static final int driveMotorID = 3;
             public static final int angleMotorID = 4;
-            public static final int canCoderID = 10;
-            public static final Rotation2d angleOffset = Rotation2d.fromRotations(0.994);
-            public static final SwerveModuleConstants constants = new SwerveModuleConstants(driveMotorID, angleMotorID, canCoderID, angleOffset);
-        }
-
-        /* Back Left Module - Module 2 */
-        public static final class BackLeftModule {
-            public static final int driveMotorID = 5;
-            public static final int angleMotorID = 6;
             public static final int canCoderID = 11;
             public static final Rotation2d angleOffset = Rotation2d.fromRotations(0.285);
             public static final SwerveModuleConstants constants = new SwerveModuleConstants(driveMotorID, angleMotorID, canCoderID, angleOffset);
         }
 
+        /* Back Left Module - Module 2 */
+        public static final class FrontRightModule {
+            public static final int driveMotorID = 5;
+            public static final int angleMotorID = 6;
+            public static final int canCoderID = 10;
+            public static final Rotation2d angleOffset = Rotation2d.fromRotations(0.994);
+            public static final SwerveModuleConstants constants = new SwerveModuleConstants(driveMotorID, angleMotorID, canCoderID, angleOffset);
+        }
+
         /* Back Right Module - Module 3 */
-        public static final class BackRightModule {
+        public static final class FrontLeftModule {
             public static final int driveMotorID = 7;
             public static final int angleMotorID = 8;
-            public static final int canCoderID = 12;
-            public static final Rotation2d angleOffset = Rotation2d.fromRotations(0.849);
+            public static final int canCoderID = 9;
+            public static final Rotation2d angleOffset = Rotation2d.fromRotations(0.742);
             public static final SwerveModuleConstants constants = new SwerveModuleConstants(driveMotorID, angleMotorID, canCoderID, angleOffset);
         }
     }
@@ -103,10 +104,18 @@ public class Constants {
         public static final double AngleConversionFactor = 360.0 / AngleGearRatio;
 
         /* Swerve Profiling Values */
-        public static final double PhysicalMaxSpeedMetersPerSecond = 9; // (4.1) Maximum speed in meters per second that the Swerve Modules allow you to go
+        public static final double PhysicalMaxSpeedMetersPerSecond = 4.1; // (4.1) Maximum speed in meters per second that the Swerve Modules allow you to go
         public static final double PhysicalMaxAcceleration = 1.9; // (1.9)
         public static final double PhysicalAngularMaxVelocity = 3 * Math.PI; // Maxiumum speed in radians per seconr that the swerve module is able to rotate (6.28 radians per full rotation)
         public static final double PhysicalMaxAngularAcceleration = 3.2;
+
+        public static final double MaximumRotationPercent = 1;
+        public static final double MaximumTranslationPercent = 1;
+
+        /* Gyro Profiling */
+        public static final double headingKp = 0.2;
+        public static final double headingKi = 0.0;
+        public static final double headingKd = 0.01;
 
         /* Neutral Modes */
         public static final IdleMode angleNeutralMode = IdleMode.kBrake; // What the steering motor should do when not applied with any power (should always be brake while running to prevent overshooting target)
@@ -120,12 +129,6 @@ public class Constants {
         public static final boolean angleInvert = false; 
         public static final boolean swerveEncoderInverted = false;
         public static final boolean gyroInverted = false;
-
-        /* The Swerve modules have the encoders and magnets all installed in different orientations, so these values will be the average returned by the CANCoders */
-        public static final double FrontLeftCANcoderOffsetRotations = 0;
-        public static final double BackLeftCANcoderOffsetRotations = 0;
-        public static final double FrontRightCANcoderOffsetRotations = 0;
-        public static final double BackRightCANcoderOffsetRotations = 0;
     }
 
     public static final class AutonomousConstants {
@@ -222,41 +225,53 @@ public class Constants {
         public static final double kVisionStdDevX = 2.5;
         public static final double kVisionStdDevY = 2.5;
         public static final double kVisionStdDevTheta = 500;
-      }
+    }
 
     public static final class IntakeConstants {
         /* Hardware ID of CAN */
         public static final int rollerMotorID = 16;
         public static final int pivotMotorID = 15;
         public static final int pivotEncoderID = 19;
+        public static final int intakeLimitSwitch = 0;
 
         /* Climber Current Limiting */
-        public static final int pivotContinuousCurrentLimit = 60; 
-        public static final int rollerContinuousCurrentLimit = 70; 
+        public static final int pivotContinuousCurrentLimit = 30; 
+        public static final int rollerContinuousCurrentLimit = 50; 
 
         /* Encoder Offsets and positions */
         public static final Rotation2d angleOffset = Rotation2d.fromRotations(0);
-        public static final double deployIntakeSetpoint = 0.0;
-        public static final double storeIntakeSetpoint = 0.0;
-        public static final double goalSetpointErrorTolerence = 0.3;
+        public static final double deployIntakeSetpoint = 66.489;
+        public static final double storeIntakeSetpoint = 252.776;
+        public static final double dropOffSetpoint = 166.489;
+        public static final double goalSetpointErrorTolerence = 1.5;
+        public static final double intakeDiameter = Units.inchesToMeters(2.0);
+        public static final double intakeMass = 0.5;
 
         /* Motor and Encoder Inversions */
         public static final boolean rollerMotorInvert = false;
         public static final boolean pivotMotorInvert = true;
-
         public static final boolean pivotEnocderInverted = false;
 
         /* Gear Ratios */
-        public static final double pivotGearRatio = (20 / 1.0);
-        public static final double rollerGearRatio = (1 / 1.0);
+        public static final double pivotGearRatio = (10.0 / 1.0) * (3.0 / 2.0);
+        public static final double rollerGearRatio = (1.0 / 1.0);
 
         /* Motor Conversion Factors */
-        public static final double AngleConversionFactor = 360.0 / pivotGearRatio;
+        public static final double PivotConversionPositionFactor = 360.0 / pivotGearRatio;
+        public static final double RollerConversionPositionFactor = 360.0 / rollerGearRatio;
+        public static final double RollerConversionVelocityFactor = rollerGearRatio / 60;
+
+        public static final double RollerMaxVelocity = (MotorParameters.NeoV1_1.getFreeSpeedRPM() * Math.PI * intakeDiameter) / (60 * rollerGearRatio);
+        public static final double RollerMaxAcceleration = (2 * MotorParameters.NeoV1_1.getFreeSpeedRPM() * rollerGearRatio * Math.PI * intakeDiameter) / intakeMass;
+
+        public static double KS = 0.4;
+        public static double KV = (12 - KS) / RollerMaxVelocity;
+        public static double KA = (12 - KS) / RollerMaxAcceleration;
 
         /* PID Values for the Motors. Used to correct the error when trying to move the motors to a desired location */
-        public static final double pivotKP = 0.05; // Propotional: If there is error, move the motor propotional to the error
-        public static final double pivotKI = 0.0; // Intergral: If the error is taking too long to correct, move the motor faster
-        public static final double pivotKD = 0.0; // Derivative: If the motor is getting close to reaching the target, slow it down
+        public static final double pivotKP = 0.16; // Propotional: If there is error, move the motor propotional to the error
+        public static final double pivotKI = 0.00; // Intergral: If the error is taking too long to correct, move the motor faster
+        public static final double pivotKD = 0.07; // Derivative: If the motor is getting close to reaching the target, slow it down
         public static final double pivotKFF = 0.0; // Force: Additional gain for creating offsts
 
         /* PID Values for the Motors. Used to correct the error when trying to move the motors to a desired location */
@@ -319,10 +334,15 @@ public class Constants {
         public static final IdleMode rightClimbNeutralMode = IdleMode.kBrake;
 
         /* PID Values for the Motors. Used to correct the error when trying to move the motors to a desired location */
-        public static final double climbKP = 0.15; // Propotional: If there is error, move the motor propotional to the error
-        public static final double climbKI = 0.0; // Intergral: If the error is taking too long to correct, move the motor faster
-        public static final double climbKD = 0.0; // Derivative: If the motor is getting close to reaching the target, slow it down
-        public static final double climbKFF = 0.0; // Force: Additional gain for creating offsets
+        public static final double rclimbKP = 0.15; // Propotional: If there is error, move the motor propotional to the error
+        public static final double rclimbKI = 0.0; // Intergral: If the error is taking too long to correct, move the motor faster
+        public static final double rclimbKD = 0.0; // Derivative: If the motor is getting close to reaching the target, slow it down
+        public static final double rclimbKFF = 0.0; // Force: Additional gain for creating offsets
+
+        public static final double lclimbKP = 0.15; // Propotional: If there is error, move the motor propotional to the error
+        public static final double lclimbKI = 0.0; // Intergral: If the error is taking too long to correct, move the motor faster
+        public static final double lclimbKD = 0.0; // Derivative: If the motor is getting close to reaching the target, slow it down
+        public static final double lclimbKFF = 0.0; // Force: Additional gain for creating offsets
 
         /* Speed Profiling */
         public static final double climbSpeed = 0.75; // Speed to default the climbers at (we have a reduced gearbox)
@@ -479,8 +499,10 @@ public class Constants {
         public static final int driverControllerPort = 0; // Driver Controller only controlls the driving and maneuverability of the robot
         public static final int operatorControllerPort = 1; // Operator Controllers helps with all of the other mechanisms and subsystems attached on the robot.
 
-        public static final double kDeadband = 0.1; // Default deband to help with stick drift on the controllers, recorded values we get is usually (+- 0.05)
+        public static final double kDeadband = 0.05; // Default deband to help with stick drift on the controllers, recorded values we get is usually (+- 0.05)
         public static final boolean disableHAL = false; // Disables the HAL for the robot, used for testing purposes
+
+        public static final boolean isTuningMode = false;
 
         public static final boolean IS_ALLIANCE_RED = true;
         public static final boolean IS_ALLIANCE_BLUE = !IS_ALLIANCE_RED;
