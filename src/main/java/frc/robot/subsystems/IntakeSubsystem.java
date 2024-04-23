@@ -123,7 +123,7 @@ public class IntakeSubsystem extends SubsystemBase {
         pivotEncoderConfigurator = intakeEncoder.getConfigurator();
         MagnetSensorConfigs magnetSensorConfiguration = new MagnetSensorConfigs();
 
-        magnetSensorConfiguration.AbsoluteSensorRange = AbsoluteSensorRangeValue.Signed_PlusMinusHalf;
+        magnetSensorConfiguration.AbsoluteSensorRange = AbsoluteSensorRangeValue.Unsigned_0To1;
         magnetSensorConfiguration.SensorDirection = SensorDirectionValue.CounterClockwise_Positive;
         pivotEncoderConfigurator.apply(new CANcoderConfiguration().withMagnetSensor(magnetSensorConfiguration));
     }

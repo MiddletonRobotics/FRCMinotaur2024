@@ -171,22 +171,18 @@ public class SwerveSubsystem extends SubsystemBase {
         PathPlannerLogging.setLogCurrentPoseCallback(current -> this.field.getObject("pathplanner curr pose").setPose(current));
       }
 
-    public void drive(double desiredThrottleMPS, double desiredStrafeMPS, double desiredOmegaRadPerSec, boolean fieldRelative) {
-        double correctedOmega = MathUtil.clamp(desiredOmegaRadPerSec, -Constants.SwerveConstants.PhysicalAngularMaxVelocity, Constants.SwerveConstants.PhysicalAngularMaxVelocity);
+      public void drive(Translation2d translation, double rotation, boolean fieldRelative, boolean isOpenLoop) {
+        SwerveModuleState[] swerveModuleStates = Constants.SwerveConstants.SwerveKinematics.toSwerveModuleStates(fieldRelative 
+            ? ChassisSpeeds.fromFieldRelativeSpeeds(translation.getX(), translation.getY(), rotation, getYawRotation2D())
+            : new ChassisSpeeds(translation.getX(), translation.getY(), rotation)
+        );
 
-        // apply corrective pose logarithm
-        double dt = 0.2;
-        double angularDisplacement = -correctedOmega * dt; // TODO: why is this negative, maybe gyro orientation
+        SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, Constants.SwerveConstants.PhysicalMaxSpeedMetersPerSecond);
 
-        double sin = Math.sin(0.5 * angularDisplacement);
-        double cos = Math.cos(0.5 * angularDisplacement);
-
-        double correctedThrottle = desiredStrafeMPS * sin + desiredThrottleMPS * cos;
-        double correctedStrafe = desiredStrafeMPS * cos - desiredThrottleMPS * sin;
-
-        ChassisSpeeds speeds = fieldRelative ? ChassisSpeeds.fromFieldRelativeSpeeds(correctedStrafe, correctedThrottle, correctedOmega, getYawRotation2D()) : new ChassisSpeeds(correctedStrafe, correctedThrottle, correctedOmega);
-        this.drive(speeds);
-  }
+        for(SwerveModule module : swerveModules) {
+            module.setDesiredState(swerveModuleStates[module.moduleNumber], false);
+        }
+    }
 
     /**
     * Command to drive the robot using robot relative speeds

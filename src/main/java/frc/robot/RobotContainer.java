@@ -84,8 +84,7 @@ public class RobotContainer {
   private final Trigger deployIntake;
   private final Trigger storeIntake;
   private final Trigger intakeGamePiece;
-  private final Trigger outtakeGamePiece; 
-  private final Trigger cycleButton;
+  private final Trigger outtakeGamePiece;
 
   public final SwerveSubsystem swerveSubsystem;
   private final int translationAxis;
@@ -99,7 +98,6 @@ public class RobotContainer {
   private final IntakePull pullNote;
   private final IntakePush pushNote;
   private final StopIntake stopIntake;
-  private final CycleShooter cyclingShooter;
 
   public RobotContainer() {
     swerveSubsystem = new SwerveSubsystem();
@@ -121,10 +119,9 @@ public class RobotContainer {
 
     resetHeading = DriverController.y();
     robotCentric = DriverController.x();
-    cycleButton = DriverController.a();
+
     speakerScoring = OperatorController.rightBumper();
     ampScoring = OperatorController.leftBumper();
-    
     deployIntake = OperatorController.a();
     storeIntake = OperatorController.b();
     intakeGamePiece = OperatorController.x();
@@ -139,13 +136,18 @@ public class RobotContainer {
     pullNote = new IntakePull(intakeSubsystem);
     pushNote = new IntakePush(intakeSubsystem);
     stopIntake = new StopIntake(intakeSubsystem);
-    cyclingShooter = new CycleShooter(shooterSubsystem, intakeSubsystem);
 
-    swerveSubsystem.setDefaultCommand(new SwerveController(swerveSubsystem, DriverController, robotCentric));
+    swerveSubsystem.setDefaultCommand(new SwerveController(
+      swerveSubsystem, 
+      () -> DriverController.getRawAxis(translationAxis),
+      () -> DriverController.getRawAxis(strafeAxis), 
+      () -> -DriverController.getRawAxis(rotationAxis), 
+      () -> robotCentric.getAsBoolean(),
+      () -> DriverController.leftBumper().getAsBoolean())
+    );
       
     configureButtonBindings();
     RobotController.setBrownoutVoltage(6.75);
-
     SmartDashboard.putNumber("PDP Current Draw", pdp.getTotalCurrent());
   }
 
@@ -153,7 +155,6 @@ public class RobotContainer {
     resetHeading.whileTrue(new InstantCommand(() -> swerveSubsystem.zeroYaw()));
     ampScoring.whileTrue(ampController);
     speakerScoring.whileTrue(shooterController);
-    cycleButton.whileTrue(cyclingShooter);
     //deployIntake.whileTrue(intakeSubsystem.deployIntake());
     //storeIntake.whileTrue(intakeSubsystem.storeIntake());
     intakeGamePiece.whileTrue(pushNote);
