@@ -1,28 +1,25 @@
 package frc.robot.utilities;
 
 public class Geometry {
-    public double fromDegreestoRadians(double degrees) {
-        return degrees * Math.PI / 180;
+    /**
+     * @param counts    Falcon Counts
+     * @param gearRatio Gear Ratio between Falcon and Mechanism
+     * @return Degrees of Rotation of Mechanism
+     */
+
+    public static double rotationsToDegrees(double counts, double gearRatio) {
+        return counts * (360.0 / (gearRatio));
     }
 
-    public double fromRadianstoDegrees(double radians) {
-        return radians * 180 / Math.PI;
-    }
+    /**
+     * @param degrees   Degrees of rotation of Mechanism
+     * @param gearRatio Gear Ratio between Falcon and Mechanism
+     * @return Falcon Counts
+     */
 
-    public double fromRotationstoDegrees(double rotations) {
-        return rotations * 360;
-    }
-
-    public double fromDegreestoRotations(double degrees) {
-        return degrees / 360;
-    }
-
-    public double fromRadianstoRotations(double radians) {
-        return radians / (2 * Math.PI);
-    }
-
-    public double fromRotationstoRadians(double rotations) {
-        return rotations * 2 * Math.PI;
+    public static double degreesToRotation(double degrees, double gearRatio) {
+        double ticks = degrees / (360.0 / (gearRatio));
+        return ticks;
     }
 
     public double angleWrapper(double angle, boolean negative) {
@@ -30,26 +27,6 @@ public class Geometry {
         angle = (angle + 360) % 360; // force it to be the postive remainder, so that 0 <= angle <= 360
 
         return angle;
-    }
-
-    public double radiansWrapper(double radians) {
-        while (radians < 0) {
-            radians += 2 * Math.PI;
-        }
-        while (radians >= 2 * Math.PI) {
-            radians -= 2 * Math.PI;
-        }
-        return radians;
-    }
-
-    public double rotationWrapper(double rotations) {
-        while (rotations < 0) {
-            rotations += 1;
-        }
-        while (rotations >= 1) {
-            rotations -= 1;
-        }
-        return rotations;
     }
 }
  

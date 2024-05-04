@@ -3,8 +3,6 @@ package frc.robot.subsystems;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 
-import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
@@ -46,18 +44,26 @@ public class ShooterSubsystem extends SubsystemBase {
     }
 
     public void shooterAmpScoring() {
-        lowerShooterMotor.set(Constants.ShooterConstants.ampScorerSpeed);
-        upperShooterMotor.set(Constants.ShooterConstants.ampScorerSpeed);
+        setSpeed(Constants.ShooterConstants.ampScorerSpeed);
     }
 
     public void shooterSpeakerScoring() {
-        lowerShooterMotor.set(Constants.ShooterConstants.shooterScorerSpeed);
-        upperShooterMotor.set(Constants.ShooterConstants.shooterScorerSpeed);
+        setSpeed(Constants.ShooterConstants.speakerScorerSpeed);
+    }
+
+    public void setSpeed(double speed) {
+        lowerShooterMotor.set(speed);
+        upperShooterMotor.set(speed);
     }
 
     public void stopShooter() {
         lowerShooterMotor.set(0.0);
         upperShooterMotor.set(0.0);
+    }
+
+    public void shooterOnDisabled() {
+        lowerShooterMotor.setIdleMode(Constants.ShooterConstants.lowerShooterMotorNeutralMode);
+        upperShooterMotor.setIdleMode(Constants.ShooterConstants.upperShooterMotorNeutralMode);
     }
 
     public SequentialCommandGroup shooterAmpScoringCommand(IntakeSubsystem intakeSubsystem) {

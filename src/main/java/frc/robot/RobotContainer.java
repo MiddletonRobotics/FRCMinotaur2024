@@ -41,11 +41,9 @@ import frc.robot.subsystems.ClimberSubsystem;
 import frc.robot.commands.ShooterController;
 import frc.robot.commands.SwerveController;
 import frc.robot.commands.AmpController;
-import frc.robot.commands.CycleShooter;
 import frc.robot.commands.IntakePull;
 import frc.robot.commands.IntakePush;
 import frc.robot.commands.StopIntake;
-import frc.robot.commands.ScorePositionQuad;
 
 import frc.robot.utilities.Controller;
 import frc.robot.utilities.constants.Constants;
@@ -75,12 +73,7 @@ public class RobotContainer {
   private final CommandXboxController OperatorController;
 
   private final SendableChooser<Command> autonomousChooser;
-  private final PowerDistribution pdp;
 
-  private final Trigger resetHeading;
-  private final Trigger robotCentric;
-  private final Trigger speakerScoring;
-  private final Trigger ampScoring;
   private final Trigger deployIntake;
   private final Trigger storeIntake;
   private final Trigger intakeGamePiece;
@@ -93,8 +86,6 @@ public class RobotContainer {
 
   private final ShooterSubsystem shooterSubsystem;
   private final IntakeSubsystem intakeSubsystem;
-  private final ShooterController shooterController;
-  private final AmpController ampController;
   private final IntakePull pullNote;
   private final IntakePush pushNote;
   private final StopIntake stopIntake;
@@ -103,8 +94,6 @@ public class RobotContainer {
     swerveSubsystem = new SwerveSubsystem();
     shooterSubsystem = new ShooterSubsystem();
     intakeSubsystem = new IntakeSubsystem();
-
-    pdp = new PowerDistribution(0, ModuleType.kCTRE);
 
     NamedCommands.registerCommand("Speaker Shooter",  new ShooterController(shooterSubsystem, intakeSubsystem));
     NamedCommands.registerCommand("Amp Shooter",  new AmpController(shooterSubsystem, intakeSubsystem));
@@ -117,22 +106,15 @@ public class RobotContainer {
     DriverController = Controller.getDriverController();
     OperatorController = Controller.getOperatorController();
 
-    resetHeading = DriverController.y();
-    robotCentric = DriverController.x();
-
-    speakerScoring = OperatorController.rightBumper();
-    ampScoring = OperatorController.leftBumper();
-    deployIntake = OperatorController.a();
-    storeIntake = OperatorController.b();
-    intakeGamePiece = OperatorController.x();
-    outtakeGamePiece = OperatorController.y();
-
     translationAxis = Constants.ControllerRawButtons.XboxController.Axis.kLeftY.value;
     strafeAxis = Constants.ControllerRawButtons.XboxController.Axis.kLeftX.value;
     rotationAxis = Constants.ControllerRawButtons.XboxController.Axis.kRightX.value;
 
-    shooterController = new ShooterController(shooterSubsystem, intakeSubsystem);
-    ampController = new AmpController(shooterSubsystem, intakeSubsystem);
+    deployIntake = OperatorController.a();
+    storeIntake = OperatorController.b();
+    intakeGamePiece = OperatorController.x();
+    outtakeGamePiece = OperatorController.y();
+    
     pullNote = new IntakePull(intakeSubsystem);
     pushNote = new IntakePush(intakeSubsystem);
     stopIntake = new StopIntake(intakeSubsystem);
@@ -141,22 +123,29 @@ public class RobotContainer {
       swerveSubsystem, 
       () -> DriverController.getRawAxis(translationAxis),
       () -> DriverController.getRawAxis(strafeAxis), 
-      () -> -DriverController.getRawAxis(rotationAxis), 
-      () -> robotCentric.getAsBoolean(),
-      () -> DriverController.leftBumper().getAsBoolean())
+      () -> -DriverController.getRawAxis(rotationAxis))
     );
       
-    configureButtonBindings();
+    configureDriverController();
+    configureOperatorController();
     RobotController.setBrownoutVoltage(6.75);
-    SmartDashboard.putNumber("PDP Current Draw", pdp.getTotalCurrent());
+  }
+
+  public void configureDriverController() {
+    new Trigger(DriverController.y()).onTrue(new InstantCommand(() -> swerveSubsystem.zeroYaw()));
+    new Trigger(DriverController.x()).onTrue(new InstantCommand(() -> swerveSubsystem.setStatesForX()));
+    new Trigger(DriverController.a()).onTrue(new InstantCommand(() -> swerveSubsystem.toggleFieldRelative()));
+    new Trigger(DriverController.leftBumper()).onTrue(new InstantCommand(() -> swerveSubsystem.toggleSlowMode()));
+  }
+
+  public void configureOperatorController() {
+    new Trigger(OperatorController.rightBumper()).onTrue(shooterSubsystem.shooterSpeakerScoringCommand(intakeSubsystem));
+    new Trigger(OperatorController.leftBumper()).onTrue(shooterSubsystem.shooterAmpScoringCommand(intakeSubsystem));
+    new Trigger(OperatorController.a()).onTrue(intakeSubsystem.deployIntake());
+    new Trigger(OperatorController.b()).onTrue(intakeSubsystem.storeIntake());
   }
 
   private void configureButtonBindings() {
-    resetHeading.whileTrue(new InstantCommand(() -> swerveSubsystem.zeroYaw()));
-    ampScoring.whileTrue(ampController);
-    speakerScoring.whileTrue(shooterController);
-    //deployIntake.whileTrue(intakeSubsystem.deployIntake());
-    //storeIntake.whileTrue(intakeSubsystem.storeIntake());
     intakeGamePiece.whileTrue(pushNote);
     outtakeGamePiece.whileTrue(pullNote);
     intakeGamePiece.whileFalse(stopIntake);
@@ -164,12 +153,12 @@ public class RobotContainer {
   }
 
   public void onTeleopInit() {
-    swerveSubsystem.resetModulesForward(); // TODO: Check if it is needed for this to be here
-    //intakeSubsystem.resetIntake();
+    swerveSubsystem.swerveOnEnabled();
   }
 
   public void onDisabled() {
-    swerveSubsystem.setStatesForX();
+    swerveSubsystem.swerveOnDisabled();
+    shooterSubsystem.shooterOnDisabled();
   }
  
   public Command getAutonomousCommand() {

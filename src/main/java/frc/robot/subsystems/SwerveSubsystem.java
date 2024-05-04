@@ -3,6 +3,7 @@ package frc.robot.subsystems;
 
 import java.util.Map;
 import java.util.Set;
+import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
 import com.kauailabs.navx.frc.AHRS;
@@ -61,6 +62,7 @@ import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Volts;
 
+import frc.robot.utilities.Alliance;
 import frc.robot.utilities.constants.Constants;
 
 /* Sets up class that assigns motors to each swerve module and get swerving.
@@ -74,9 +76,7 @@ public class SwerveSubsystem extends SubsystemBase {
 
     private final PIDController headingController;
 
-    private SlewRateLimiter translationLimiter = new SlewRateLimiter(2.9);
-    private SlewRateLimiter strafeLimiter = new SlewRateLimiter(2.9);
-    private SlewRateLimiter rotationLimiter = new SlewRateLimiter(2.9);
+    /* 
 
     private final MutableMeasure<Voltage> m_appliedVoltage = mutable(Volts.of(0));
     private final MutableMeasure<Distance> m_distance = mutable(Meters.of(0));
@@ -91,7 +91,13 @@ public class SwerveSubsystem extends SubsystemBase {
         this)
     );
 
+    */
+
     private Field2d field;
+
+    private boolean isFieldRelative = true;
+    private boolean isSlowMode = false;
+    private boolean changedOrientation = false;
 
     public SwerveSubsystem() {
         setName("SwerveSubsystem");
@@ -130,6 +136,7 @@ public class SwerveSubsystem extends SubsystemBase {
 
     public void zeroYaw() {
         gyro.zeroYaw();
+        System.out.println("NavX Yaw Reading has been successfully reset");
     }
 
     private void configureController() {
@@ -171,8 +178,13 @@ public class SwerveSubsystem extends SubsystemBase {
         PathPlannerLogging.setLogCurrentPoseCallback(current -> this.field.getObject("pathplanner curr pose").setPose(current));
       }
 
-      public void drive(Translation2d translation, double rotation, boolean fieldRelative, boolean isOpenLoop) {
-        SwerveModuleState[] swerveModuleStates = Constants.SwerveConstants.SwerveKinematics.toSwerveModuleStates(fieldRelative 
+      public void drive(Translation2d translation, double rotation, boolean isOpenLoop) {
+        if(isSlowMode) {
+            translation = translation.times(0.4);
+            rotation = rotation * 0.4;
+        }
+
+        SwerveModuleState[] swerveModuleStates = Constants.SwerveConstants.SwerveKinematics.toSwerveModuleStates(isFieldRelative 
             ? ChassisSpeeds.fromFieldRelativeSpeeds(translation.getX(), translation.getY(), rotation, getYawRotation2D())
             : new ChassisSpeeds(translation.getX(), translation.getY(), rotation)
         );
@@ -200,6 +212,17 @@ public class SwerveSubsystem extends SubsystemBase {
             module.voltageDrive(Voltage);
         }
     }
+
+    private Translation2d getSpeakerPosition() {
+        return Alliance.isRed() ? new Translation2d(16.53, 5.55) : new Translation2d(0.0, 5.55);
+      }
+
+    private double getAngleToSpeaker() {
+        Translation2d speakerLocation = this.getSpeakerPosition();
+        return -180 + speakerLocation.minus(this.getPose().getTranslation()).getAngle().getDegrees() + this.getYawDegrees();
+    
+        // TODO: is it worth using this.getPose().getRotation() instead? i think we trust gyro over vision when it comes to angle
+      }
 
     public SwerveModuleState[] getSwerveModuleStates() {
         SwerveModuleState[] states = new SwerveModuleState[4];
@@ -231,6 +254,15 @@ public class SwerveSubsystem extends SubsystemBase {
         }
     }
 
+    public void resetModulesForward() {
+        setModuleStates(new SwerveModuleState[] {
+            new SwerveModuleState(0.0, Rotation2d.fromDegrees(0)),
+            new SwerveModuleState(0.0, Rotation2d.fromDegrees(0)),
+            new SwerveModuleState(0.0, Rotation2d.fromDegrees(0)),
+            new SwerveModuleState(0.0, Rotation2d.fromDegrees(0))
+        });
+    }
+
     public void setStatesForX() {
         setModuleStates(new SwerveModuleState[] {
             new SwerveModuleState(0.0, Rotation2d.fromDegrees(45)),
@@ -238,6 +270,64 @@ public class SwerveSubsystem extends SubsystemBase {
             new SwerveModuleState(0.0, Rotation2d.fromDegrees(135)),
             new SwerveModuleState(0.0, Rotation2d.fromDegrees(-135))
         });
+
+        System.out.println("Swerve Module States successfuly set in locking position");
+    }
+
+    public void toggleFieldRelative() {
+        isFieldRelative = !isFieldRelative;
+        System.out.println("Field Relative Mode successfuly changed to: " + isFieldRelative);
+    }
+
+    public void toggleSlowMode() {
+        isSlowMode = !isSlowMode;
+        System.out.println("Slow Mode successfuly changed to: " + isSlowMode);
+    }
+
+    public Command turnToAngle(double angle) {
+        if(isFieldRelative == false) {
+            changedOrientation = true;
+            toggleFieldRelative();
+        }
+
+        return runOnce(() -> this.headingController.setSetpoint(angle)).andThen(
+            run(() -> {
+                    double headingControllerOutput = -this.headingController.calculate(this.getYawDegrees(), angle);
+                    this.drive(new Translation2d(0.0, 0.0), headingControllerOutput, false);
+            }).until(this.headingController::atSetpoint).andThen(
+                runOnce(() -> {
+                    if(changedOrientation) {
+                        changedOrientation = false;
+                        toggleFieldRelative();
+                    }
+                })
+            )
+        );
+    }
+
+    private Command turnToAngle(DoubleSupplier angleSupplier) {
+        if(isFieldRelative == false) {
+            changedOrientation = true;
+            toggleFieldRelative();
+        }
+
+        return runOnce(() -> this.headingController.setSetpoint(angleSupplier.getAsDouble())).andThen(
+            run(() -> {
+                  double headingControllerOutput = -this.headingController.calculate(angleSupplier.getAsDouble(), 0.0);
+                  this.drive(new Translation2d(0.0, 0.0), headingControllerOutput, false);
+            })
+        ).until(this.headingController::atSetpoint).andThen(
+            runOnce(() -> {
+                if(changedOrientation) {
+                    changedOrientation = false;
+                    toggleFieldRelative();
+                }
+            })
+        );
+    }
+
+    public Command turnToSpeaker() {
+        return this.turnToAngle(this::getAngleToSpeaker);
     }
 
     public Pose2d getPose() {
@@ -246,15 +336,6 @@ public class SwerveSubsystem extends SubsystemBase {
 
     public void resetSwerveOdometry(Pose2d pose) {
         swerveOdometry.resetPosition(getYawRotation2D(), getSwerveModulePositions(), pose);
-    }
-
-    public void resetModulesForward() {
-        setModuleStates(new SwerveModuleState[] {
-            new SwerveModuleState(0.0, Rotation2d.fromDegrees(0)),
-            new SwerveModuleState(0.0, Rotation2d.fromDegrees(0)),
-            new SwerveModuleState(0.0, Rotation2d.fromDegrees(0)),
-            new SwerveModuleState(0.0, Rotation2d.fromDegrees(0))
-        });
     }
 
     public void resetModulesToAbsolute() {
@@ -269,12 +350,9 @@ public class SwerveSubsystem extends SubsystemBase {
         }
     }
 
-    public void sysidroutine(SysIdRoutineLog log) {
-        log.motor("drive-BR")
-            .voltage(m_appliedVoltage.mut_replace(swerveModules[3].getMotorVoltage(), Volts))
-            .linearPosition(m_distance.mut_replace(swerveModules[3].getSwerveModulePosition().distanceMeters, Meters))
-            .linearVelocity(m_velocity.mut_replace(swerveModules[3].getMotorVelocity(), MetersPerSecond));
+    /* 
 
+    public void sysidroutine(SysIdRoutineLog log) {
         log.motor("drive-FL")
             .voltage(m_appliedVoltage.mut_replace(swerveModules[0].getMotorVoltage(), Volts))
             .linearPosition(m_distance.mut_replace(swerveModules[0].getSwerveModulePosition().distanceMeters, Meters))
@@ -289,6 +367,11 @@ public class SwerveSubsystem extends SubsystemBase {
             .voltage(m_appliedVoltage.mut_replace(swerveModules[2].getMotorVoltage(), Volts))
             .linearPosition(m_distance.mut_replace(swerveModules[2].getSwerveModulePosition().distanceMeters, Meters))
             .linearVelocity(m_velocity.mut_replace(swerveModules[2].getMotorVelocity(), MetersPerSecond));
+
+        log.motor("drive-BR")
+            .voltage(m_appliedVoltage.mut_replace(swerveModules[3].getMotorVoltage(), Volts))
+            .linearPosition(m_distance.mut_replace(swerveModules[3].getSwerveModulePosition().distanceMeters, Meters))
+            .linearVelocity(m_velocity.mut_replace(swerveModules[3].getMotorVelocity(), MetersPerSecond));
     }
 
     public Command sysIdQuasistatic(SysIdRoutine.Direction direction) {
@@ -307,6 +390,23 @@ public class SwerveSubsystem extends SubsystemBase {
         );
     }
 
+    */
+
+    public void swerveOnDisabled() {
+        setStatesForX();
+
+        for(SwerveModule module : swerveModules) {
+            module.moduleOnDisabled();
+        }
+    }
+
+    public void swerveOnEnabled() {
+        resetModulesForward();
+
+        for(SwerveModule module : swerveModules) {
+            module.moduleOnEnabled();
+        }
+    }
 
     @Override
     public void periodic() {
@@ -344,5 +444,15 @@ public class SwerveSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("FR Absolute Encoder Position", swerveModules[1].getSwerveEncoder().getDegrees());
         SmartDashboard.putNumber("BL Absolute Encoder Position", swerveModules[2].getSwerveEncoder().getDegrees());
         SmartDashboard.putNumber("BR Absolute Encoder Position", swerveModules[3].getSwerveEncoder().getDegrees());
+
+        SmartDashboard.putNumber("FL Velocity", swerveModules[0].getMotorVelocity());
+        SmartDashboard.putNumber("FR Velocity", swerveModules[1].getMotorVelocity());
+        SmartDashboard.putNumber("BL Velocity", swerveModules[2].getMotorVelocity());
+        SmartDashboard.putNumber("BR Velocity", swerveModules[3].getMotorVelocity());
+
+        SmartDashboard.putNumber("FL Position Meters", swerveModules[0].getDrivePositionMeters());
+        SmartDashboard.putNumber("FR Position Meters", swerveModules[1].getDrivePositionMeters());
+        SmartDashboard.putNumber("BL Position Meters", swerveModules[2].getDrivePositionMeters());
+        SmartDashboard.putNumber("BR Position Meters", swerveModules[3].getDrivePositionMeters());
   }
 }
