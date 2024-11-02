@@ -59,24 +59,12 @@ public class SwerveModule {
     private final SparkPIDController drivePIDController;
     private final SparkPIDController anglePIDController;
 
-    /* 
 
     private final MutableMeasure<Voltage> m_appliedVoltage = mutable(Volts.of(0));
     private final MutableMeasure<Distance> m_distance = mutable(Meters.of(0));
     private final MutableMeasure<Velocity<Distance>> m_velocity = mutable(MetersPerSecond.of(0));
 
-    private final SysIdRoutine m_sysIdRoutine = new SysIdRoutine(new SysIdRoutine.Config(), new SysIdRoutine.Mechanism((Measure<Voltage> volts) -> {
-            driveMotor.setVoltage(volts.in(Volts));
-        },
-        log -> {
-            log.motor("swerveDriveMotor").voltage(m_appliedVoltage.mut_replace(driveMotor.get() * RobotController.getBatteryVoltage(), Volts))
-                .linearPosition(m_distance.mut_replace(driveEncocder.getPosition(), Meters))
-                .linearVelocity(m_velocity.mut_replace(driveEncocder.getVelocity(), MetersPerSecond));
-        },
-        (Subsystem) this)
-    );
-
-    */
+    private final SysIdRoutine m_sysIdRoutine;
 
     private final SimpleMotorFeedforward feedforward = new SimpleMotorFeedforward(Constants.ModuleConstants.driveKS, Constants.ModuleConstants.driveKV, Constants.ModuleConstants.driveKA);
 
@@ -99,6 +87,16 @@ public class SwerveModule {
         configureDriveMotor();
 
         lastAngle = getSwerveModuleState().angle;
+
+        m_sysIdRoutine = new SysIdRoutine(new SysIdRoutine.Config(), new SysIdRoutine.Mechanism((Measure<Voltage> volts) -> {
+            driveMotor.setVoltage(volts.in(Volts));
+        },
+        log -> {
+            log.motor("swerveDriveMotor").voltage(m_appliedVoltage.mut_replace(driveMotor.get() * RobotController.getBatteryVoltage(), Volts))
+                .linearPosition(m_distance.mut_replace(driveEncocder.getPosition(), Meters))
+                .linearVelocity(m_velocity.mut_replace(driveEncocder.getVelocity(), MetersPerSecond));
+        },
+        (Subsystem) this));
     }
 
     private void configureSwerveEncoder() {
@@ -224,8 +222,6 @@ public class SwerveModule {
         stopAngleMotor();
     }
 
-    /* 
-
     public Command sysIdQuasistatic(SysIdRoutine.Direction direction) {
         return m_sysIdRoutine.quasistatic(direction);
     }
@@ -233,6 +229,4 @@ public class SwerveModule {
     public Command sysIdDynamic(SysIdRoutine.Direction direction) {
         return m_sysIdRoutine.dynamic(direction);
     }
-
-    */
 }

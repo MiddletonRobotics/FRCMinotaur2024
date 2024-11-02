@@ -42,7 +42,6 @@ import frc.robot.commands.IntakeNote;
 import frc.robot.commands.IntakePull;
 import frc.robot.commands.IntakePush;
 import frc.robot.commands.StopIntake;
-import frc.robot.commands.ScorePositionQuad;
 
 import frc.robot.utilities.Controller;
 import frc.robot.utilities.constants.Constants;
@@ -75,7 +74,6 @@ public class RobotContainer {
 
   private final JoystickButton resetHeading;
   private final JoystickButton robotCentric;
-  private final JoystickButton findScorePosition;
   private final JoystickButton speakerScoring;
   private final JoystickButton ampScoring;
   private final JoystickButton deployIntake;
@@ -101,7 +99,6 @@ public class RobotContainer {
   private final IntakePull pullNote;
   private final IntakePush pushNote;
   private final StopIntake stopIntake;
-  private final ScorePositionQuad goScorePosition;
   private final CycleShooter cyclingShooter;
 
   public RobotContainer() {
@@ -126,7 +123,6 @@ public class RobotContainer {
 
     resetHeading = new JoystickButton(DriverController, Constants.ControllerRawButtons.XboxController.Button.kY.value);
     robotCentric = new JoystickButton(DriverController, Constants.ControllerRawButtons.XboxController.Button.kX.value);
-    findScorePosition = new JoystickButton(DriverController, Constants.ControllerRawButtons.XboxController.Button.kB.value);
     cycleButton = new JoystickButton(DriverController, Constants.ControllerRawButtons.XboxController.Button.kA.value);
     speakerScoring = new JoystickButton(OperatorController, Constants.ControllerRawButtons.XboxController.Button.kRightBumper.value);
     ampScoring = new JoystickButton(OperatorController, Constants.ControllerRawButtons.XboxController.Button.kLeftBumper.value);
@@ -150,7 +146,6 @@ public class RobotContainer {
     pushNote = new IntakePush(intakeSubsystem);
     stopIntake = new StopIntake(intakeSubsystem);
     cyclingShooter = new CycleShooter(shooterSubsystem, intakeSubsystem);
-    goScorePosition = new ScorePositionQuad(swerveSubsystem);
 
     swerveSubsystem.setDefaultCommand(new SwerveController(
       swerveSubsystem, 
@@ -176,7 +171,6 @@ public class RobotContainer {
     outtakeGamePiece.whileTrue(pullNote);
     intakeGamePiece.whileFalse(stopIntake);
     outtakeGamePiece.whileFalse(stopIntake);
-    findScorePosition.whileTrue(goScorePosition);
 
     rightClimberUp.whileTrue(climberSubsystem.rightClimbUp());
     rightClimberUp.whileFalse(new InstantCommand(() -> climberSubsystem.rightClimberReset()));
