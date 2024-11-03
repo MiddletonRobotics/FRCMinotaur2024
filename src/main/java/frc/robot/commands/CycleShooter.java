@@ -2,6 +2,7 @@ package frc.robot.commands;
 
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
 
@@ -20,8 +21,9 @@ public class CycleShooter extends Command {
     @Override
     public void execute() {
         shooterSubsystem.shooterSpeakerScoring();
+        new WaitCommand(1.5);
         intakeSubsystem.intakeToShooter();
-        Timer.delay(2.5);
+        new WaitCommand(1);
         shooterSubsystem.stopShooter();
         intakeSubsystem.stopIntake();
     }

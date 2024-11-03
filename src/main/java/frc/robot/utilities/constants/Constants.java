@@ -22,7 +22,7 @@ public class Constants {
 
         /* Swerve Current Limiting */
         public static final int angleContinuousCurrentLimit = 20; // Steering the swerve modules requires less power, and doesn't have a lot of movement, therefore we can reduce the amperes we are feeding it
-        public static final int driveContinuousCurrentLimit = 20; // Drive motors should be at the maximum reccomended amperes to get the most power and speed from it
+        public static final int driveContinuousCurrentLimit = 40; // Drive motors should be at the maximum reccomended amperes to get the most power and speed from it
 
         /* PID Values for the Motors. Used to correct the error when trying to move the motors to a desired location */
         public static final double angleKP = 0.004; // Propotional: If there is error, move the motor propotional to the error
@@ -103,8 +103,8 @@ public class Constants {
         public static final double AngleConversionFactor = 360.0 / AngleGearRatio;
 
         /* Swerve Profiling Values */
-        public static final double PhysicalMaxSpeedMetersPerSecond = 9; // (4.1) Maximum speed in meters per second that the Swerve Modules allow you to go
-        public static final double PhysicalMaxAcceleration = 1.9; // (1.9)
+        public static final double PhysicalMaxSpeedMetersPerSecond = 9.5; // (4.1) Maximum speed in meters per second that the Swerve Modules allow you to go
+        public static final double PhysicalMaxAcceleration = 2.5; // (1.9)
         public static final double PhysicalAngularMaxVelocity = 3 * Math.PI; // Maxiumum speed in radians per seconr that the swerve module is able to rotate (6.28 radians per full rotation)
         public static final double PhysicalMaxAngularAcceleration = 3.2;
 
