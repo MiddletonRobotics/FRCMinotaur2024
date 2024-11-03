@@ -83,6 +83,7 @@ public class IntakeSubsystem extends SubsystemBase {
         CANSparkMaxUtil.setCANSparkMaxBusUsage(pivotMotor, Usage.kAll);
         pivotMotor.setIdleMode(Constants.IntakeConstants.pivotMotorNeutralMode);
         pivotEncoder.setPositionConversionFactor(Constants.IntakeConstants.AngleConversionFactor);
+        pivotMotor.setSmartCurrentLimit(60);
         pivotPIDController.setFeedbackDevice(pivotEncoder);
         pivotPIDController.setP(Constants.IntakeConstants.pivotKP);
         pivotPIDController.setI(Constants.IntakeConstants.pivotKI);
@@ -146,12 +147,12 @@ public class IntakeSubsystem extends SubsystemBase {
     }
 
     public void intkeOut(){
-        pivotMotor.set(0.3);
+        pivotMotor.set(0.8);
         System.out.println("out");
     }
 
     public void intkeIn(){
-        pivotMotor.set(-0.3);
+        pivotMotor.set(-0.8);
     }
 
     public void stop(){
@@ -176,12 +177,12 @@ public class IntakeSubsystem extends SubsystemBase {
 
     //we felt a little silly with the names
     public void intakeConsume() {
-        rollerMotor.set(-0.3); //whatever makes motor take thingy
+        rollerMotor.set(-0.5); //whatever makes motor take thingy
         setIntakeState(IntakeDirection.FORWARD);
     }
 
     public void intakeRegurgitate() {
-        rollerMotor.set(0.3); //whatever makes motor release thingy
+        rollerMotor.set(0.5); //whatever makes motor release thingy
         setIntakeState(IntakeDirection.REVERSE);
     }
 

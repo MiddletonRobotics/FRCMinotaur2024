@@ -20,9 +20,9 @@ public class ShooterController extends Command {
     @Override
     public void execute() {
         shooterSubsystem.shooterSpeakerScoring();
-        new WaitCommand(1);
+        Timer.delay(2);
         intakeSubsystem.intakeToShooter();
-        new WaitCommand(2);
+        Timer.delay(1.5);
         shooterSubsystem.stopShooter();
         intakeSubsystem.stopIntake();
     }

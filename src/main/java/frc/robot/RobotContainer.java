@@ -20,6 +20,7 @@ import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.networktables.DoubleSubscriber;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -124,8 +125,8 @@ public class RobotContainer {
     resetHeading = new JoystickButton(DriverController, Constants.ControllerRawButtons.XboxController.Button.kY.value);
     robotCentric = new JoystickButton(DriverController, Constants.ControllerRawButtons.XboxController.Button.kX.value);
     cycleButton = new JoystickButton(DriverController, Constants.ControllerRawButtons.XboxController.Button.kA.value);
-    speakerScoring = new JoystickButton(OperatorController, Constants.ControllerRawButtons.XboxController.Button.kRightBumper.value);
-    ampScoring = new JoystickButton(OperatorController, Constants.ControllerRawButtons.XboxController.Button.kLeftBumper.value);
+    speakerScoring = new JoystickButton(DriverController, Constants.ControllerRawButtons.XboxController.Button.kRightBumper.value);
+    ampScoring = new JoystickButton(DriverController, Constants.ControllerRawButtons.XboxController.Button.kLeftBumper.value);
     
     deployIntake = new JoystickButton(OperatorController, Constants.ControllerRawButtons.XboxController.Button.kA.value);
     storeIntake = new JoystickButton(OperatorController, Constants.ControllerRawButtons.XboxController.Button.kB.value);
@@ -154,6 +155,8 @@ public class RobotContainer {
       () -> -DriverController.getRawAxis(rotationAxis), 
       () -> robotCentric.getAsBoolean())
     );
+
+    RobotController.setBrownoutVoltage(6.5);
       
     configureButtonBindings();
   }
